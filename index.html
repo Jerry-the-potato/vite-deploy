@@ -2,12 +2,108 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <!-- <link rel="icon" type="image/svg+xml" href="/vite.svg" /> -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Vite + React</title>
+    <title>Station</title>
+    <!--Google Fonts-->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300&family=Noto+Sans+TC:wght@300&display=swap" rel="stylesheet">
+           
   </head>
-  <body>
+  <body class="body">
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
+    <script>
+      	const managerMaker = function(){
+          this.validId = ["S1", "S2", "S3"];
+          this.lastId = "";
+          this.lastRequests = [];
+          this.request = {};
+          this.getRequestsById = (id) => {
+            if(typeof isSomethingHappended !== "undefined") return null;
+            // some magic here and BOOM!!
+            // ... may be more conplicated
+            const req = [];
+            for(let key in this.request){
+              if(key.includes(id)) req.push(this.request[key])
+            }
+            return req;
+          }
+          this.updateRequestAnimation = (id) => {
+            const newRequests = this.getRequestsById(id);
+            this.lastId = id;
+            this.lastRequests.forEach(request => {
+              cancelAnimationFrame(request.ID);
+            })
+            
+            if(newRequests === null) return;
+            this.lastRequests = newRequests;
+            newRequests.forEach(request => {
+              if(typeof request === "undefined") return console.warn("invalid request");
+              if(typeof request.method === "undefined") return console.warn("invalid requestMethod");
+              request.ID = requestAnimationFrame(request.method);
+            })
+            
+          }
+          this.setMethod = (name, method) => {
+            this.request[name] = this.request[name] || {};
+            this.request[name].method = method;
+            // setRequst(request);
+            if(name.includes(this.lastId)) this.updateRequestAnimation(this.lastId);
+          }
+          this.setID = (name, id) => {
+            this.request[name] = this.request[name] || {};
+            this.request[name].ID = id;
+            // setRequst(request);
+          }
+          this.cancelAnimationByName = (name) => {
+            cancelAnimationFrame(this.request[name].ID);
+          }
+          this.requestAnimationByName = (name) => {
+            this.request[name].ID = requestAnimationFrame(this.request[name].method);
+          }
+          this.addAnimationByName = (callback) => {
+            const name = callback.name || Math.abs(Math.random() * 100);
+            this.request[name] = this.request[name] || {};
+            this.request[name].method = function animate(){
+              callback();
+              this.request[name].ID = requestAnimationFrame(animate.bind(this));
+            }.bind(this)
+            this.updateRequestAnimation(this.lastId);
+        
+            const valid = this.validId.some(ID => name.includes(ID));
+            if(!valid) console.warn("naming issue: " + name + " should include one of following letters: " + this.validId);
+          }
+          return this;
+        }
+        const manager = new managerMaker();
+        window.addEventListener('load', function(){
+          const io = new IntersectionObserver((entries) => {
+            entries.forEach((entry) => {
+              // 實測大約0.01 ~ 0.05
+              // console.log(entry.target.id + ": " + entry.intersectionRatio);
+              if(entry.intersectionRatio === 0) return;
+              manager.updateRequestAnimation(entry.target.id);
+            });
+          });
+          const sectionElList = document.querySelectorAll(".section");
+          sectionElList.forEach((el) => {
+            io.unobserve(el) // avoid observing one element mutiple time
+            io.observe(el);
+          });
+        }, false);
+        // window.manager = manager;
+        
+        window.addEventListener("resize", function(){
+            const ID = location.href.split("#")[1];
+            document.getElementById("to" + ID).click();
+            manager.updateRequestAnimation(ID);
+        }, false)
+    </script>
+    <!-- <script type="text/javascript" src="./src/js/animateManager.js"></script> -->
+    <script type="module" src="./src/js/lokaVolterra.js"></script>
+    <script type="module" src="/src/js/musicAnalyser.js"></script>
+    <script type="module" src="/src/js/physic.js"></script>
   </body>
 </html>

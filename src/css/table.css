@@ -1,0 +1,81 @@
+.table{
+    width: 100%;
+    border-color: var(--soft-color);
+    border-width: 1em;
+    border-radius: 2em;
+    border-style: double;
+}
+    .thead, tbody{
+    }
+        .tr{
+            font-size: 1.4em;
+            height: 1em;
+        }
+        .th:nth-child(1), .td:nth-child(1){
+            width: 2.5em;
+        }
+        .th:nth-child(2), .td:nth-child(2){
+            width: 4.5em;
+            color: var(--textbg-color);;
+        }
+        .th:nth-child(3), .td:nth-child(3){
+            width: 2.5em;
+        }
+        .th:nth-child(4), .td:nth-child(4){
+            width: 1em;
+        }
+        .th:nth-child(5), .td:nth-child(5){
+            width: 2.5em;
+        }
+            .th, .td{
+                text-align: center;
+                vertical-align: bottom;
+                padding: 0 0 0 0.4em;
+                border-width: 0.01em;
+                border-color: var(--soft-color);
+                border-style:dashed;
+            }
+            .input{
+                font-size: 0.8em;
+                width: 90%;
+                padding: 0.1em 0.4em 0.1em 0.4em;
+                border-radius: 0.5em;
+                color: var(--main-color);
+                background-color: var(--soft-color);
+                /* border-width: 0; */
+            }
+.pagination{
+    position: absolute;
+    width: -webkit-fill-available;
+    display: flex;
+    bottom: 1em;
+    margin: 0.5em;
+}
+.pagDescription{
+    width: 9em;
+}
+    .button{
+        width: auto;
+        flex: auto;
+        font-size: 1.2rem;
+        color: var(--soft-color);
+        background-color: transparent;
+        border-color: var(--soft-color);
+        border-style: outset;
+        border-width: 0.1em;
+        border-radius: 0.5em;
+        padding: 0.2em 0.5em;
+        margin: 0.2em;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+    .button:hover{
+        border-style: inset;
+        background-color: var(--textbg-color);
+        color: var(--main-color);
+    }
+    /* .button:disabled{
+        color: var(--darker-color);
+        border-color: var(--darker-color);
+
+    } */

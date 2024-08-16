@@ -1,0 +1,100 @@
+class PathConfig{
+    static linear = -1;
+    static easein = 0;
+    static easeout = 2;
+
+    static leapLinear = 0;
+    static leapEasein = -2;
+    static leapEaseout = 2;
+    
+    static setPath(linear = 1, easein = 0, easeout = 0){
+        if(linear + easein + easeout != 1) console.warn("sum of parameter is recommend to be 1");
+        PathConfig.linear = linear;
+        PathConfig.easein = easein;
+        PathConfig.easeout = easeout;
+    }
+
+    static setLeap(linear = 0, easein = 0, easeout = 0){
+        PathConfig.leapLinear = linear;
+        PathConfig.leapEasein = easein;
+        PathConfig.leapEaseout = easeout;
+    }
+
+    getPath(){
+        return [PathConfig.linear, PathConfig.easein, PathConfig.easeout];
+    }
+    getLeap(){
+        return [PathConfig.leapLinear, PathConfig.leapEasein, PathConfig.leapEaseout];
+    }
+}
+class Path extends PathConfig{
+    constructor(x = 0, y = 0){
+        super();
+        this.pointX = x;
+        this.pointY = y;
+    
+        this.originX = x;
+        this.originY = y;
+        this.targetX = x;
+        this.targetY = y;
+        this.period = 90;
+        this.timer = 0;
+    }
+    NewTarget = function(targetX, targetY, frames){
+        this.targetX = targetX;
+        this.targetY = targetY;
+        this.originX = this.pointX;
+        this.originY = this.pointY;
+        this.timer = frames;
+        this.period = frames;
+    };
+    ResetTo = function(x = x, y = y){
+        this.pointX = x;
+        this.pointY = y;
+        this.timer = 0;
+    };
+
+    getPath(){
+        return super.getPath();
+    }
+    getLeap(){
+        return super.getLeap();
+    }
+    NextFrame = function validInS1_S2_S3(){
+        if(this.timer > 0){
+            this.timer--;
+            const dX = this.targetX - this.originX;
+            const dY = this.targetY - this.originY;
+            const t = this.timer;
+            const p = this.period;
+            const linear = 1/p;
+            const easeout = Math.pow((t+1)/p, 2) - Math.pow((t)/p, 2);
+            const easein = Math.pow(1 - (t-1)/p, 2) - Math.pow(1 - t/p, 2);
+            const [a, b, c] = this.getPath();
+            const [d, e, f] = this.getLeap();
+            this.pointX+= (a * linear + b * easein + c * easeout) * dX;
+            this.pointY+= (a * linear + b * easein + c * easeout) * dY
+                + (d * linear + e * easein + f * easeout) * ((-dX/5 + 10 * -dX/Math.abs(dX==0 ? 1 : dX)));
+        }
+        else if(this.timer == 0){
+            this.timer--;
+            this.pointX = this.targetX;
+            this.pointY = this.targetY;
+        }
+    }.bind(this);
+}
+// const gameBox = document.getElementById("gameBox");
+// gameBox.addEventListener("mousemove", function(e){
+//     let Rect = gameBox.getBoundingClientRect();
+//     if(true){
+//         a = ((e.pageX - Rect.x)) / (Rect.width);
+//         b = ((e.pageY - Rect.y)) / (Rect.height);
+//         const frames = 30;
+//         myMouse.NewTarget(a, b, frames);
+//     }
+// }, false);
+// myMouse = new Path(0, 0);
+// manager.addAnimationByName(myMouse.NextFrame);
+
+export { Path };
+export { PathConfig };
