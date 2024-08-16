@@ -12712,6 +12712,7 @@ function MainScreen() {
 function GameBox({ margin }) {
   let w2 = window.innerWidth - margin * 2;
   let h = window.innerHeight - margin * 2;
+  const [ratio, setRatio] = reactExports.useState(window.innerWidth > 992 ? 1 : 2);
   const [max, setMax] = reactExports.useState(getMax);
   const [tableData, setTableData] = reactExports.useState([]);
   function getMax() {
@@ -12721,6 +12722,7 @@ function GameBox({ margin }) {
   window.onresize = function handleResize() {
     w2 = window.innerWidth - margin * 2;
     h = window.innerHeight - margin * 2;
+    setRatio(window.innerWidth > 992 ? 1 : 2);
     setMax(getMax);
   };
   const columns = [
@@ -12812,14 +12814,14 @@ function GameBox({ margin }) {
         /* @__PURE__ */ jsxRuntimeExports.jsx(Section, { id: "home", content: /* @__PURE__ */ jsxRuntimeExports.jsx(jsxRuntimeExports.Fragment, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(Table, { columns, rows }) }) }),
         /* @__PURE__ */ jsxRuntimeExports.jsx(Section, { id: "S1", content: /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx("h4", { children: "Opps! 似乎還在施工中" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("canvas", { id: "canvasS1", width: max, height: window.innerWidth < 992 ? max * 2 : max }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("canvas", { id: "bitmap", width: max, height: window.innerWidth < 992 ? max * 2 : max }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("canvas", { id: "canvasS1", width: max * ratio, height: window.innerWidth < 992 ? ratio * max * 2 : ratio * max }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("canvas", { id: "bitmap", width: max * ratio, height: window.innerWidth < 992 ? ratio * max * 2 : ratio * max }),
           /* @__PURE__ */ jsxRuntimeExports.jsx(MenuS1, {})
         ] }) }),
         /* @__PURE__ */ jsxRuntimeExports.jsx(Section, { id: "S2", content: /* @__PURE__ */ jsxRuntimeExports.jsx(jsxRuntimeExports.Fragment, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(Audio, { id: "myAudio", name: "Lovely Piano Song" }) }) }),
         /* @__PURE__ */ jsxRuntimeExports.jsx(Section, { id: "S3", content: /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx("h4", { children: "Opps! 似乎還在施工中" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("canvas", { id: "canvasS3", ref: canvasRef, width: max, height: window.innerWidth < 992 ? max * 2 : max }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("canvas", { id: "canvasS3", ref: canvasRef, width: max * ratio, height: window.innerWidth < 992 ? ratio * max * 2 : ratio * max }),
           /* @__PURE__ */ jsxRuntimeExports.jsx(Button, { onClick: handleClick, id: "record", text: Status }),
           /* @__PURE__ */ jsxRuntimeExports.jsx(MenuS3, {})
         ] }) })
@@ -12829,7 +12831,7 @@ function GameBox({ margin }) {
 }
 function MenuS1() {
   return /* @__PURE__ */ jsxRuntimeExports.jsx(Div, { className: "gamemenu", content: /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
-    /* @__PURE__ */ jsxRuntimeExports.jsx("header", { id: "header", children: /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { children: "Lotka Volterra 實驗場" }) }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx("header", { id: "header", children: /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { children: "Lotka Volterra 實驗場：主線程 vs Web Woker" }) }),
     /* @__PURE__ */ jsxRuntimeExports.jsx(Div, { className: "parameter", content: /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
       /* @__PURE__ */ jsxRuntimeExports.jsx(Input, { text: "Alpha :", type: "number", id: "alpha-equation", value: "5" }),
       /* @__PURE__ */ jsxRuntimeExports.jsx(Input, { text: "Beta :", type: "number", id: "beta-equation", value: "10" }),
@@ -35284,8 +35286,8 @@ window.addEventListener("load", function() {
       this.j = 0;
       this.sortFunction = function nothingHere() {
       };
-      this.maxValue = 400;
-      const length = 200;
+      this.maxValue = y2;
+      const length = Math.floor(x2 - 200);
       const width = Math.max(Math.floor(x2 * 2 / length), 0.5);
       this.columns = new Array(length).fill().map((v2, i) => {
         return this.createColumn(x2 - width * length / 2 + width * i, y2 * 1.8, width, (i + 1) / length * this.maxValue);
@@ -35497,7 +35499,7 @@ window.addEventListener("load", function() {
         ctx.beginPath();
         ctx.moveTo(column.path.pointX, column.path.pointY);
         ctx.lineTo(column.path.pointX, column.path.pointY - column.height);
-        const c = column.height / 400;
+        const c = column.height / canvas.height * 2;
         const r2 = 246 + c * (195 - 246);
         const g = 211 + c * (160 - 211);
         const b = 101 + c * (133 - 101);
@@ -35594,4 +35596,4 @@ window.addEventListener("load", function() {
   }
   const frame = new Averager(60);
 });
-//# sourceMappingURL=index-BXhy-hmo.js.map
+//# sourceMappingURL=index-D0Ywy0CU.js.map
