@@ -530,7 +530,7 @@ window.addEventListener("load", function () {
             // this.maxValue = columns.reduce((max, column) => {
             //     return column.height > max ? column.height : max;
             // }, columns[0].height);
-            this.count = new Array(this.maxValue).fill(0);
+            this.count = new Array(Math.floor(this.maxValue)).fill(0);
             this.secondColumns = new Array(columns.length);
             this.i = 0;
             this.countingPhase = "1.count";
