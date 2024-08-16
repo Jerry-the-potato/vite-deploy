@@ -35068,7 +35068,7 @@ window.addEventListener("load", function() {
             this.mergePhase = "1.Copy";
             col.forEach((column, index) => {
               column.height = columns[min + index].height;
-              column.path.NewTarget(column.x, column.y - 400, 20);
+              column.path.NewTarget(column.x, column.y - canvas.height * 0.4, 20);
               column.width /= 3;
             });
           } else {
@@ -35596,4 +35596,4 @@ window.addEventListener("load", function() {
   }
   const frame = new Averager(60);
 });
-//# sourceMappingURL=index-BMU0X0R6.js.map
+//# sourceMappingURL=index-CTgLK6kQ.js.map
