@@ -35194,7 +35194,7 @@ window.addEventListener("load", function() {
         return column.height;
       });
       this.maxValue = Math.max(...heights);
-      this.count = new Array(this.maxValue).fill(0);
+      this.count = new Array(Math.floor(this.maxValue)).fill(0);
       this.secondColumns = new Array(columns.length);
       this.i = 0;
       this.countingPhase = "1.count";
@@ -35596,4 +35596,4 @@ window.addEventListener("load", function() {
   }
   const frame = new Averager(60);
 });
-//# sourceMappingURL=index-CTgLK6kQ.js.map
+//# sourceMappingURL=index-CYGkGqu8.js.map
