@@ -333,7 +333,7 @@ window.addEventListener("load", function () {
                         this.secondColumns = JSON.parse(JSON.stringify(columns.slice(0, columns.length + 1)));
                         this.secondColumns.forEach((column, index) => {
                             column.path = new Path(column.x, column.y);
-                            column.path.NewTarget(column.x, column.y - 400, 20);
+                            column.path.NewTarget(column.x, column.y - canvas.height*0.4, 20);
                             column.width/=3;
                         })
                         return;
@@ -354,7 +354,7 @@ window.addEventListener("load", function () {
                     col.forEach((column, index) => {
                         column.height = columns[min + index].height;
                         column.width = columns[min + index].width/2;
-                        column.path.NewTarget(column.x, column.y - 400, 20);
+                        column.path.NewTarget(column.x, column.y - canvas.height*0.4, 20);
                     })
                     this.mergePhase = "2.Merge";
                     break;
@@ -559,7 +559,7 @@ window.addEventListener("load", function () {
                 case "3.build":
                     const index = this.count[Math.round(columns[i].height) - 1]; // 如果有兩個以上會出錯
                     this.secondColumns[index] = JSON.parse(JSON.stringify(columns[i]));
-                    this.secondColumns[index].y = columns[i].y - 400;
+                    this.secondColumns[index].y = columns[i].y - canvas.height*0.4;
                     this.secondColumns[index].width/=2
                     this.secondColumns[index].path = new Path(columns[i].x, columns[i].y);
                     this.secondColumns[index].path.NewTarget(columns[index].x, columns[i].y - 400, 60 + Math.round(i/len * 60));
@@ -624,7 +624,7 @@ window.addEventListener("load", function () {
             this.j = 0;
             this.sortFunction = function nothingHere(){};
             // this.status = {'i': 0, 'j': 0, 'isSorting': false, 'sortFunction': function nothingHere(){}, 'isStoping': false};
-            this.maxValue = y;
+            this.maxValue = canvas.height*0.4;
             const length = Math.floor(x - 200);
             const width = Math.max(Math.floor(x*2/length), 0.5);
             this.columns = new Array(length).fill().map((v,i) => {

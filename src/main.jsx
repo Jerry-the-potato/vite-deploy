@@ -173,7 +173,7 @@ function GameBox({margin}){
 }
 function MenuS1(){
     return <Div className="gamemenu" content=<>
-                <header id="header"><h3>Lotka Volterra 實驗場：主線程 vs Web Woker</h3></header>
+                <header id="header"><h3>Lotka Volterra 實驗場 + Web Woker</h3></header>
                 <Div className="parameter" content=<>
                     <Input text="Alpha :" type="number" id="alpha-equation" value="5"/>
                     <Input text="Beta :" type="number" id="beta-equation" value="10"/>

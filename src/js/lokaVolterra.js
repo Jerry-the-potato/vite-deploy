@@ -63,8 +63,8 @@ window.addEventListener("load", function () {
 		this.innerText = "停止(左)";
 	}, false);
 
-	let slide = document.getElementsByClassName("slideMenu")[0];
-	let menu = document.getElementsByClassName("gamemenu")[0];
+	const slide = document.getElementsByClassName("slideMenu")[0];
+	const menu = document.getElementsByClassName("gamemenu")[0];
 	slide.addEventListener("click", function(){
 		const rectMenu = menu.getBoundingClientRect();
 		const rectButton = slide.getBoundingClientRect();
@@ -79,19 +79,19 @@ window.addEventListener("load", function () {
 		}
 	}, false);
 
-	slide = document.getElementsByClassName("slideMenu")[1];
-	menu = document.getElementsByClassName("gamemenu")[1];
-	slide.addEventListener("click", function(){
-		const rectMenu = menu.getBoundingClientRect();
-		const rectButton = slide.getBoundingClientRect();
+	const slide2 = document.getElementsByClassName("slideMenu")[1];
+	const menu2 = document.getElementsByClassName("gamemenu")[1];
+	slide2.addEventListener("click", function(){
+		const rectMenu = menu2.getBoundingClientRect();
+		const rectButton = slide2.getBoundingClientRect();
 		const height = rectButton.y - rectMenu.y;
-		if(slide.innerText == "△"){
-			menu.style.top = "-" + height + "px";
-			slide.innerText = "▽";
+		if(slide2.innerText == "△"){
+			menu2.style.top = "-" + height + "px";
+			slide2.innerText = "▽";
 		}
 		else{
-			menu.style.top = "1%";
-			slide.innerText = "△";
+			menu2.style.top = "1%";
+			slide2.innerText = "△";
 		}
 	}, false);
 
