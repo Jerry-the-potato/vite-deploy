@@ -396,7 +396,7 @@ window.addEventListener("load", function () {
                         this.mergePhase = "1.Copy";
                         col.forEach((column, index) => {
                             column.height = columns[min + index].height;
-                            column.path.NewTarget(column.x, column.y - 400, 20);
+                            column.path.NewTarget(column.x, column.y - canvas.height*0.4, 20);
                             column.width/=3;
                         })
                     }
