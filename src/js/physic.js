@@ -624,8 +624,8 @@ window.addEventListener("load", function () {
             this.j = 0;
             this.sortFunction = function nothingHere(){};
             // this.status = {'i': 0, 'j': 0, 'isSorting': false, 'sortFunction': function nothingHere(){}, 'isStoping': false};
-            this.maxValue = 400;
-            const length = 200;
+            this.maxValue = y;
+            const length = Math.floor(x - 200);
             const width = Math.max(Math.floor(x*2/length), 0.5);
             this.columns = new Array(length).fill().map((v,i) => {
                 return this.createColumn(x - width * length/2 + width * i, y * 1.8, width, ((i+1)/length) * this.maxValue);
@@ -886,7 +886,7 @@ window.addEventListener("load", function () {
                 // ctx.lineTo(column.x, column.y - column.height);
                 ctx.moveTo(column.path.pointX, column.path.pointY);
                 ctx.lineTo(column.path.pointX, column.path.pointY - column.height);
-                const c = column.height / 400;
+                const c = column.height / canvas.height * 2;
                 // const r = 100 + c * (202 - 100);
                 // const g = 50 + c * (254 - 50);
                 // const b = 225 + c * (127 - 225);

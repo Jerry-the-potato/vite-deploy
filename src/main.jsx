@@ -37,6 +37,7 @@ function GameBox({margin}){
     
     let w = window.innerWidth - margin*2;
     let h = window.innerHeight - margin*2;
+    const [ratio, setRatio] = useState(window.innerWidth > 992 ? 1 : 2);
     const [max, setMax] = useState(getMax);
     const [tableData, setTableData] = useState([]);
 
@@ -47,6 +48,7 @@ function GameBox({margin}){
     window.onresize = function handleResize(){
         w = window.innerWidth - margin*2;
         h = window.innerHeight - margin*2;
+        setRatio(window.innerWidth > 992 ? 1 : 2)
         setMax(getMax);
     }
 
@@ -150,8 +152,8 @@ function GameBox({margin}){
             </>/>
             <Section id="S1" content= <>
                 <h4>Opps! 似乎還在施工中</h4>
-                <canvas id="canvasS1" width={max} height={window.innerWidth<992 ? max*2 : max}></canvas>
-                <canvas id="bitmap" width={max} height={window.innerWidth<992 ? max*2 : max}></canvas>
+                <canvas id="canvasS1" width={max*ratio} height={window.innerWidth<992 ? ratio *max*2 : ratio *max}></canvas>
+                <canvas id="bitmap" width={max*ratio} height={window.innerWidth<992 ? ratio *max*2 : ratio *max}></canvas>
                 <MenuS1/>
             </>/>
             <Section id="S2" content= <>
@@ -161,7 +163,7 @@ function GameBox({margin}){
             </>/>
             <Section id="S3" content= <>
                 <h4>Opps! 似乎還在施工中</h4>
-                <canvas id="canvasS3" ref={canvasRef} width={max} height={window.innerWidth<992 ? max*2 : max}></canvas>
+                <canvas id="canvasS3" ref={canvasRef} width={max*ratio} height={window.innerWidth<992 ? ratio *max*2 : ratio *max}></canvas>
                 {/* <Menu/> */}
                 <Button onClick={handleClick} id="record" text={Status}/>
                 <MenuS3/>
@@ -171,7 +173,7 @@ function GameBox({margin}){
 }
 function MenuS1(){
     return <Div className="gamemenu" content=<>
-                <header id="header"><h3>Lotka Volterra 實驗場</h3></header>
+                <header id="header"><h3>Lotka Volterra 實驗場：主線程 vs Web Woker</h3></header>
                 <Div className="parameter" content=<>
                     <Input text="Alpha :" type="number" id="alpha-equation" value="5"/>
                     <Input text="Beta :" type="number" id="beta-equation" value="10"/>
