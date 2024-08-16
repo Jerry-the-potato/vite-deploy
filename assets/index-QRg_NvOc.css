@@ -1,0 +1,347 @@
+/* myDefault */
+h1, h2, h3, p, ul, li, a, input{
+  margin: 0;
+  padding: 0;
+  line-height: 1.5;
+}
+a{
+  text-decoration: none;
+  outline: none;
+}
+h3{
+  font-size: 1.25em;
+}
+p{
+  font-size: 1em;
+}
+header, .div{
+  margin: 0.8rem;
+}
+ul, li{
+  list-style-type: none;
+}
+button{
+  font-family: 'Noto Sans TC', 'IBM Plex Sans', sans-serif;
+}
+
+/* 基本版面架構 */
+html{
+  font-size: 16px;
+}
+body{
+touch-action: none;
+margin: 0;
+  font-family: 'Noto Sans TC', 'IBM Plex Sans', sans-serif;
+  --main-color:     #456;
+  --darker-color:   #222;
+  --soft-color:     rgb(222, 241, 255);
+  /* --soft-color:     rgba(179, 198, 213, 1); */
+  --textbg-color: #FFEEDD;
+  background-color: var(--textbg-color);
+}
+canvas{
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  /* filter: blur(2px) contrast(5.5); */
+  /* filter: blur(1px); */
+}
+
+/* 頁首設定 */
+header{
+  position: absolute;
+  width: 100%;
+  font-size: 1rem;
+}
+nav{
+  position: fixed;
+  top: 0;
+  left: 0px;
+  width: 250px;
+  height: 100%;
+  z-index: 2;
+  background-color: var(--darker-color);
+  transition: all 0.5s ease-in-out;
+}
+nav a{
+  display: block;
+  padding: 0.6em;
+  font-size: 1.5em;
+  font-weight: 600;
+  text-align: center;
+  color: var(--textbg-color);
+}
+nav a:hover{
+  background-color: var(--main-color);
+  color: var(--soft-color);
+}
+#navSlider{
+  position: fixed;
+  top: 10px;
+  left: 10px;
+  width: 30px;
+  height: 30px;
+  margin: 0;
+  font-size: 20px;
+  border-radius: 15px;
+  z-index: 2;
+  background-color: var(--textbg-color);
+}
+#navSlider:hover{
+  background-color: var(--soft-color);
+}
+#navSlider p{
+  text-align: center;
+  font-weight: 900;
+  color: #222;
+  pointer-events: none;
+}
+
+/* 互動介面架構 */
+div#gameBox{
+  position: relative;
+  aspect-ratio: 1/1;
+  margin: 20px auto;
+  /* background-color: #000; */
+  border-radius: 2rem;
+  overflow: hidden;
+  scroll-behavior: smooth;
+  transition: all 0.5 ease-out;
+}
+div#gameBox section{
+  position: relative;
+  width: 100%;
+  height: 100%;
+  margin-bottom: 20px;
+  color: var(--soft-color);
+  background-color: black;
+}
+div#gameBox section h4{
+  position: absolute;
+  top: 50%;
+  width: 100%;
+  font-size: 1.2em;
+  text-align: center;
+  vertical-align: middle;
+  color: var(--soft-color);
+}
+
+/* 遊戲介面架構 */
+.gamemenu{
+  position: absolute;
+  left: 0;
+  margin: 0 10px;
+  right: 0;
+  width: auto;
+  height: 20%;
+  top: 1%;
+  border-radius: 1em;
+  font-size: 1rem;
+  background-color: rgba(0, 0, 0, 0.6);
+  transition: all 1s ease-in-out;
+}
+  .gamemenu header{
+      position: relative;
+      height: 2em;
+      font-size: 1.4em;
+      margin-bottom: 1em;
+  }
+  .gamemenu .parameter{
+      position: relative;
+      font-size: 1em;
+  }
+  .gamemenu .controlpanel{
+      position: relative;
+      font-size: 1em;
+  }
+  .gamemenu #dialogbox{
+      position: relative;
+      font-size: 1em;
+  }
+  .gamemenu button.slideMenu{
+      position: relative;
+      margin-top: 0.5em;
+      float: inline-end;
+      color: var(--soft-color);
+      border: 1px solid;
+      border-radius: 0.5em;
+      border-color: var(--soft-color);
+      background-color: transparent;
+  }
+      .gamemenu .parameter label{
+          font-size: 1.0em;
+          color: var(--soft-color);
+      }
+      .gamemenu .parameter input{
+          width: 2.5em;
+          font-size: 1em;
+          margin: 0 0.8em 0 0.5em;
+          padding: 0 0 0 0.5em;
+          border: none;
+          border-radius: 0.5em;
+          color: var(--darker-color);
+          background-color: var(--textbg-color);
+          opacity: 0.8;
+      }
+      .gamemenu .controlpanel button{
+          font-size: 1.0em;
+          margin: 0.4em 0.4em 0 0;
+          padding: 0 0.5em;
+          color: var(--darker-color);
+          background-color: var(--textbg-color);
+          line-height: unset;
+          opacity: 0.8;
+          border: none;
+          border-radius: 0.5em;
+      }
+      .gamemenu .controlpanel button:hover, .gamemenu .parameter input:hover{
+          opacity: 1;
+      }
+
+
+#S3 #record{
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  font-size: 1.0em;
+  margin: 0 0.4em 0 0;
+  padding: 0 0.5em;
+  line-height: unset;
+  border: none;
+  border-radius: 0.5em;
+}.table{
+    width: 100%;
+    border-color: var(--soft-color);
+    border-width: 1em;
+    border-radius: 2em;
+    border-style: double;
+}
+    .thead, tbody{
+    }
+        .tr{
+            font-size: 1.4em;
+            height: 1em;
+        }
+        .th:nth-child(1), .td:nth-child(1){
+            width: 2.5em;
+        }
+        .th:nth-child(2), .td:nth-child(2){
+            width: 4.5em;
+            color: var(--textbg-color);;
+        }
+        .th:nth-child(3), .td:nth-child(3){
+            width: 2.5em;
+        }
+        .th:nth-child(4), .td:nth-child(4){
+            width: 1em;
+        }
+        .th:nth-child(5), .td:nth-child(5){
+            width: 2.5em;
+        }
+            .th, .td{
+                text-align: center;
+                vertical-align: bottom;
+                padding: 0 0 0 0.4em;
+                border-width: 0.01em;
+                border-color: var(--soft-color);
+                border-style:dashed;
+            }
+            .input{
+                font-size: 0.8em;
+                width: 90%;
+                padding: 0.1em 0.4em 0.1em 0.4em;
+                border-radius: 0.5em;
+                color: var(--main-color);
+                background-color: var(--soft-color);
+                /* border-width: 0; */
+            }
+.pagination{
+    position: absolute;
+    width: -webkit-fill-available;
+    display: flex;
+    bottom: 1em;
+    margin: 0.5em;
+}
+.pagDescription{
+    width: 9em;
+}
+    .button{
+        width: auto;
+        flex: auto;
+        font-size: 1.2rem;
+        color: var(--soft-color);
+        background-color: transparent;
+        border-color: var(--soft-color);
+        border-style: outset;
+        border-width: 0.1em;
+        border-radius: 0.5em;
+        padding: 0.2em 0.5em;
+        margin: 0.2em;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+    .button:hover{
+        border-style: inset;
+        background-color: var(--textbg-color);
+        color: var(--main-color);
+    }
+    /* .button:disabled{
+        color: var(--darker-color);
+        border-color: var(--darker-color);
+
+    } */@media (max-width: 992px){
+    html{
+        font-size: 12px;
+    }
+    /* 頁首設定 */
+    nav{
+        left: -150px;
+        width: 150px;
+    }
+    nav a{
+        font-size: 1.5em;
+    }
+    #navSlider{
+        top: 10px;
+        left: 10px;
+        width: 30px;
+        height: 30px;
+        font-size: 20px;
+    }
+    
+    /* 互動介面架構 */
+    div#game-box{
+        aspect-ratio: 1/2;
+    }
+    
+    /* 遊戲介面架構 */
+    #game-menu{
+        height: 200px;
+        font-size: 1rem;
+    }
+        #game-menu #parameter{
+            display: flex;
+            height: 6em;
+            width: 15em;
+            flex-direction: column;
+            flex-wrap: wrap;
+            font-size: 1em;
+            transition: all 1s ease-in-out;
+        }
+            #game-menu #parameter label{
+                flex: 1 0 15%;
+                margin: 0;
+            }
+            #game-menu #parameter input{
+                flex: 1 0 10%;
+                margin: 0 2em 0 0;
+            }
+            #game-menu #controlpanel button:focus, #game-menu #parameter input:focus{
+                opacity: 1;
+            }
+    
+    /* 表單元件 */
+    .tr{
+        font-size: 1em;
+    }
+}
