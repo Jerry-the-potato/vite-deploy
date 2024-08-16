@@ -12831,7 +12831,7 @@ function GameBox({ margin }) {
 }
 function MenuS1() {
   return /* @__PURE__ */ jsxRuntimeExports.jsx(Div, { className: "gamemenu", content: /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
-    /* @__PURE__ */ jsxRuntimeExports.jsx("header", { id: "header", children: /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { children: "Lotka Volterra 實驗場：主線程 vs Web Woker" }) }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx("header", { id: "header", children: /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { children: "Lotka Volterra 實驗場 + Web Woker" }) }),
     /* @__PURE__ */ jsxRuntimeExports.jsx(Div, { className: "parameter", content: /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
       /* @__PURE__ */ jsxRuntimeExports.jsx(Input, { text: "Alpha :", type: "number", id: "alpha-equation", value: "5" }),
       /* @__PURE__ */ jsxRuntimeExports.jsx(Input, { text: "Beta :", type: "number", id: "beta-equation", value: "10" }),
@@ -12944,8 +12944,8 @@ window.addEventListener("load", function() {
     manager.requestAnimationByName("updateS1");
     this.innerText = "停止(左)";
   }, false);
-  let slide = document.getElementsByClassName("slideMenu")[0];
-  let menu = document.getElementsByClassName("gamemenu")[0];
+  const slide = document.getElementsByClassName("slideMenu")[0];
+  const menu = document.getElementsByClassName("gamemenu")[0];
   slide.addEventListener("click", function() {
     const rectMenu = menu.getBoundingClientRect();
     const rectButton = slide.getBoundingClientRect();
@@ -12958,18 +12958,18 @@ window.addEventListener("load", function() {
       slide.innerText = "△";
     }
   }, false);
-  slide = document.getElementsByClassName("slideMenu")[1];
-  menu = document.getElementsByClassName("gamemenu")[1];
-  slide.addEventListener("click", function() {
-    const rectMenu = menu.getBoundingClientRect();
-    const rectButton = slide.getBoundingClientRect();
+  const slide2 = document.getElementsByClassName("slideMenu")[1];
+  const menu2 = document.getElementsByClassName("gamemenu")[1];
+  slide2.addEventListener("click", function() {
+    const rectMenu = menu2.getBoundingClientRect();
+    const rectButton = slide2.getBoundingClientRect();
     const height = rectButton.y - rectMenu.y;
-    if (slide.innerText == "△") {
-      menu.style.top = "-" + height + "px";
-      slide.innerText = "▽";
+    if (slide2.innerText == "△") {
+      menu2.style.top = "-" + height + "px";
+      slide2.innerText = "▽";
     } else {
-      menu.style.top = "1%";
-      slide.innerText = "△";
+      menu2.style.top = "1%";
+      slide2.innerText = "△";
     }
   }, false);
   let painter = new createPainter();
@@ -35006,7 +35006,7 @@ window.addEventListener("load", function() {
             this.secondColumns = JSON.parse(JSON.stringify(columns.slice(0, columns.length + 1)));
             this.secondColumns.forEach((column, index) => {
               column.path = new Path(column.x, column.y);
-              column.path.NewTarget(column.x, column.y - 400, 20);
+              column.path.NewTarget(column.x, column.y - canvas.height * 0.4, 20);
               column.width /= 3;
             });
             return;
@@ -35027,7 +35027,7 @@ window.addEventListener("load", function() {
           col.forEach((column, index) => {
             column.height = columns[min + index].height;
             column.width = columns[min + index].width / 2;
-            column.path.NewTarget(column.x, column.y - 400, 20);
+            column.path.NewTarget(column.x, column.y - canvas.height * 0.4, 20);
           });
           this.mergePhase = "2.Merge";
           break;
@@ -35223,7 +35223,7 @@ window.addEventListener("load", function() {
         case "3.build":
           const index = this.count[Math.round(columns[i].height) - 1];
           this.secondColumns[index] = JSON.parse(JSON.stringify(columns[i]));
-          this.secondColumns[index].y = columns[i].y - 400;
+          this.secondColumns[index].y = columns[i].y - canvas.height * 0.4;
           this.secondColumns[index].width /= 2;
           this.secondColumns[index].path = new Path(columns[i].x, columns[i].y);
           this.secondColumns[index].path.NewTarget(columns[index].x, columns[i].y - 400, 60 + Math.round(i / len * 60));
@@ -35286,7 +35286,7 @@ window.addEventListener("load", function() {
       this.j = 0;
       this.sortFunction = function nothingHere() {
       };
-      this.maxValue = y2;
+      this.maxValue = canvas.height * 0.4;
       const length = Math.floor(x2 - 200);
       const width = Math.max(Math.floor(x2 * 2 / length), 0.5);
       this.columns = new Array(length).fill().map((v2, i) => {
@@ -35596,4 +35596,4 @@ window.addEventListener("load", function() {
   }
   const frame = new Averager(60);
 });
-//# sourceMappingURL=index-D0Ywy0CU.js.map
+//# sourceMappingURL=index-BMU0X0R6.js.map
