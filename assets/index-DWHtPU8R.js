@@ -7021,6 +7021,105 @@ var m = reactDomExports;
   createRoot = m.createRoot;
   m.hydrateRoot;
 }
+function GetHyperLink() {
+  const [hyperlink, setHyperlink] = reactExports.useState();
+  reactExports.useEffect(() => {
+    const sections = document.getElementById("playground").getElementsByTagName("section");
+    setHyperlink(Object.keys(sections).map((key) => {
+      const ID = sections[key].id;
+      return /* @__PURE__ */ jsxRuntimeExports.jsx("a", { className: "list", href: "#" + ID, id: "to" + ID, children: ID }, ID);
+    }));
+  }, []);
+  return hyperlink;
+}
+function NavigationBar({ width }) {
+  const [isOpen, setIsOpen] = reactExports.useState(false);
+  function handleClick() {
+    setIsOpen(!isOpen);
+  }
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs("nav", { id: "nav", style: { "left": isOpen ? 0 : -width + "px" }, children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsx(GetHyperLink, {}),
+    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { onClick: handleClick, id: "navSlider", children: /* @__PURE__ */ jsxRuntimeExports.jsx("p", { children: isOpen ? "X" : "≡" }) })
+  ] });
+}
+function Input({ text, type, id: id2, value }) {
+  return /* @__PURE__ */ jsxRuntimeExports.jsx(jsxRuntimeExports.Fragment, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs("label", { className: "label", children: [
+    text,
+    /* @__PURE__ */ jsxRuntimeExports.jsx("input", { type, id: id2, defaultValue: value })
+  ] }) });
+}
+function MenuS1() {
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "gamemenu", children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsx("header", { id: "header", children: /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { children: "Lotka Volterra 實驗場 + Web Woker" }) }),
+    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "parameter", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx(Input, { text: "Alpha :", type: "number", id: "alpha-equation", value: "5" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(Input, { text: "Beta :", type: "number", id: "beta-equation", value: "10" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(Input, { text: "Gamma :", type: "number", id: "gamma-equation", value: "5" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(Input, { text: "Delta :", type: "number", id: "delta-equation", value: "10" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(Input, { text: "Vector Size :", type: "number", id: "dlength", value: "10" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(Input, { text: "Transform Speed :", type: "number", id: "speed", value: "10" })
+    ] }),
+    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "controlpanel", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx("label", { children: "★" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("button", { id: "mouseOn", children: "跟隨滑鼠" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("button", { id: "transform", children: "取消縮放" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("button", { id: "pauseMain", children: "停止(左)" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("button", { id: "pauseWorker", children: "停止(右)" })
+    ] }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { id: "dialogbox", content: /* @__PURE__ */ jsxRuntimeExports.jsx("p", { id: "dialog", children: "∫此微分方程用於描述捕食者和獵物的此消彼長，沿著中心點呈現漩渦紋理" }) }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx("button", { className: "slideMenu", children: "△" })
+  ] });
+}
+const CanvasSectionS1 = ({ canvas, ratio, max, status, handleClick }) => {
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs("section", { className: "section", id: "S1", children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsx("canvas", { id: "canvasS1", ref: canvas, width: max * ratio, height: window.innerWidth < 992 ? ratio * max * 2 : ratio * max }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx("canvas", { id: "bitmap", width: max * ratio, height: window.innerWidth < 992 ? ratio * max * 2 : ratio * max }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: handleClick, value: "S1", className: "record", children: status }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(MenuS1, {})
+  ] });
+};
+const audioUrl = "/vite-deploy/assets/Lovely%20Piano%20Song-D2Oyr38W.mp3";
+const SectionS2 = ({ audio, canvas, ratio, max, status, handleClick }) => {
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs("section", { className: "section", id: "S2", children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsx("audio", { ref: audio, controls: true, id: "myAudio", style: { "position": "absolute", "left": "10px", "bottom": "10px", "zIndex": "100" }, children: /* @__PURE__ */ jsxRuntimeExports.jsx("source", { src: audioUrl }) }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx("canvas", { id: "canvasS2", ref: canvas, width: max * ratio, height: window.innerWidth < 992 ? ratio * max * 2 : ratio * max }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: handleClick, value: "S2", className: "record", children: status })
+  ] });
+};
+function MenuS3() {
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "gamemenu", children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsx("header", { id: "", children: /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { children: "粒子系統" }) }),
+    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { id: "pathConfig", className: "parameter", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx(Input, { text: "linear :", type: "number", id: "linear", value: "0" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(Input, { text: "easein :", type: "number", id: "easein", value: "-2" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(Input, { text: "easeout :", type: "number", id: "easeout", value: "2" })
+    ] }),
+    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { id: "sortAlgorithm", className: "controlpanel", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx("label", { children: "★" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("button", { id: "bubbleSort", children: "泡沫排序" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("button", { id: "selectionSort", children: "選擇排序" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("button", { id: "insertionSort", children: "插入排序" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("button", { id: "quickSort", children: "快速排序" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("button", { id: "mergeSort", children: "合併排序" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("button", { id: "heapSort", children: "堆排序" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("button", { id: "shellSort", children: "希爾排序" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("button", { id: "countingSort", children: "計數排序" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("button", { id: "cancelSort", children: "取消" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("button", { id: "stepByStep", children: "一步一步來" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("button", { id: "randomSort", children: "打亂" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("button", { id: "instantRandomSort", children: "立刻打亂" })
+    ] }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { id: "sortLog", children: /* @__PURE__ */ jsxRuntimeExports.jsx("p", { id: "", children: "碰撞模擬和重力引擎" }) }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx("button", { className: "slideMenu", children: "△" })
+  ] });
+}
+const CanvasSectionS3 = ({ canvas, ratio, max, status, handleClick }) => {
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs("section", { className: "section", id: "S3", children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsx("canvas", { id: "canvasS3", ref: canvas, width: max * ratio, height: window.innerWidth < 992 ? ratio * max * 2 : ratio * max }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: handleClick, value: "S3", className: "record", children: status }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(MenuS3, {})
+  ] });
+};
 var lodash = { exports: {} };
 /**
  * @license
@@ -12504,29 +12603,6 @@ lodash.exports;
 })(lodash, lodash.exports);
 var lodashExports = lodash.exports;
 const _ = /* @__PURE__ */ getDefaultExportFromCjs(lodashExports);
-const audioUrl = "/vite-deploy/assets/Lovely%20Piano%20Song-D2Oyr38W.mp3";
-function Hyperlink({ text, href, id: id2 }) {
-  return /* @__PURE__ */ jsxRuntimeExports.jsx("a", { id: id2, className: "list", href, children: text });
-}
-function Input({ text, type, id: id2, value }) {
-  return /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
-    /* @__PURE__ */ jsxRuntimeExports.jsx("label", { className: "label", children: text }),
-    /* @__PURE__ */ jsxRuntimeExports.jsx("input", { type, id: id2, defaultValue: value })
-  ] });
-}
-function Button({ text, id: id2, className, onClick }) {
-  return /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick, id: id2, className, children: text });
-}
-function Section({ id: id2, content }) {
-  return /* @__PURE__ */ jsxRuntimeExports.jsx("section", { id: id2, className: "section", children: content });
-}
-function Div({ id: id2, className, content, style, onClick }) {
-  return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: className + " div", id: id2, style, onClick, children: content });
-}
-function Audio({ id: id2, name = "Lovely Piano Song" }) {
-  const audioElement = reactExports.useRef();
-  return /* @__PURE__ */ jsxRuntimeExports.jsx(jsxRuntimeExports.Fragment, { children: /* @__PURE__ */ jsxRuntimeExports.jsx("audio", { ref: audioElement, controls: true, id: id2, style: { "position": "absolute", "left": "10px", "bottom": "10px", "zIndex": "100" }, children: /* @__PURE__ */ jsxRuntimeExports.jsx("source", { src: audioUrl }) }) });
-}
 const Pagination = ({ activePage, count, rowsPerPage, totalPages, setActivePage }) => {
   const beginning = activePage === 1 ? 1 : rowsPerPage * (activePage - 1) + 1;
   const end = activePage === totalPages ? count : beginning + rowsPerPage - 1;
@@ -12640,7 +12716,7 @@ function Table({ columns, rows }) {
             }
           };
           return /* @__PURE__ */ jsxRuntimeExports.jsxs("th", { className: "th", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(
+            /* @__PURE__ */ jsxRuntimeExports.jsx("label", { children: /* @__PURE__ */ jsxRuntimeExports.jsx(
               "input",
               {
                 className: "input",
@@ -12650,7 +12726,7 @@ function Table({ columns, rows }) {
                 onChange: (event) => handleSearch(event.target.value, column.accessor)
               },
               `${column.accessor}-search`
-            ),
+            ) }),
             /* @__PURE__ */ jsxRuntimeExports.jsx("button", { className: "button", onClick: () => handleSort(column.accessor), children: sortIcon() })
           ] }, `${column.accessor}-search`);
         }) }),
@@ -12688,43 +12764,8 @@ function Table({ columns, rows }) {
     )
   ] });
 }
-const domNode = document.getElementById("root");
-const root = createRoot(domNode);
-function NavigationBar({ width }) {
-  const [isOpen, setIsOpen] = reactExports.useState(false);
-  function handleClick() {
-    setIsOpen(!isOpen);
-  }
-  return /* @__PURE__ */ jsxRuntimeExports.jsxs("nav", { id: "nav", style: { "left": isOpen ? 0 : -width + "px" }, children: [
-    /* @__PURE__ */ jsxRuntimeExports.jsx(Hyperlink, { text: "Home", href: "#home", id: "tohome" }),
-    /* @__PURE__ */ jsxRuntimeExports.jsx(Hyperlink, { text: "section1", href: "#S1", id: "toS1" }),
-    /* @__PURE__ */ jsxRuntimeExports.jsx(Hyperlink, { text: "section2", href: "#S2", id: "toS2" }),
-    /* @__PURE__ */ jsxRuntimeExports.jsx(Hyperlink, { text: "section3", href: "#S3", id: "toS3" }),
-    /* @__PURE__ */ jsxRuntimeExports.jsx(Div, { onClick: handleClick, id: "navSlider", content: /* @__PURE__ */ jsxRuntimeExports.jsx("p", { children: isOpen ? "X" : "≡" }) })
-  ] });
-}
-function MainScreen() {
-  reactExports.useEffect(() => {
-    document.getElementById("toS3").click();
-  }, []);
-  return /* @__PURE__ */ jsxRuntimeExports.jsx(Div, { id: "mainScreen", content: /* @__PURE__ */ jsxRuntimeExports.jsx(jsxRuntimeExports.Fragment, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(GameBox, { margin: 20 }) }) });
-}
-function GameBox({ margin }) {
-  let w2 = window.innerWidth - margin * 2;
-  let h = window.innerHeight - margin * 2;
-  const [ratio, setRatio] = reactExports.useState(window.innerWidth > 992 ? 1 : 2);
-  const [max, setMax] = reactExports.useState(getMax);
+function CookieTable() {
   const [tableData, setTableData] = reactExports.useState([]);
-  function getMax() {
-    if (window.innerWidth > 992) return w2 < h ? w2 : h;
-    else return w2 * 2 < h ? w2 : h / 2;
-  }
-  window.onresize = function handleResize() {
-    w2 = window.innerWidth - margin * 2;
-    h = window.innerHeight - margin * 2;
-    setRatio(window.innerWidth > 992 ? 1 : 2);
-    setMax(getMax);
-  };
   const columns = [
     { accessor: "price", label: "售價" },
     { accessor: "name", label: "品名" },
@@ -12760,128 +12801,94 @@ function GameBox({ margin }) {
     ]);
     setTableData(newTableData);
   }, []);
-  const canvasRef = reactExports.useRef();
-  const [media, setMedia] = reactExports.useState({});
-  function downloadMedia(data) {
-    var blob = new Blob(data, { type: "video/webm" });
-    const recording_url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.style = "display: none;";
-    a.href = recording_url;
-    a.download = "video.mp4";
-    document.body.appendChild(a);
-    a.click();
-    setTimeout(() => {
-      URL.revokeObjectURL(recording_url);
-      document.body.removeChild(a);
-    }, 0);
+  return /* @__PURE__ */ jsxRuntimeExports.jsx("section", { className: "section", id: "cookie", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Table, { columns, rows }) });
+}
+function downloadMedia(data) {
+  var blob = new Blob(data, { type: "video/mp4" });
+  const recording_url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.style = "display: none;";
+  a.href = recording_url;
+  a.download = "video.mp4";
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(() => {
+    URL.revokeObjectURL(recording_url);
+    document.body.removeChild(a);
+  }, 0);
+}
+function Playground({ margin }) {
+  let w2 = window.innerWidth - margin * 2;
+  let h = window.innerHeight - margin * 2;
+  const [ratio, setRatio] = reactExports.useState(window.innerWidth > 992 ? 1 : 2);
+  const [max, setMax] = reactExports.useState(getMax);
+  function getMax() {
+    if (window.innerWidth > 992) return w2 < h ? w2 : h;
+    else return w2 * 2 < h ? w2 : h / 2;
   }
-  reactExports.useEffect(() => {
-    const chunks = [];
-    const media2 = {};
-    media2.canvas = canvasRef.current;
-    media2.stream = media2.canvas.captureStream(60);
-    media2.recorder = new MediaRecorder(media2.stream, { mimeType: "video/mp4; codecs=vp9" });
-    media2.recorder.ondataavailable = (evt) => {
-      chunks.push(evt.data);
-    };
-    media2.recorder.onstop = () => {
-      downloadMedia(chunks);
-    };
-    setMedia(media2);
-  }, []);
-  const [Status, setStatus] = reactExports.useState("Record");
-  function handleClick() {
-    console.log("clicked");
-    if (Status == "Record") {
-      media.recorder.start(1e3);
-      setStatus("Stop");
+  window.onresize = function handleResize() {
+    w2 = window.innerWidth - margin * 2;
+    h = window.innerHeight - margin * 2;
+    setRatio(window.innerWidth > 992 ? 1 : 2);
+    setMax(getMax);
+  };
+  const audio = reactExports.useRef();
+  const canvas = { "S1": reactExports.useRef(), "S2": reactExports.useRef(), "S3": reactExports.useRef() };
+  const [media] = reactExports.useState({});
+  const [status, setStatus] = reactExports.useState("Record");
+  function handleClick(e) {
+    if (status == "Stop") {
+      setStatus("Record");
+      media.recorder.stop();
       return;
     }
-    setStatus("Record");
-    media.recorder.stop();
+    const chunks = [];
+    const ID = e.target.value;
+    media.canvas = canvas[ID].current;
+    media.stream = media.canvas.captureStream(60);
+    media.audio = audio.current;
+    if (ID == "S2") {
+      media.audio.play();
+      media.audioStream = media.audio.captureStream();
+      media.stream = new MediaStream([...media.stream.getVideoTracks(), ...media.audioStream.getAudioTracks()]);
+    }
+    media.recorder = new MediaRecorder(media.stream, { mimeType: "video/mp4; codecs=vp9" });
+    media.recorder.ondataavailable = (evt) => {
+      chunks.push(evt.data);
+    };
+    media.recorder.onstop = () => {
+      downloadMedia(chunks);
+    };
+    media.recorder.start(1e3);
+    setStatus("Stop");
   }
-  return /* @__PURE__ */ jsxRuntimeExports.jsx(
-    Div,
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs(
+    "div",
     {
-      id: "gameBox",
+      id: "playground",
       style: {
         "width": max + "px",
         "height": window.innerWidth < 992 ? max * 2 : max + "px",
         "margin": margin + "px auto"
       },
-      content: /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(Section, { id: "home", content: /* @__PURE__ */ jsxRuntimeExports.jsx(jsxRuntimeExports.Fragment, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(Table, { columns, rows }) }) }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(Section, { id: "S1", content: /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx("h4", { children: "Opps! 似乎還在施工中" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("canvas", { id: "canvasS1", width: max * ratio, height: window.innerWidth < 992 ? ratio * max * 2 : ratio * max }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("canvas", { id: "bitmap", width: max * ratio, height: window.innerWidth < 992 ? ratio * max * 2 : ratio * max }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(MenuS1, {})
-        ] }) }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(Section, { id: "S2", content: /* @__PURE__ */ jsxRuntimeExports.jsx(jsxRuntimeExports.Fragment, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(Audio, { id: "myAudio", name: "Lovely Piano Song" }) }) }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(Section, { id: "S3", content: /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx("h4", { children: "Opps! 似乎還在施工中" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("canvas", { id: "canvasS3", ref: canvasRef, width: max * ratio, height: window.innerWidth < 992 ? ratio * max * 2 : ratio * max }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(Button, { onClick: handleClick, id: "record", text: Status }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(MenuS3, {})
-        ] }) })
-      ] })
+      children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(CanvasSectionS1, { canvas: canvas.S1, ratio, max, status, handleClick }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(SectionS2, { audio, canvas: canvas.S2, ratio, max, status, handleClick }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(CanvasSectionS3, { canvas: canvas.S3, ratio, max, status, handleClick }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(CookieTable, {})
+      ]
     }
   );
 }
-function MenuS1() {
-  return /* @__PURE__ */ jsxRuntimeExports.jsx(Div, { className: "gamemenu", content: /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
-    /* @__PURE__ */ jsxRuntimeExports.jsx("header", { id: "header", children: /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { children: "Lotka Volterra 實驗場 + Web Woker" }) }),
-    /* @__PURE__ */ jsxRuntimeExports.jsx(Div, { className: "parameter", content: /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx(Input, { text: "Alpha :", type: "number", id: "alpha-equation", value: "5" }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx(Input, { text: "Beta :", type: "number", id: "beta-equation", value: "10" }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx(Input, { text: "Gamma :", type: "number", id: "gamma-equation", value: "5" }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx(Input, { text: "Delta :", type: "number", id: "delta-equation", value: "10" }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx(Input, { text: "Vector Size :", type: "number", id: "dlength", value: "10" }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx(Input, { text: "Transform Speed :", type: "number", id: "speed", value: "10" })
-    ] }) }),
-    /* @__PURE__ */ jsxRuntimeExports.jsx(Div, { className: "controlpanel", content: /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx("label", { children: "★" }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx(Button, { text: "跟隨滑鼠", id: "mouseOn" }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx(Button, { text: "取消縮放", id: "transform" }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx(Button, { text: "停止(左)", id: "pauseMain" }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx(Button, { text: "停止(右)", id: "pauseWorker" })
-    ] }) }),
-    /* @__PURE__ */ jsxRuntimeExports.jsx(Div, { id: "dialogbox", content: /* @__PURE__ */ jsxRuntimeExports.jsx("p", { id: "dialog", children: "∫此微分方程用於描述捕食者和獵物的此消彼長，沿著中心點呈現漩渦紋理" }) }),
-    /* @__PURE__ */ jsxRuntimeExports.jsx(Button, { className: "slideMenu", text: "△" })
-  ] }) });
+function App() {
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsx(NavigationBar, { width: 250 }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(Playground, { margin: 20 })
+  ] });
 }
-function MenuS3() {
-  return /* @__PURE__ */ jsxRuntimeExports.jsx(Div, { className: "gamemenu", content: /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
-    /* @__PURE__ */ jsxRuntimeExports.jsx("header", { id: "", children: /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { children: "粒子系統" }) }),
-    /* @__PURE__ */ jsxRuntimeExports.jsx(Div, { id: "pathConfig", className: "parameter", content: /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx(Input, { text: "linear :", type: "number", id: "linear", value: "0" }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx(Input, { text: "easein :", type: "number", id: "easein", value: "-2" }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx(Input, { text: "easeout :", type: "number", id: "easeout", value: "2" })
-    ] }) }),
-    /* @__PURE__ */ jsxRuntimeExports.jsx(Div, { id: "sortAlgorithm", className: "controlpanel", content: /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx("label", { children: "★" }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx(Button, { text: "泡沫排序", id: "bubbleSort" }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx(Button, { text: "選擇排序", id: "selectionSort" }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx(Button, { text: "插入排序", id: "insertionSort" }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx(Button, { text: "快速排序", id: "quickSort" }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx(Button, { text: "合併排序", id: "mergeSort" }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx(Button, { text: "堆排序", id: "heapSort" }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx(Button, { text: "希爾排序", id: "shellSort" }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx(Button, { text: "計數排序", id: "countingSort" }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx(Button, { text: "取消", id: "cancelSort" }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx(Button, { text: "一步一步來", id: "stepByStep" }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx(Button, { text: "打亂", id: "randomSort" }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx(Button, { text: "立刻打亂", id: "instantRandomSort" })
-    ] }) }),
-    /* @__PURE__ */ jsxRuntimeExports.jsx(Div, { id: "sortLog", content: /* @__PURE__ */ jsxRuntimeExports.jsx("p", { id: "", children: "碰撞模擬和重力引擎" }) }),
-    /* @__PURE__ */ jsxRuntimeExports.jsx(Button, { className: "slideMenu", text: "△" })
-  ] }) });
-}
-root.render(/* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
-  /* @__PURE__ */ jsxRuntimeExports.jsx(NavigationBar, { width: 250 }),
-  /* @__PURE__ */ jsxRuntimeExports.jsx(MainScreen, {})
-] }));
+const domNode = document.getElementById("root");
+const root = createRoot(domNode);
+root.render(/* @__PURE__ */ jsxRuntimeExports.jsx(App, {}));
 function WorkerWrapper(options) {
   return new Worker(
     "/vite-deploy/assets/worker-PpdV9tWO.js",
@@ -13102,17 +13109,15 @@ window.addEventListener("load", function() {
       for (let i = 0; i < list.length; i++) {
         let point = list[i];
         const rad = transitionRadian;
-        const p1 = Math.cos(rad) * Math.sin(rad);
         const p2 = Math.sin(rad);
         const p3 = Math.sin(rad * 2);
         let d = point.d / 2;
         if (transform) d = point.d / 3 * (0.05 + 0.95 * (1 - p3));
-        let w1 = d * p1 * 0.1;
         let w2 = d * p2 * 0.1;
         point.r += Math.PI / 1e3;
         point.x -= point.fakeX;
         point.y -= point.fakeY;
-        point.fakeX = board.width / 2 + d * Math.cos(point.r + w1);
+        point.fakeX = board.width / 2 + d * Math.cos(point.r + w2);
         point.fakeY = board.height / 2 + d * Math.sin(point.r + w2);
         point.x += point.fakeX;
         point.y += point.fakeY;
@@ -34280,7 +34285,20 @@ window.addEventListener("load", function() {
   window.gui = gui;
   const scene = new Scene();
   const camera = new PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1e3);
-  const renderer = new WebGLRenderer({ alpha: true });
+  const renderer = new WebGLRenderer({ alpha: true, canvas: document.getElementById("canvasS2") });
+  setScreen();
+  window.addEventListener("resize", setScreen, false);
+  function setScreen() {
+    const box = document.getElementById("canvasS2");
+    const w2 = box.clientWidth;
+    const h = box.clientHeight;
+    renderer.setSize(w2, h);
+    camera.aspect = w2 / h;
+    camera.updateProjectionMatrix();
+  }
+  window.camera = camera;
+  const axis = new AxesHelper(300);
+  scene.add(axis);
   let firstTime = true;
   document.getElementById("myAudio").addEventListener("play", myGreeting, false);
   function myGreeting() {
@@ -34307,20 +34325,6 @@ window.addEventListener("load", function() {
       myBuff.transformData(data);
     });
   }
-  setScreen();
-  window.addEventListener("resize", setScreen, false);
-  function setScreen() {
-    const box = document.getElementById("gameBox");
-    const w2 = box.clientWidth;
-    const h = box.clientHeight;
-    renderer.setSize(w2, h);
-    camera.aspect = w2 / h;
-    camera.updateProjectionMatrix();
-  }
-  document.getElementById("S2").appendChild(renderer.domElement);
-  window.camera = camera;
-  const axis = new AxesHelper(300);
-  scene.add(axis);
   const pG = new BufferGeometry();
   pG.setAttribute("position", new BufferAttribute(new Float32Array([0, 0, 0]), 3));
   function getPointsMaterial(size = 1, map2 = null) {
@@ -35596,4 +35600,4 @@ window.addEventListener("load", function() {
   }
   const frame = new Averager(60);
 });
-//# sourceMappingURL=index-CYGkGqu8.js.map
+//# sourceMappingURL=index-DWHtPU8R.js.map
