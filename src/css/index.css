@@ -14,7 +14,7 @@ h3{
 p{
   font-size: 1em;
 }
-header, .div{
+header, div{
   margin: 0.8rem;
 }
 ul, li{
@@ -98,7 +98,7 @@ nav a:hover{
 }
 
 /* 互動介面架構 */
-div#gameBox{
+div#playground{
   position: relative;
   aspect-ratio: 1/1;
   margin: 20px auto;
@@ -108,7 +108,7 @@ div#gameBox{
   scroll-behavior: smooth;
   transition: all 0.5 ease-out;
 }
-div#gameBox section{
+div#playground section{
   position: relative;
   width: 100%;
   height: 100%;
@@ -116,7 +116,7 @@ div#gameBox section{
   color: var(--soft-color);
   background-color: black;
 }
-div#gameBox section h4{
+div#playground section h4{
   position: absolute;
   top: 50%;
   width: 100%;
@@ -199,7 +199,7 @@ div#gameBox section h4{
       }
 
 
-#S3 #record{
+.section .record{
   position: absolute;
   right: 10px;
   bottom: 10px;

@@ -336,7 +336,7 @@ window.addEventListener("load", function () {
 				point.r+= Math.PI / 1000;
 				point.x-= point.fakeX;
 				point.y-= point.fakeY;
-				point.fakeX = board.width/2 + d * Math.cos(point.r + w1);
+				point.fakeX = board.width/2 + d * Math.cos(point.r + w2);//w1);
 				point.fakeY = board.height/2 + d * Math.sin(point.r + w2);
 				point.x+= point.fakeX;
 				point.y+= point.fakeY;

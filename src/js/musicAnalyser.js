@@ -8,8 +8,26 @@ window.addEventListener("load", function () {
     window.gui = gui;
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
-    const renderer = new THREE.WebGLRenderer({alpha: true});
+    const renderer = new THREE.WebGLRenderer({alpha: true, canvas: document.getElementById("canvasS2")});
     // const board = renderer.domElement;
+
+    setScreen();
+    window.addEventListener("resize", setScreen, false);
+    function setScreen(){
+        // 已透過css的aspect-ratio預先設定game-box長寬比和canvas布局
+        const box = document.getElementById("canvasS2");
+        const w = box.clientWidth;
+        const h = box.clientHeight;
+        renderer.setSize(w, h);
+        camera.aspect = w/h;
+        camera.updateProjectionMatrix();
+    }
+
+    window.camera = camera;
+    const axis = new THREE.AxesHelper(300);
+    scene.add(axis)
+
+
 
     // const myTimeout = setTimeout(myGreeting, 500);
     let firstTime = true;
@@ -44,24 +62,6 @@ window.addEventListener("load", function () {
             myBuff.transformData(data);
         })
     }
-
-
-    setScreen();
-    window.addEventListener("resize", setScreen, false);
-    function setScreen(){
-        // 已透過css的aspect-ratio預先設定game-box長寬比和canvas布局
-        const box = document.getElementById("gameBox");
-        const w = box.clientWidth;
-        const h = box.clientHeight;
-        renderer.setSize(w, h);
-        camera.aspect = w/h;
-        camera.updateProjectionMatrix();
-    }
-    document.getElementById("S2").appendChild( renderer.domElement );
-
-    window.camera = camera;
-    const axis = new THREE.AxesHelper(300);
-    scene.add(axis)
 
     // Buffer 自定義紋理貼圖
 
