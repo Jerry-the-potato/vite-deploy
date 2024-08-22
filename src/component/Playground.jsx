@@ -4,6 +4,8 @@ import CanvasSectionS2 from './CanvasSection2.jsx';
 import CanvasSectionS3 from './CanvasSection3.jsx';
 import CookieTable from './CookieTable.jsx';
 import downloadMedia from '../js/downloadMedia.js';
+import manager from '../js/animateManager.js';
+// import {updateS1, renderS1} from '../js/lokaVolterra.js';
 
 function Playground({margin}){
     
@@ -11,6 +13,16 @@ function Playground({margin}){
     let h = window.innerHeight - margin*2;
     const [ratio, setRatio] = useState(window.innerWidth > 992 ? 1 : 2);
     const [max, setMax] = useState(getMax);
+    
+    const sections = [useRef(), useRef(), useRef()];
+    useEffect(()=>{
+        const elements = sections.map((obj) => {
+            if(obj.current) return obj.current;
+        })
+        manager.addIntersectionObserver();
+        manager.addSubjectElements(elements)
+        console.log(manager);
+    }, [])
 
     function getMax(){
         if(window.innerWidth > 992) return (w < h ? w : h);
@@ -57,9 +69,9 @@ function Playground({margin}){
                      "height": window.innerWidth<992 ? max*2 : max + "px",
                      "margin": margin +"px auto"}}>
 
-            <CanvasSectionS1 canvas={canvas.S1} ratio={ratio} max={max} status={status} handleClick={handleClick}/>
-            <CanvasSectionS2 audio={audio} canvas={canvas.S2} ratio={ratio} max={max} status={status} handleClick={handleClick}/>
-            <CanvasSectionS3 canvas={canvas.S3} ratio={ratio} max={max} status={status} handleClick={handleClick}/>
+            <CanvasSectionS1 section={sections[0]} canvas={canvas.S1} ratio={ratio} max={max} status={status} handleClick={handleClick} manager={manager}/>
+            <CanvasSectionS2 section={sections[1]} canvas={canvas.S2} audio={audio} ratio={ratio} max={max} status={status} handleClick={handleClick}/>
+            <CanvasSectionS3 section={sections[2]} canvas={canvas.S3} ratio={ratio} max={max} status={status} handleClick={handleClick}/>
             <CookieTable></CookieTable>
         </div>
     )

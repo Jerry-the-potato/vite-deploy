@@ -1,6 +1,6 @@
 
-import NavigationBar from './component/NavigationBar.jsx'
-import Playground from './component/Playground.jsx'
+import NavigationBar from './component/NavigationBar.jsx';
+import Playground from './component/Playground.jsx';
 
 export default function App(){
     return <>

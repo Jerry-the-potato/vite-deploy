@@ -30,25 +30,16 @@ const managerMaker = function(){
         })
         
     }
-    this.setMethod = (name, method) => {
-        this.request[name] = this.request[name] || {};
-        this.request[name].method = method;
-        // setRequst(request);
-        if(name.includes(this.lastId)) this.updateRequestAnimation(this.lastId);
-    }
-    this.setID = (name, id) => {
-        this.request[name] = this.request[name] || {};
-        this.request[name].ID = id;
-        // setRequst(request);
-    }
     this.cancelAnimationByName = (name) => {
         cancelAnimationFrame(this.request[name].ID);
     }
     this.requestAnimationByName = (name) => {
         this.request[name].ID = requestAnimationFrame(this.request[name].method);
     }
-    this.addAnimationByName = (callback) => {
-        const name = callback.name || Math.abs(Math.random() * 100);
+    this.addAnimationCallback = (callback) => {
+        const string = callback.name || "#" + Math.random();
+        // 有空白判定為 bound name，只取後面的函式名稱
+        const name = string.match(" ") ? string.split(" ")[1] : string;
         this.request[name] = this.request[name] || {};
         this.request[name].method = function animate(){
             callback();
@@ -65,25 +56,23 @@ const managerMaker = function(){
         const valid = this.validId.some(ID => name.includes(ID));
         if(!valid) console.warn("naming issue: " + name + " should include one of following letters: " + this.validId);
     }
+    this.addIntersectionObserver = () => {
+        this.io = new IntersectionObserver((entries) => {
+            entries.forEach((entry) => {
+                // 實測大約0.01 ~ 0.05
+                // console.log(entry.target.id + ": " + entry.intersectionRatio);
+                if(entry.intersectionRatio === 0) return;
+                manager.updateRequestAnimation(entry.target.id);
+            });
+        });
+    }
+    this.addSubjectElements = (elements) => {
+        elements.forEach((el) => {
+            this.io.unobserve(el) // avoid observing one element mutiple time
+            this.io.observe(el);
+        });
+    }
     return this;
 }
-// window.managerRef = useRef(new managerMaker());
-// useEffect(() => {
-    // const manager = managerRef.current;
 const manager = new managerMaker();
-window.addEventListener('load', function(){
-    const io = new IntersectionObserver((entries) => {
-        entries.forEach((entry) => {
-            // 實測大約0.01 ~ 0.05
-            // console.log(entry.target.id + ": " + entry.intersectionRatio);
-            if(entry.intersectionRatio === 0) return;
-            manager.updateRequestAnimation(entry.target.id);
-        });
-    });
-    const sectionElList = document.querySelectorAll(".section");
-    sectionElList.forEach((el) => {
-        io.unobserve(el) // avoid observing one element mutiple time
-        io.observe(el);
-    });
-}, false);
-console.log("animate");
+export default manager;

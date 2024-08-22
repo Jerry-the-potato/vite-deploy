@@ -1,6 +1,24 @@
+import { useEffect, useRef } from "react";
 import Input from "./Input";
 function MenuS3(){
-    return <div className="gamemenu">
+    const menu = useRef();
+    
+    function handleClick(e){
+        const m = menu.current;
+        const b = e.target;
+		const rectMenu = m.getBoundingClientRect();
+		const rectButton = b.getBoundingClientRect();
+		const height = rectButton.y - rectMenu.y;
+		if(b.innerText == "△"){
+			m.style.top = "-" + height + "px";
+			b.innerText = "▽";
+		}
+		else{
+			m.style.top = "1%";
+			b.innerText = "△";
+		}
+	}
+    return <div ref={menu} className="gamemenu">
                 <header id=""><h3>粒子系統</h3></header>
                 <div id="pathConfig" className="parameter">
                     <Input text="linear :" type="number" id="linear" value="0"/>
@@ -25,12 +43,12 @@ function MenuS3(){
                     <button id="instantRandomSort">立刻打亂</button>
                 </div>
                 <div id="sortLog"><p id="">碰撞模擬和重力引擎</p></div>
-                <button className="slideMenu">△</button>
+                <button onClick={handleClick} className="slideMenu">△</button>
             </div>
 }
-const CanvasSectionS3 = ({ canvas, ratio, max, status, handleClick}) => {
+const CanvasSectionS3 = ({section, canvas, ratio, max, status, handleClick}) => {
     return (
-        <section className="section" id="S3">
+        <section ref={section} className="section" id="S3">
             <canvas id="canvasS3" ref={canvas} width={max * ratio} height={window.innerWidth < 992 ? ratio * max * 2 : ratio * max}></canvas>
             <button onClick={handleClick} value="S3" className="record">{status}</button>
             <MenuS3 />

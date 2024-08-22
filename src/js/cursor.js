@@ -94,7 +94,7 @@ class Path extends PathConfig{
 //     }
 // }, false);
 // myMouse = new Path(0, 0);
-// manager.addAnimationByName(myMouse.NextFrame);
+// manager.addAnimationCallback(myMouse.NextFrame);
 
 export { Path };
 export { PathConfig };

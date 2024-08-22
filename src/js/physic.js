@@ -959,7 +959,7 @@ window.addEventListener("load", function () {
 
     // 繪圖系統-main
     {
-        manager.addAnimationByName(function renderS3(){
+        manager.addAnimationCallback(function renderS3(){
             clearBoard();
             system.sort.update(system.columns);
             system.update();

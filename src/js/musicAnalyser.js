@@ -56,7 +56,7 @@ window.addEventListener("load", function () {
         const dataArray = new Uint8Array(bufferLength);
 
         window.analyser = analyser;
-        manager.addAnimationByName(function S2test(){
+        manager.addAnimationCallback(function S2test(){
             analyser.getByteFrequencyData(dataArray);
             const data = [...dataArray].splice(0,128);
             myBuff.transformData(data);
@@ -430,7 +430,7 @@ window.addEventListener("load", function () {
     const clock = new THREE.Clock();
     window.clock = clock;
     clock.fps = 0;
-    manager.addAnimationByName(function renderS2(){
+    manager.addAnimationCallback(function renderS2(){
         myBuff.update();
         frame.updateValue(clock.getDelta());
         frame.getFPS();
