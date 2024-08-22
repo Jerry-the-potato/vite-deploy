@@ -133,12 +133,13 @@ div#playground section h4{
   margin: 0 10px;
   right: 0;
   width: auto;
-  height: 20%;
+  /* height: 20%; */
   top: 1%;
   border-radius: 1em;
   font-size: 1rem;
   background-color: rgba(0, 0, 0, 0.6);
   transition: all 1s ease-in-out;
+  overflow: hidden;
 }
   .gamemenu header{
       position: relative;

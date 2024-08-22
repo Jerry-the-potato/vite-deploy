@@ -7048,8 +7048,359 @@ function Input({ text, type, id: id2, value }) {
     /* @__PURE__ */ jsxRuntimeExports.jsx("input", { type, id: id2, defaultValue: value })
   ] }) });
 }
-function MenuS1() {
-  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "gamemenu", children: [
+function WorkerWrapper(options) {
+  return new Worker(
+    "/vite-deploy/assets/worker-PpdV9tWO.js",
+    {
+      name: options == null ? void 0 : options.name
+    }
+  );
+}
+function createPainter() {
+  this.works = [];
+  this.pixelX = window.innerWidth;
+  this.pixelY = window.innerWidth;
+  this.setPixel = function(w2, h) {
+    this.pixelX = w2;
+    this.pixelY = h;
+  };
+  this.draw = function(obj) {
+    let ctx = obj.ctx;
+    this.pixelX;
+    this.pixelY;
+    let x2 = obj.x;
+    let y2 = obj.y;
+    let r2 = obj.r;
+    let x22 = obj.x2;
+    let y22 = obj.y2;
+    let text = obj.text;
+    let size = obj.size;
+    let color = obj.color;
+    let a = obj.a;
+    let b = obj.b;
+    let angle = obj.angle;
+    if (ctx)
+      switch (obj.name) {
+        case "circle":
+          drawCircle();
+          break;
+        case "point":
+          drawPoint();
+          break;
+        case "line":
+          drawLine();
+          break;
+        case "crescent":
+          drawCrescent();
+          break;
+        case "text":
+          drawText();
+      }
+    function drawCircle() {
+      if (x2 + y2 + r2 == "NaN") {
+        console.warn("drawCircle failed: missing parameter");
+        return;
+      }
+      ctx.beginPath();
+      ctx.arc(x2, y2, r2, 0, 2 * Math.PI, false);
+      ctx.fillStyle = color;
+      ctx.fill();
+    }
+    function drawPoint() {
+      if (x2 + y2 + size == "NaN") {
+        console.warn("drawPoint failed: missing parameter");
+        return;
+      }
+      ctx.fillStyle = color;
+      ctx.fillRect(x2 - size / 2, y2 - size / 2, size, size);
+    }
+    function drawLine() {
+      if (x2 + y2 + x22 + y22 == "NaN") {
+        console.warn("drawLine failed: missing parameter");
+        return;
+      }
+      ctx.beginPath();
+      ctx.moveTo(x2, y2);
+      ctx.lineTo(x22, y22);
+      ctx.strokeStyle = color;
+      ctx.lineWidth = size ? size : 1;
+      ctx.stroke();
+    }
+    function drawCrescent() {
+      if (x2 + y2 + a + b + angle + size == "NaN") {
+        console.warn("drawCrescent failed: missing parameter");
+        return;
+      }
+      let c = Math.sqrt(a * a + b * b);
+      let aTan = Math.atan(a / b);
+      let dx = Math.cos(angle + Math.PI / 2) * a * size;
+      let dy = Math.sin(angle + Math.PI / 2) * a * size;
+      ctx.beginPath();
+      ctx.arc(x2, y2, b * size, angle, Math.PI + angle, true);
+      ctx.arc(x2 + dx, y2 + dy, c * size, Math.PI + angle + aTan, angle - aTan, false);
+      ctx.fillStyle = color;
+      ctx.fill();
+    }
+    function drawText() {
+      x2 = Math.round(x2);
+      y2 = Math.round(y2);
+      ctx.font = size + "px Comic Sans MS";
+      ctx.textBaseline = "middle";
+      ctx.textAlign = "center";
+      ctx.fillStyle = color;
+      ctx.fillText(text, x2, y2);
+    }
+  };
+}
+function clearBoard(ctx) {
+  ctx.fillStyle = "black";
+  ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+}
+const lokaVolterraAlgorithm = function() {
+  const painter = new createPainter();
+  this.transitionRadian = 0;
+  this.trasitionOmega = Math.PI / 1e4;
+  this.alpha = 0.5;
+  this.beta = 1;
+  this.gamma = 0.5;
+  this.delta = 1;
+  this.dlength = 0.1;
+  this.speed = 1;
+  this.mouseOn = false;
+  this.transform = true;
+  this.timeBefore = Date.now();
+  const DELAY = new Array(100);
+  DELAY.fill(17);
+  this.render = (ctx) => {
+    clearBoard(ctx);
+    ctx.save();
+    ctx.translate(-ctx.canvas.width * 0.25, 0);
+    painter.works.forEach((obj) => {
+      painter.draw(obj);
+    });
+    painter.works = [];
+    ctx.restore();
+  };
+  this.update = (ctx, width, height) => {
+    this.transitionRadian += this.trasitionOmega * this.speed;
+    this.motion(width, height);
+    this.addTexture(width, height, ctx);
+  };
+  this.reset = (width, height) => {
+    const len = 2e3;
+    this.data = [];
+    for (let i = 0; i < len; i++) {
+      const mid = 0.5;
+      const pow = 1;
+      const max = 1 + Math.pow(mid, pow);
+      const minus1 = Math.pow(getRandomFloat(mid, 1), pow);
+      const minus2 = Math.pow(getRandomFloat(0, mid), pow);
+      const obj = {
+        "d": (max - minus1 - minus2) * width,
+        // distance
+        "r": getRandomFloat(0, Math.PI * 2),
+        // radian
+        "fakeX": width / 2,
+        "fakeY": height / 2,
+        "x": width / 2,
+        "y": height / 2,
+        "vx": [],
+        "vy": []
+      };
+      obj.x += obj.d * Math.cos(obj.r);
+      obj.y += obj.d * Math.sin(obj.r);
+      obj.fakeX = obj.x;
+      obj.fakeY = obj.y;
+      this.data.push(obj);
+    }
+    function getRandomFloat(min, max) {
+      return Math.random() * (max * 100 - min * 100 + 1) / 100 + min;
+    }
+  };
+  this.motion = (width, height) => {
+    const list = this.data;
+    for (let i = 0; i < list.length; i++) {
+      const point = list[i];
+      const rad = this.transitionRadian;
+      const p2 = Math.sin(rad);
+      const p3 = Math.sin(rad * 2);
+      const d = this.transform ? point.d / 2 : point.d / 3 * (0.05 + 0.95 * (1 - p3));
+      const w2 = d * p2 * 0.1;
+      point.r += Math.PI / 1e3;
+      point.x -= point.fakeX;
+      point.y -= point.fakeY;
+      point.fakeX = width / 2 + d * Math.cos(point.r + w2);
+      point.fakeY = height / 2 + d * Math.sin(point.r + w2);
+      point.x += point.fakeX;
+      point.y += point.fakeY;
+    }
+    for (let i = 0; i < list.length; i++) {
+      const p1 = list[i];
+      let vx1 = 0;
+      let vx2 = 0;
+      let vy1 = 0;
+      let vy2 = 0;
+      for (let j = i + 1; j < list.length; j++) {
+        const p2 = list[j];
+        const d = getDistance(p1.x, p1.y, p2.x, p2.y);
+        const MAXD = 0;
+        if (d < MAXD) {
+          let force;
+          if (d < MAXD * 0.1) force = -1;
+          if (d < MAXD * 0.55) force = 1 * (d - MAXD * 0.1) / (MAXD * 0.45);
+          if (d < MAXD) force = 1 * (MAXD - d) / (MAXD * 0.45);
+          vx1 += p2.x > p1.x ? 1 : -1 * force;
+          vx2 += p1.x > p2.x ? 1 : -1 * force;
+          vy1 += p2.y > p1.y ? 1 : -1 * force;
+          vy2 += p1.y > p2.y ? 1 : -1 * force;
+        }
+      }
+      p1.x += caluVelocity(p1.vx);
+      p1.y += caluVelocity(p1.vy);
+      const GRAVITY = 100;
+      vx1 += width * 0.5 + GRAVITY / 2 > p1.x ? 1 : -1 * GRAVITY;
+      vx1 -= width * 0.5 - GRAVITY / 2 < p1.x ? 1 : -1 * GRAVITY;
+      vy1 += height / 2 + GRAVITY / 2 > p1.y ? 1 : -1 * GRAVITY;
+      vy1 -= height / 2 - GRAVITY / 2 < p1.y ? 1 : -1 * GRAVITY;
+      addVelocity(p1.vx, vx1);
+      addVelocity(p1.vy, vy1);
+    }
+    function getDistance(x1, y1, x2, y2) {
+      const distance = Math.sqrt(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2));
+      return distance;
+    }
+    function addVelocity(a, v2) {
+      a.splice(1, 0, v2);
+      a.splice(60, 1);
+    }
+    function caluVelocity(a) {
+      let sum = 0;
+      a.forEach((value) => {
+        sum += value / a.length / 20;
+      });
+      return sum;
+    }
+  };
+  this.addTexture = (width, height, ctx) => {
+    const list = this.data;
+    for (let i = 0; i < list.length; i++) {
+      const point = list[i];
+      const x2 = point.x;
+      const y2 = point.y;
+      const ex = x2 / width;
+      const ey = y2 / height;
+      const dx = this.equation1(ex, ey) * width;
+      const dy = this.equation2(ex, ey) * height;
+      const blue = y2 / width * 255;
+      const green = x2 / width * 255;
+      const red = Math.sin(this.transitionRadian) * 255;
+      const color = "rgb(" + Math.abs(red).toString() + "," + Math.abs(green).toString() + "," + Math.abs(blue).toString() + ")";
+      const mypoint = {
+        "name": "point",
+        "ctx": ctx,
+        "size": 2,
+        "x": x2,
+        "y": y2,
+        "color": color
+      };
+      painter.works.push(mypoint);
+      const myline = {
+        "name": "line",
+        "ctx": ctx,
+        "size": 2,
+        "x": x2,
+        "y": y2,
+        "x2": x2 + this.dlength * dx,
+        "y2": y2 + this.dlength * dy,
+        "color": color
+      };
+      painter.works.push(myline);
+    }
+  };
+  this.equation1 = (x2, y2) => {
+    return this.alpha * x2 - this.beta * x2 * y2;
+  };
+  this.equation2 = (x2, y2) => {
+    return this.delta * x2 * y2 - this.gamma * y2;
+  };
+  return this;
+};
+const createLokaVolterra = function() {
+  const myWorker = new WorkerWrapper();
+  const algorithm = new lokaVolterraAlgorithm();
+  this.setCanvas = (canvas, bitmap) => {
+    algorithm.reset(canvas.width, canvas.height);
+    this.canvas = canvas;
+    this.ctx = this.canvas.getContext("2d");
+    this.bitmap = bitmap;
+    const bitmapCtx = this.bitmap.getContext("bitmaprenderer");
+    this.bitmap.width = this.bitmap.offsetWidth;
+    this.bitmap.height = this.bitmap.offsetHeight;
+    myWorker.addEventListener("message", function handleMessageFromWorker(msg) {
+      switch (msg.data.name) {
+        case "drawImage":
+          bitmapCtx.transferFromImageBitmap(msg.data.bitmap);
+          break;
+        case "error":
+          break;
+        default:
+          console.log("invalid message received!");
+      }
+    });
+    myWorker.postMessage({
+      "name": "createOffscreenCanvas",
+      "w": bitmap.width,
+      "h": bitmap.height
+    });
+    window.addEventListener("resize", function() {
+      myWorker.postMessage({
+        "name": "setOffscreen",
+        "w": bitmap.width,
+        "h": bitmap.height
+      });
+    }, false);
+  };
+  this.pauseWorker = (isPause) => {
+    myWorker.postMessage({ "name": isPause ? "requestAnimation" : "cancelAnimation" });
+  };
+  this.render = (function renderS1() {
+    algorithm.render(this.ctx);
+  }).bind(this);
+  this.updateS1 = (function updateS1() {
+    algorithm.update(this.ctx, this.canvas.width, this.canvas.height);
+  }).bind(this);
+  return this;
+};
+const lokaVolterra = new createLokaVolterra();
+function MenuS1({ manager: manager2 }) {
+  const menu = reactExports.useRef();
+  function handleSlideMenu(e) {
+    const m2 = menu.current;
+    const b = e.target;
+    const rectMenu = m2.getBoundingClientRect();
+    const rectButton = b.getBoundingClientRect();
+    const height = rectButton.y - rectMenu.y;
+    if (b.innerText == "△") {
+      m2.style.top = "-" + height + "px";
+      b.innerText = "▽";
+    } else {
+      m2.style.top = "1%";
+      b.innerText = "△";
+    }
+  }
+  function handlePauseMain() {
+    const name = (!isMain ? "request" : "cancel") + "AnimationByName";
+    manager2[name]("renderS1");
+    manager2[name]("updateS1");
+    setIsMain(!isMain);
+  }
+  function handlePauseWorker() {
+    lokaVolterra["pauseWorker"](!isWorker);
+    setIsWorker(!isWorker);
+  }
+  const [isMain, setIsMain] = reactExports.useState(true);
+  const [isWorker, setIsWorker] = reactExports.useState(true);
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { ref: menu, className: "gamemenu", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsx("header", { id: "header", children: /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { children: "Lotka Volterra 實驗場 + Web Woker" }) }),
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "parameter", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsx(Input, { text: "Alpha :", type: "number", id: "alpha-equation", value: "5" }),
@@ -7063,31 +7414,52 @@ function MenuS1() {
       /* @__PURE__ */ jsxRuntimeExports.jsx("label", { children: "★" }),
       /* @__PURE__ */ jsxRuntimeExports.jsx("button", { id: "mouseOn", children: "跟隨滑鼠" }),
       /* @__PURE__ */ jsxRuntimeExports.jsx("button", { id: "transform", children: "取消縮放" }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx("button", { id: "pauseMain", children: "停止(左)" }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx("button", { id: "pauseWorker", children: "停止(右)" })
+      /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: handlePauseMain, id: "pauseMain", children: isMain ? "停止(左)" : "開始(左)" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: handlePauseWorker, id: "pauseWorker", children: isWorker ? "停止(右)" : "開始(右)" })
     ] }),
     /* @__PURE__ */ jsxRuntimeExports.jsx("div", { id: "dialogbox", content: /* @__PURE__ */ jsxRuntimeExports.jsx("p", { id: "dialog", children: "∫此微分方程用於描述捕食者和獵物的此消彼長，沿著中心點呈現漩渦紋理" }) }),
-    /* @__PURE__ */ jsxRuntimeExports.jsx("button", { className: "slideMenu", children: "△" })
+    /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: handleSlideMenu, className: "slideMenu", children: "△" })
   ] });
 }
-const CanvasSectionS1 = ({ canvas, ratio, max, status, handleClick }) => {
-  return /* @__PURE__ */ jsxRuntimeExports.jsxs("section", { className: "section", id: "S1", children: [
+const CanvasSectionS1 = ({ section, manager: manager2, canvas, ratio, max, status, handleClick }) => {
+  const bitmap = reactExports.useRef();
+  reactExports.useEffect(() => {
+    lokaVolterra.setCanvas(canvas.current, bitmap.current);
+    manager2.addAnimationCallback(lokaVolterra.render);
+    manager2.addAnimationCallback(lokaVolterra.updateS1);
+  }, []);
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs("section", { ref: section, className: "section", id: "S1", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsx("canvas", { id: "canvasS1", ref: canvas, width: max * ratio, height: window.innerWidth < 992 ? ratio * max * 2 : ratio * max }),
-    /* @__PURE__ */ jsxRuntimeExports.jsx("canvas", { id: "bitmap", width: max * ratio, height: window.innerWidth < 992 ? ratio * max * 2 : ratio * max }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx("canvas", { id: "bitmap", ref: bitmap, width: max * ratio, height: window.innerWidth < 992 ? ratio * max * 2 : ratio * max }),
     /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: handleClick, value: "S1", className: "record", children: status }),
-    /* @__PURE__ */ jsxRuntimeExports.jsx(MenuS1, {})
+    /* @__PURE__ */ jsxRuntimeExports.jsx(MenuS1, { manager: manager2 })
   ] });
 };
 const audioUrl = "/vite-deploy/assets/Lovely%20Piano%20Song-D2Oyr38W.mp3";
-const SectionS2 = ({ audio, canvas, ratio, max, status, handleClick }) => {
-  return /* @__PURE__ */ jsxRuntimeExports.jsxs("section", { className: "section", id: "S2", children: [
+const SectionS2 = ({ section, audio, canvas, ratio, max, status, handleClick }) => {
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs("section", { ref: section, className: "section", id: "S2", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsx("audio", { ref: audio, controls: true, id: "myAudio", style: { "position": "absolute", "left": "10px", "bottom": "10px", "zIndex": "100" }, children: /* @__PURE__ */ jsxRuntimeExports.jsx("source", { src: audioUrl }) }),
     /* @__PURE__ */ jsxRuntimeExports.jsx("canvas", { id: "canvasS2", ref: canvas, width: max * ratio, height: window.innerWidth < 992 ? ratio * max * 2 : ratio * max }),
     /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: handleClick, value: "S2", className: "record", children: status })
   ] });
 };
 function MenuS3() {
-  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "gamemenu", children: [
+  const menu = reactExports.useRef();
+  function handleClick(e) {
+    const m2 = menu.current;
+    const b = e.target;
+    const rectMenu = m2.getBoundingClientRect();
+    const rectButton = b.getBoundingClientRect();
+    const height = rectButton.y - rectMenu.y;
+    if (b.innerText == "△") {
+      m2.style.top = "-" + height + "px";
+      b.innerText = "▽";
+    } else {
+      m2.style.top = "1%";
+      b.innerText = "△";
+    }
+  }
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { ref: menu, className: "gamemenu", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsx("header", { id: "", children: /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { children: "粒子系統" }) }),
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { id: "pathConfig", className: "parameter", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsx(Input, { text: "linear :", type: "number", id: "linear", value: "0" }),
@@ -7110,11 +7482,11 @@ function MenuS3() {
       /* @__PURE__ */ jsxRuntimeExports.jsx("button", { id: "instantRandomSort", children: "立刻打亂" })
     ] }),
     /* @__PURE__ */ jsxRuntimeExports.jsx("div", { id: "sortLog", children: /* @__PURE__ */ jsxRuntimeExports.jsx("p", { id: "", children: "碰撞模擬和重力引擎" }) }),
-    /* @__PURE__ */ jsxRuntimeExports.jsx("button", { className: "slideMenu", children: "△" })
+    /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: handleClick, className: "slideMenu", children: "△" })
   ] });
 }
-const CanvasSectionS3 = ({ canvas, ratio, max, status, handleClick }) => {
-  return /* @__PURE__ */ jsxRuntimeExports.jsxs("section", { className: "section", id: "S3", children: [
+const CanvasSectionS3 = ({ section, canvas, ratio, max, status, handleClick }) => {
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs("section", { ref: section, className: "section", id: "S3", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsx("canvas", { id: "canvasS3", ref: canvas, width: max * ratio, height: window.innerWidth < 992 ? ratio * max * 2 : ratio * max }),
     /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: handleClick, value: "S3", className: "record", children: status }),
     /* @__PURE__ */ jsxRuntimeExports.jsx(MenuS3, {})
@@ -12817,11 +13189,81 @@ function downloadMedia(data) {
     document.body.removeChild(a);
   }, 0);
 }
+const managerMaker = function() {
+  this.validId = ["S1", "S2", "S3"];
+  this.lastId = "";
+  this.lastRequests = [];
+  this.request = {};
+  this.getRequestsById = (id2) => {
+    if (typeof isSomethingHappended !== "undefined") return null;
+    const req = [];
+    for (let key in this.request) {
+      if (key.includes(id2)) req.push(this.request[key]);
+    }
+    return req;
+  };
+  this.updateRequestAnimation = (id2) => {
+    const newRequests = this.getRequestsById(id2);
+    if (newRequests === null) return;
+    this.lastId = id2;
+    this.lastRequests.forEach((request) => {
+      cancelAnimationFrame(request.ID);
+    });
+    this.lastRequests = newRequests;
+    newRequests.forEach((request) => {
+      if (typeof request === "undefined") return console.warn("invalid request");
+      if (typeof request.method === "undefined") return console.warn("invalid requestMethod");
+      request.ID = requestAnimationFrame(request.method);
+    });
+  };
+  this.cancelAnimationByName = (name) => {
+    cancelAnimationFrame(this.request[name].ID);
+  };
+  this.requestAnimationByName = (name) => {
+    this.request[name].ID = requestAnimationFrame(this.request[name].method);
+  };
+  this.addAnimationCallback = (callback) => {
+    const string = callback.name || "#" + Math.random();
+    const name = string.match(" ") ? string.split(" ")[1] : string;
+    this.request[name] = this.request[name] || {};
+    this.request[name].method = (function animate() {
+      callback();
+      this.request[name].ID = requestAnimationFrame(animate.bind(this));
+    }).bind(this);
+    const valid = this.validId.some((ID) => name.includes(ID));
+    if (!valid) console.warn("naming issue: " + name + " should include one of following letters: " + this.validId);
+  };
+  this.addIntersectionObserver = () => {
+    this.io = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.intersectionRatio === 0) return;
+        manager$1.updateRequestAnimation(entry.target.id);
+      });
+    });
+  };
+  this.addSubjectElements = (elements) => {
+    elements.forEach((el2) => {
+      this.io.unobserve(el2);
+      this.io.observe(el2);
+    });
+  };
+  return this;
+};
+const manager$1 = new managerMaker();
 function Playground({ margin }) {
   let w2 = window.innerWidth - margin * 2;
   let h = window.innerHeight - margin * 2;
   const [ratio, setRatio] = reactExports.useState(window.innerWidth > 992 ? 1 : 2);
   const [max, setMax] = reactExports.useState(getMax);
+  const sections = [reactExports.useRef(), reactExports.useRef(), reactExports.useRef()];
+  reactExports.useEffect(() => {
+    const elements = sections.map((obj) => {
+      if (obj.current) return obj.current;
+    });
+    manager$1.addIntersectionObserver();
+    manager$1.addSubjectElements(elements);
+    console.log(manager$1);
+  }, []);
   function getMax() {
     if (window.innerWidth > 992) return w2 < h ? w2 : h;
     else return w2 * 2 < h ? w2 : h / 2;
@@ -12872,9 +13314,9 @@ function Playground({ margin }) {
         "margin": margin + "px auto"
       },
       children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(CanvasSectionS1, { canvas: canvas.S1, ratio, max, status, handleClick }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(SectionS2, { audio, canvas: canvas.S2, ratio, max, status, handleClick }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(CanvasSectionS3, { canvas: canvas.S3, ratio, max, status, handleClick }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(CanvasSectionS1, { section: sections[0], canvas: canvas.S1, ratio, max, status, handleClick, manager: manager$1 }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(SectionS2, { section: sections[1], canvas: canvas.S2, audio, ratio, max, status, handleClick }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(CanvasSectionS3, { section: sections[2], canvas: canvas.S3, ratio, max, status, handleClick }),
         /* @__PURE__ */ jsxRuntimeExports.jsx(CookieTable, {})
       ]
     }
@@ -12889,505 +13331,6 @@ function App() {
 const domNode = document.getElementById("root");
 const root = createRoot(domNode);
 root.render(/* @__PURE__ */ jsxRuntimeExports.jsx(App, {}));
-function WorkerWrapper(options) {
-  return new Worker(
-    "/vite-deploy/assets/worker-PpdV9tWO.js",
-    {
-      name: options == null ? void 0 : options.name
-    }
-  );
-}
-window.addEventListener("load", function() {
-  const board_border = "black";
-  const board_background = "black";
-  const board = document.getElementById("canvasS1");
-  const board_ctx = board.getContext("2d");
-  const bitmapBoard = document.getElementById("bitmap");
-  const bitmapBoard_ctx = bitmapBoard.getContext("bitmaprenderer");
-  bitmapBoard.width = bitmapBoard.offsetWidth;
-  bitmapBoard.height = bitmapBoard.offsetHeight;
-  const myWorker = new WorkerWrapper();
-  myWorker.addEventListener("message", function handleMessageFromWorker(msg) {
-    switch (msg.data.name) {
-      case "drawImage":
-        msg.data.bitmap;
-        bitmapBoard_ctx.transferFromImageBitmap(msg.data.bitmap);
-        break;
-      case "error":
-        break;
-      default:
-        console.log("invalid message received!");
-    }
-  });
-  myWorker.postMessage({
-    "name": "createOffscreenCanvas",
-    "w": bitmapBoard.width,
-    "h": bitmapBoard.height
-  });
-  window.addEventListener("resize", function() {
-    myWorker.postMessage({
-      "name": "setOffscreen",
-      "w": bitmapBoard.width,
-      "h": bitmapBoard.height
-    });
-  }, false);
-  document.getElementById("pauseWorker").addEventListener("click", function() {
-    if (this.innerText == "停止(右)") {
-      myWorker.postMessage({ "name": "cancelAnimation" });
-      this.innerText = "開始(右)";
-    } else {
-      myWorker.postMessage({ "name": "requestAnimation" });
-      this.innerText = "停止(右)";
-    }
-  }, false);
-  document.getElementById("pauseMain").addEventListener("click", function() {
-    manager.cancelAnimationByName("renderS1");
-    manager.cancelAnimationByName("updateS1");
-    if (this.innerText == "停止(左)") {
-      this.innerText = "開始(左)";
-      return;
-    }
-    manager.requestAnimationByName("renderS1");
-    manager.requestAnimationByName("updateS1");
-    this.innerText = "停止(左)";
-  }, false);
-  const slide = document.getElementsByClassName("slideMenu")[0];
-  const menu = document.getElementsByClassName("gamemenu")[0];
-  slide.addEventListener("click", function() {
-    const rectMenu = menu.getBoundingClientRect();
-    const rectButton = slide.getBoundingClientRect();
-    const height = rectButton.y - rectMenu.y;
-    if (slide.innerText == "△") {
-      menu.style.top = "-" + height + "px";
-      slide.innerText = "▽";
-    } else {
-      menu.style.top = "1%";
-      slide.innerText = "△";
-    }
-  }, false);
-  const slide2 = document.getElementsByClassName("slideMenu")[1];
-  const menu2 = document.getElementsByClassName("gamemenu")[1];
-  slide2.addEventListener("click", function() {
-    const rectMenu = menu2.getBoundingClientRect();
-    const rectButton = slide2.getBoundingClientRect();
-    const height = rectButton.y - rectMenu.y;
-    if (slide2.innerText == "△") {
-      menu2.style.top = "-" + height + "px";
-      slide2.innerText = "▽";
-    } else {
-      menu2.style.top = "1%";
-      slide2.innerText = "△";
-    }
-  }, false);
-  let painter = new createPainter();
-  function createPainter() {
-    this.works = [];
-    this.tree = [];
-    this.pixelX = window.innerWidth;
-    this.pixelY = window.innerWidth;
-    this.setPixel = function(w2, h) {
-      this.pixelX = w2;
-      this.pixelY = h;
-    };
-    this.draw = function(obj) {
-      let ctx = obj.ctx;
-      this.pixelX;
-      this.pixelY;
-      let x2 = obj.x;
-      let y2 = obj.y;
-      let r2 = obj.r;
-      let x22 = obj.x2;
-      let y22 = obj.y2;
-      let text = obj.text;
-      let size = obj.size;
-      let color = obj.color;
-      let a = obj.a;
-      let b = obj.b;
-      let angle = obj.angle;
-      if (ctx)
-        switch (obj.name) {
-          case "circle":
-            drawCircle();
-            break;
-          case "point":
-            drawPoint();
-            break;
-          case "line":
-            drawLine();
-            break;
-          case "crescent":
-            drawCrescent();
-            break;
-          case "text":
-            drawText();
-        }
-      function drawCircle() {
-        if (x2 + y2 + r2 == "NaN") {
-          console.warn("drawCircle failed: missing parameter");
-          return;
-        }
-        ctx.beginPath();
-        ctx.arc(x2, y2, r2, 0, 2 * Math.PI, false);
-        ctx.fillStyle = color;
-        ctx.fill();
-      }
-      function drawPoint() {
-        if (x2 + y2 + size == "NaN") {
-          console.warn("drawPoint failed: missing parameter");
-          return;
-        }
-        ctx.fillStyle = color;
-        ctx.fillRect(x2 - size / 2, y2 - size / 2, size, size);
-      }
-      function drawLine() {
-        if (x2 + y2 + x22 + y22 == "NaN") {
-          console.warn("drawLine failed: missing parameter");
-          return;
-        }
-        ctx.beginPath();
-        ctx.moveTo(x2, y2);
-        ctx.lineTo(x22, y22);
-        ctx.strokeStyle = color;
-        ctx.lineWidth = size ? size : 1;
-        ctx.stroke();
-      }
-      function drawCrescent() {
-        if (x2 + y2 + a + b + angle + size == "NaN") {
-          console.warn("drawCrescent failed: missing parameter");
-          return;
-        }
-        let c = Math.sqrt(a * a + b * b);
-        let aTan = Math.atan(a / b);
-        let dx = Math.cos(angle + Math.PI / 2) * a * size;
-        let dy = Math.sin(angle + Math.PI / 2) * a * size;
-        ctx.beginPath();
-        ctx.arc(x2, y2, b * size, angle, Math.PI + angle, true);
-        ctx.arc(x2 + dx, y2 + dy, c * size, Math.PI + angle + aTan, angle - aTan, false);
-        ctx.fillStyle = color;
-        ctx.fill();
-      }
-      function drawText() {
-        x2 = Math.round(x2);
-        y2 = Math.round(y2);
-        ctx.font = size + "px Comic Sans MS";
-        ctx.textBaseline = "middle";
-        ctx.textAlign = "center";
-        ctx.fillStyle = color;
-        ctx.fillText(text, x2, y2);
-      }
-    };
-  }
-  {
-    let clearBoard2 = function() {
-      board_ctx.fillStyle = board_background;
-      board_ctx.strokestyle = board_border;
-      board_ctx.fillRect(0, 0, board.width, board.height);
-    };
-    var clearBoard = clearBoard2;
-    manager.addAnimationByName(function renderS1() {
-      clearBoard2();
-      painter.tree.forEach((obj) => {
-        painter.draw(obj);
-      });
-      board_ctx.save();
-      board_ctx.translate(-board.width * 0.25, 0);
-      painter.works.forEach((obj) => {
-        painter.draw(obj);
-      });
-      painter.works = [];
-      board_ctx.restore();
-    });
-  }
-  {
-    let simulatior2 = function() {
-      motion2(data);
-      addTexture2(data);
-      updateFps2();
-      const newID = requestAnimationFrame(simulatior2);
-      manager.setID("updateS1", newID);
-    }, motion2 = function(list) {
-      for (let i = 0; i < list.length; i++) {
-        let point = list[i];
-        const rad = transitionRadian;
-        const p2 = Math.sin(rad);
-        const p3 = Math.sin(rad * 2);
-        let d = point.d / 2;
-        if (transform) d = point.d / 3 * (0.05 + 0.95 * (1 - p3));
-        let w2 = d * p2 * 0.1;
-        point.r += Math.PI / 1e3;
-        point.x -= point.fakeX;
-        point.y -= point.fakeY;
-        point.fakeX = board.width / 2 + d * Math.cos(point.r + w2);
-        point.fakeY = board.height / 2 + d * Math.sin(point.r + w2);
-        point.x += point.fakeX;
-        point.y += point.fakeY;
-      }
-      for (let i = 0; i < list.length; i++) {
-        let p1 = list[i];
-        let vx1 = 0;
-        let vx2 = 0;
-        let vy1 = 0;
-        let vy2 = 0;
-        for (let j = i + 1; j < list.length; j++) {
-          let p2 = list[j];
-          let d = getDistance(p1.x, p1.y, p2.x, p2.y);
-          const MAXD = 0;
-          if (d < MAXD) {
-            let force;
-            if (d < MAXD * 0.1) force = -1;
-            if (d < MAXD * 0.55) force = 1 * (d - MAXD * 0.1) / (MAXD * 0.45);
-            if (d < MAXD) force = 1 * (MAXD - d) / (MAXD * 0.45);
-            vx1 += p2.x > p1.x ? 1 : -1 * force;
-            vx2 += p1.x > p2.x ? 1 : -1 * force;
-            vy1 += p2.y > p1.y ? 1 : -1 * force;
-            vy2 += p1.y > p2.y ? 1 : -1 * force;
-          }
-        }
-        p1.x += caluVelocity(p1.vx);
-        p1.y += caluVelocity(p1.vy);
-        const GRAVITY = 100;
-        vx1 += board.width * 0.5 + GRAVITY / 2 > p1.x ? 1 : -1 * GRAVITY;
-        vx1 -= board.width * 0.5 - GRAVITY / 2 < p1.x ? 1 : -1 * GRAVITY;
-        vy1 += board.height / 2 + GRAVITY / 2 > p1.y ? 1 : -1 * GRAVITY;
-        vy1 -= board.height / 2 - GRAVITY / 2 < p1.y ? 1 : -1 * GRAVITY;
-        addVelocity(p1.vx, vx1);
-        addVelocity(p1.vy, vy1);
-      }
-      function getDistance(x1, y1, x2, y2) {
-        let d = Math.sqrt(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2));
-        return d;
-      }
-      function addVelocity(a, v2) {
-        a.splice(1, 0, v2);
-        a.splice(60, 1);
-      }
-      function caluVelocity(a) {
-        let sum = 0;
-        a.forEach((value) => {
-          sum += value / a.length / 20;
-        });
-        return sum;
-      }
-    }, addTexture2 = function(list) {
-      for (let i = 0; i < list.length; i++) {
-        let point = list[i];
-        let x2 = point.x;
-        let y2 = point.y;
-        let ex = x2 / board.width;
-        let ey = y2 / board.height;
-        let dx = equation1(ex, ey) * board.width;
-        let dy = equation2(ex, ey) * board.height;
-        let blue = y2 / board.width * 255;
-        let green = x2 / board.width * 255;
-        let red = Math.sin(transitionRadian) * 255;
-        let color = "rgb(" + Math.abs(red).toString() + "," + Math.abs(green).toString() + "," + Math.abs(blue).toString() + ")";
-        let mypoint = {
-          "name": "point",
-          "ctx": board_ctx,
-          "size": 2,
-          "x": x2,
-          "y": y2,
-          "color": color
-        };
-        painter.works.push(mypoint);
-        let myline = {
-          "name": "line",
-          "ctx": board_ctx,
-          "size": 2,
-          "x": x2,
-          "y": y2,
-          "x2": x2 + dlength * dx,
-          "y2": y2 + dlength * dy,
-          "color": color
-        };
-        painter.works.push(myline);
-      }
-      transitionRadian += trasitionOmega * speed;
-      function equation1(x2, y2) {
-        if (mouseOn) {
-          let ratio = myMouse.pointY > 0.2 ? myMouse.pointY : 0.2;
-          return alpha * x2 - 1 / ratio * alpha * x2 * y2;
-        } else return alpha * x2 - beta * x2 * y2;
-      }
-      function equation2(x2, y2) {
-        if (mouseOn) {
-          let ratio = myMouse.pointX > 0.2 ? myMouse.pointX : 0.2;
-          return 1 / ratio * gamma * x2 * y2 - gamma * y2;
-        } else return delta * x2 * y2 - gamma * y2;
-      }
-    }, updateFps2 = function() {
-      let duration = Date.now() - timeBefore;
-      timeBefore = Date.now();
-      DELAY.push(duration);
-      DELAY.splice(0, 1);
-      let sum = 0;
-      let fps;
-      for (let N2 = 0; N2 < DELAY.length; N2++) {
-        sum = sum + DELAY[N2];
-      }
-      fps = Math.round(1e3 / (sum / DELAY.length));
-      let angle = Math.PI * (Date.now() % 3e3) / 1500;
-      let size = (board.height + board.width) * 3e-3;
-      let x2 = board.width * 0.5;
-      let y2 = board.height - size * 20;
-      let blue = y2 / board.width * 255;
-      let green = x2 / board.width * 255;
-      let red = Math.sin(transitionRadian) * 255;
-      let transitionColor = "rgb(" + Math.abs(red).toString() + "," + Math.abs(green).toString() + "," + Math.abs(blue).toString() + ")";
-      let backgroundColor = "rgb(" + Math.abs(red * 0.3).toString() + "," + Math.abs(green * 0.2).toString() + "," + Math.abs(blue * 0.4).toString() + ")";
-      let circle = {
-        "name": "circle",
-        "ctx": board_ctx,
-        "r": size * 10,
-        "x": x2,
-        "y": y2,
-        "color": backgroundColor
-      };
-      let crescent1 = {
-        "name": "crescent",
-        "ctx": board_ctx,
-        "size": size,
-        "a": 1,
-        "b": 9,
-        "angle": angle * 3,
-        "x": x2,
-        "y": y2,
-        "color": transitionColor
-      };
-      let crescent2 = {
-        "name": "crescent",
-        "ctx": board_ctx,
-        "size": size,
-        "a": 1,
-        "b": 8,
-        "angle": angle * 2,
-        "x": x2,
-        "y": y2,
-        "color": transitionColor
-      };
-      let crescent3 = {
-        "name": "crescent",
-        "ctx": board_ctx,
-        "size": size,
-        "a": 1,
-        "b": 7,
-        "angle": angle * 1,
-        "x": x2,
-        "y": y2,
-        "color": transitionColor
-      };
-      let text1 = {
-        "name": "text",
-        "ctx": board_ctx,
-        "text": "fps",
-        "size": size * 4,
-        "x": x2,
-        "y": y2 - size * 3,
-        "color": transitionColor
-      };
-      let text2 = {
-        "name": "text",
-        "ctx": board_ctx,
-        "text": fps,
-        "size": size * 4,
-        "x": x2,
-        "y": y2 + size * 3,
-        "color": transitionColor
-      };
-      let text3 = {
-        "name": "text",
-        "ctx": board_ctx,
-        "text": "Res: " + Math.round(board.width) + " x " + Math.round(board.height),
-        "size": size * 4,
-        "x": x2,
-        "y": y2 + size * 13,
-        "color": transitionColor
-      };
-      painter.works.push(circle, crescent1, crescent2, crescent3, text1, text2, text3);
-    };
-    var simulatior = simulatior2, motion = motion2, addTexture = addTexture2, updateFps = updateFps2;
-    let transitionRadian = 0;
-    let trasitionOmega = Math.PI / 1e4;
-    let data = [];
-    let alpha = 0;
-    let beta = 0;
-    let gamma = 0;
-    let delta = 0;
-    let dlength = 0;
-    let speed = 0;
-    let mouseOn = false;
-    let transform = true;
-    let timeBefore = Date.now();
-    const DELAY = new Array(100);
-    DELAY.fill(17);
-    manager.setMethod("updateS1", simulatior2);
-    {
-      let getValue2 = function() {
-        alpha = document.getElementById("alpha-equation").value * 0.1;
-        beta = document.getElementById("beta-equation").value * 0.1;
-        gamma = document.getElementById("gamma-equation").value * 0.1;
-        delta = document.getElementById("delta-equation").value * 0.1;
-        dlength = parseFloat(document.getElementById("dlength").value) * 0.01;
-        speed = parseInt(document.getElementById("speed").value);
-      };
-      var getValue = getValue2;
-      document.getElementById("mouseOn").addEventListener("click", function() {
-        if (this.innerText == "跟隨滑鼠") {
-          mouseOn = true;
-          this.innerText = "取消跟隨";
-        } else {
-          mouseOn = false;
-          this.innerText = "跟隨滑鼠";
-        }
-      }, false);
-      document.getElementById("transform").addEventListener("click", function() {
-        if (this.innerText == "取消縮放") {
-          transform = false;
-          this.innerText = "加入縮放";
-        } else {
-          transform = true;
-          this.innerText = "取消縮放";
-        }
-      }, false);
-      getValue2();
-      document.getElementsByClassName("gamemenu")[0].addEventListener("click", getValue2, false);
-    }
-    {
-      let populate2 = function(data2, n2) {
-        for (let i = 0; i < n2; i++) {
-          let mid = 0.5;
-          let pow = 1;
-          let max = 1 + Math.pow(mid, pow);
-          let minus1 = Math.pow(getRandomFloat(mid, 1), pow);
-          let minus2 = Math.pow(getRandomFloat(0, mid), pow);
-          let obj = {
-            "d": (max - minus1 - minus2) * board.width,
-            // distance
-            "r": getRandomFloat(0, Math.PI * 2),
-            // radian
-            "fakeX": board.width / 2,
-            "fakeY": board.height / 2,
-            "x": board.width / 2,
-            "y": board.height / 2,
-            "vx": [],
-            "vy": []
-          };
-          obj.x += obj.d * Math.cos(obj.r);
-          obj.y += obj.d * Math.sin(obj.r);
-          obj.fakeX = obj.x;
-          obj.fakeY = obj.y;
-          data2.push(obj);
-        }
-        function getRandomFloat(min, max) {
-          return Math.random() * (max * 100 - min * 100 + 1) / 100 + min;
-        }
-      };
-      var populate = populate2;
-      data = [];
-      populate2(data, 2e3);
-    }
-  }
-});
 /**
  * @license
  * Copyright 2010-2024 Three.js Authors
@@ -34319,7 +34262,7 @@ window.addEventListener("load", function() {
     const bufferLength = analyser.frequencyBinCount;
     const dataArray = new Uint8Array(bufferLength);
     window.analyser = analyser;
-    manager.addAnimationByName(function S2test() {
+    manager.addAnimationCallback(function S2test() {
       analyser.getByteFrequencyData(dataArray);
       const data = [...dataArray].splice(0, 128);
       myBuff.transformData(data);
@@ -34626,7 +34569,7 @@ window.addEventListener("load", function() {
   const clock2 = new Clock();
   window.clock = clock2;
   clock2.fps = 0;
-  manager.addAnimationByName(function renderS2() {
+  manager.addAnimationCallback(function renderS2() {
     myBuff.update();
     frame.updateValue(clock2.getDelta());
     frame.getFPS();
@@ -35561,13 +35504,13 @@ window.addEventListener("load", function() {
     PathConfig.setLeap(linear, easein, easeout);
   });
   {
-    let clearBoard2 = function() {
+    let clearBoard3 = function() {
       ctx.fillStyle = canvas_background;
       ctx.fillRect(0, 0, canvas.width, canvas.height);
     };
-    var clearBoard = clearBoard2;
-    manager.addAnimationByName(function renderS3() {
-      clearBoard2();
+    var clearBoard2 = clearBoard3;
+    manager.addAnimationCallback(function renderS3() {
+      clearBoard3();
       system.sort.update(system.columns);
       system.update();
       system.draw();
@@ -35600,4 +35543,4 @@ window.addEventListener("load", function() {
   }
   const frame = new Averager(60);
 });
-//# sourceMappingURL=index-DWHtPU8R.js.map
+//# sourceMappingURL=index-CWzH6JQU.js.map

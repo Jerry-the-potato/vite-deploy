@@ -10,8 +10,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300&family=Noto+Sans+TC:wght@300&display=swap" rel="stylesheet">
            
-    <script type="module" crossorigin src="/vite-deploy/assets/index-DWHtPU8R.js"></script>
-    <link rel="stylesheet" crossorigin href="/vite-deploy/assets/index-CR7wNq1Q.css">
+    <script type="module" crossorigin src="/vite-deploy/assets/index-CWzH6JQU.js"></script>
+    <link rel="stylesheet" crossorigin href="/vite-deploy/assets/index-Bd1esa8E.css">
   </head>
   <body class="body">
     <div id="root"></div>
@@ -47,24 +47,13 @@
             })
             
           }
-          this.setMethod = (name, method) => {
-            this.request[name] = this.request[name] || {};
-            this.request[name].method = method;
-            // setRequst(request);
-            if(name.includes(this.lastId)) this.updateRequestAnimation(this.lastId);
-          }
-          this.setID = (name, id) => {
-            this.request[name] = this.request[name] || {};
-            this.request[name].ID = id;
-            // setRequst(request);
-          }
           this.cancelAnimationByName = (name) => {
             cancelAnimationFrame(this.request[name].ID);
           }
           this.requestAnimationByName = (name) => {
             this.request[name].ID = requestAnimationFrame(this.request[name].method);
           }
-          this.addAnimationByName = (callback) => {
+          this.addAnimationCallback = (callback) => {
             const name = callback.name || Math.abs(Math.random() * 100);
             this.request[name] = this.request[name] || {};
             this.request[name].method = function animate(){
@@ -98,10 +87,12 @@
         
         window.addEventListener("resize", function(){
             const ID = location.href.split("#")[1];
+            if(ID == undefined) return;
             document.getElementById("to" + ID).click();
             manager.updateRequestAnimation(ID);
         }, false)
     </script>
     <!-- <script type="text/javascript" src="./src/js/animateManager.js"></script> -->
+    <!-- <script type="module" src="./src/js/lokaVolterra.js"></script> -->
   </body>
 </html>
