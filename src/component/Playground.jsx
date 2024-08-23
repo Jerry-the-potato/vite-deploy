@@ -1,4 +1,5 @@
 import { useEffect, useState, useRef } from 'react';
+import useWindowSize from '../customHook/useWindowSize.js';
 import CanvasSectionS1 from './CanvasSection1.jsx';
 import CanvasSectionS2 from './CanvasSection2.jsx';
 import CanvasSectionS3 from './CanvasSection3.jsx';
@@ -10,11 +11,20 @@ import { Path, PathConfig } from "../js/path.js";
 
 function Playground({margin}){
     
-    let w = window.innerWidth - margin*2;
-    let h = window.innerHeight - margin*2;
-    const [ratio, setRatio] = useState(window.innerWidth > 992 ? 1 : 2);
-    const [max, setMax] = useState(getMax);
+    const [width, height] = useWindowSize();
+    const [ratio, setRatio] = useState(width > 992 ? 1 : 2);
+    const [max, setMax] = useState(getMax(width, height));
     
+    useEffect(()=>{
+        setRatio(width > 992 ? 1 : 2)
+        setMax(getMax(width, height));
+    }, [width]);
+
+    function getMax(w, h){
+        if(w > 992) return (w < h ? w : h);
+        else return (w*2 < h ? w : h/2);
+    }
+
     const sections = [useRef(), useRef(), useRef()];
     const [myMouse] = useState(new Path());
     useEffect(()=>{
@@ -37,17 +47,6 @@ function Playground({margin}){
             const frames = 30;
             myMouse.NewTarget(a, b, frames);
         }
-    }
-
-    function getMax(){
-        if(window.innerWidth > 992) return (w < h ? w : h);
-        else return (w*2 < h ? w : h/2);
-    }
-    window.onresize = function handleResize(){
-        w = window.innerWidth - margin*2;
-        h = window.innerHeight - margin*2;
-        setRatio(window.innerWidth > 992 ? 1 : 2)
-        setMax(getMax);
     }
 
     const audio = useRef();

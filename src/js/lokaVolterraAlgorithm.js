@@ -37,10 +37,6 @@ export default function lokaVolterraAlgorithm(){
         this.dlength = data.dlength * 0.001;
         this.speed = data.speed;
     }
-
-	this.timeBefore = Date.now();
-	const DELAY = new Array(100);
-	DELAY.fill(17);
 	this.render = (ctx) => {
 		clearBoard(ctx);
 		ctx.save();
@@ -53,7 +49,7 @@ export default function lokaVolterraAlgorithm(){
 		this.transitionRadian += this.trasitionOmega * this.speed;
 		this.motion(width, height);
 		this.addTexture(width, height, ctx);
-		// updateFps();
+		this.updateFps(width, height, ctx);
 	}
 	this.reset = (width, height) => {
 		const len = 2000;
@@ -210,99 +206,100 @@ export default function lokaVolterraAlgorithm(){
 		}
 		return (this.delta * x * y) -  this.gamma * y;
 	}
+
+	this.timeBefore = Date.now();
+	const delay = new Array(100);
+	delay.fill(16);
+	// fps子系統
+	this.updateFps = (width, height, ctx) => {
+		const duration = (Date.now() - this.timeBefore); // 秒數
+		this.timeBefore = Date.now();
+		delay.push(duration);
+		const throwAway = delay.shift();
+		const sum = delay.reduce((total, current) => {
+			return total + current;
+		}, 0)
+		const fps = Math.round(1000 / (sum / delay.length));
+
+		const angle = Math.PI * (Date.now() % 3000) / 1500;
+		const size = (height + width) * 0.003;
+		const x = width * 0.5// - size * 20;
+		const y = height - size * 20 //* 0.9;
+		const blue = y/width * 255;
+		const green = x/width * 255;
+		const red = Math.sin(this.transitionRadian) * 255;
+		const transitionColor = "rgb(" + Math.abs(red).toString() + "," + Math.abs(green).toString() + "," + Math.abs(blue).toString() + ")";
+		const backgroundColor = "rgb(" + Math.abs(red*0.3).toString() + "," + Math.abs(green*0.2).toString() + "," + Math.abs(blue*0.4).toString() + ")";
+
+		const circle = {
+			"name": "circle",
+			"ctx": ctx,
+			"r": size * 10,
+			"x": x,
+			"y": y,
+			"color": backgroundColor
+		}
+		const crescent1 = {
+			"name": "crescent",
+			"ctx": ctx,
+			"size": size,
+			"a": 1,
+			"b": 9,
+			"angle": angle * 3,
+			"x": x,
+			"y": y,
+			"color": transitionColor
+		}
+		const crescent2 = {
+			"name": "crescent",
+			"ctx": ctx,
+			"size": size,
+			"a": 1,
+			"b": 8,
+			"angle": angle * 2,
+			"x": x,
+			"y": y,
+			"color": transitionColor
+		}
+		const crescent3 = {
+			"name": "crescent",
+			"ctx": ctx,
+			"size": size,
+			"a": 1,
+			"b": 7,
+			"angle": angle * 1,
+			"x": x,
+			"y": y,
+			"color": transitionColor
+		}
+		const text1 = {
+			"name": "text",
+			"ctx": ctx,
+			"text": "fps",
+			"size": size * 4,
+			"x": x,
+			"y": y - size * 3,
+			"color": transitionColor
+		}
+		const text2 = {
+			"name": "text",
+			"ctx": ctx,
+			"text": fps,
+			"size": size * 4,
+			"x": x,
+			"y": y + size * 3,
+			"color": transitionColor
+		}
+		const text3 = {
+			"name": "text",
+			"ctx": ctx,
+			"text": "Res: " + Math.round(width) + " x " + Math.round(height),
+			"size": size * 4,
+			"x": x,
+			"y": y + size * 13,
+			"color": transitionColor
+		}
+		painter.works.push(circle, crescent1, crescent2, crescent3, text1, text2, text3);
+	}
 	return this;
-
-		// fps子系統
-		// function updateFps(){
-		// 	let duration = (Date.now() - timeBefore); // 秒數
-		// 	timeBefore = Date.now();
-		// 	DELAY.push(duration);
-		// 	DELAY.splice(0, 1);
-		// 	let sum = 0;
-		// 	let fps;
-		// 	for(let N = 0; N < DELAY.length; N++){
-		// 		sum = sum + DELAY[N];
-		// 	}
-		// 	fps = Math.round(1000 / (sum / DELAY.length));
-
-		// 	let angle = Math.PI * (Date.now() % 3000) / 1500;
-		// 	let size = (height + width) * 0.003;
-		// 	let x = width * 0.5// - size * 20;
-		// 	let y = height - size * 20 //* 0.9;
-		// 	let blue = y/width * 255;
-		// 	let green = x/width * 255;
-		// 	let red = Math.sin(transitionRadian) * 255;
-		// 	let transitionColor = "rgb(" + Math.abs(red).toString() + "," + Math.abs(green).toString() + "," + Math.abs(blue).toString() + ")";
-		// 	let backgroundColor = "rgb(" + Math.abs(red*0.3).toString() + "," + Math.abs(green*0.2).toString() + "," + Math.abs(blue*0.4).toString() + ")";
-
-		// 	let circle = {
-		// 		"name": "circle",
-		// 		"ctx": this.ctx,
-		// 		"r": size * 10,
-		// 		"x": x,
-		// 		"y": y,
-		// 		"color": backgroundColor
-		// 	}
-		// 	let crescent1 = {
-		// 		"name": "crescent",
-		// 		"ctx": this.ctx,
-		// 		"size": size,
-		// 		"a": 1,
-		// 		"b": 9,
-		// 		"angle": angle * 3,
-		// 		"x": x,
-		// 		"y": y,
-		// 		"color": transitionColor
-		// 	}
-		// 	let crescent2 = {
-		// 		"name": "crescent",
-		// 		"ctx": this.ctx,
-		// 		"size": size,
-		// 		"a": 1,
-		// 		"b": 8,
-		// 		"angle": angle * 2,
-		// 		"x": x,
-		// 		"y": y,
-		// 		"color": transitionColor
-		// 	}
-		// 	let crescent3 = {
-		// 		"name": "crescent",
-		// 		"ctx": this.ctx,
-		// 		"size": size,
-		// 		"a": 1,
-		// 		"b": 7,
-		// 		"angle": angle * 1,
-		// 		"x": x,
-		// 		"y": y,
-		// 		"color": transitionColor
-		// 	}
-		// 	let text1 = {
-		// 		"name": "text",
-		// 		"ctx": this.ctx,
-		// 		"text": "fps",
-		// 		"size": size * 4,
-		// 		"x": x,
-		// 		"y": y - size * 3,
-		// 		"color": transitionColor
-		// 	}
-		// 	let text2 = {
-		// 		"name": "text",
-		// 		"ctx": this.ctx,
-		// 		"text": fps,
-		// 		"size": size * 4,
-		// 		"x": x,
-		// 		"y": y + size * 3,
-		// 		"color": transitionColor
-		// 	}
-		// 	let text3 = {
-		// 		"name": "text",
-		// 		"ctx": this.ctx,
-		// 		"text": "Res: " + Math.round(width) + " x " + Math.round(height),
-		// 		"size": size * 4,
-		// 		"x": x,
-		// 		"y": y + size * 13,
-		// 		"color": transitionColor
-		// 	}
-		// 	painter.works.push(circle, crescent1, crescent2, crescent3, text1, text2, text3);
-		// }
 }

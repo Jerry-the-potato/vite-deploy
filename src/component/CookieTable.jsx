@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import Table from './Table.jsx'
 function CookieTable(){
     const [tableData, setTableData] = useState([]);
+    const [rows, setRows] = useState([]);
     const columns = [
         { accessor: 'price', label: '售價' },
         { accessor: 'name', label: '品名' },
@@ -9,10 +10,6 @@ function CookieTable(){
         { accessor: 'tag', label: '標籤' },
         { accessor: 'rate', label: '顧客評價' },
     ]
-    const rows = tableData.map((data, index) => {
-        // return data; 需要ID作為Table取得key的手段
-        return {url: data.url, id: index, price: data.price, name: data.name, onsale: data.onsale, tag: data.tag, rate: data.rate}
-    })
     useEffect(()=>{
         const newTableData = tableData.concat([
             { id: 1, price: '50', name: "potatochip 洋芋片", onsale: true, tag: 'salty crispy delicious', rate: '⭐️⭐️⭐️⭐️' },
@@ -36,7 +33,12 @@ function CookieTable(){
             { id: 19, price: '58', name: "caramelpopcorn 焦糖爆米花", onsale: false, tag: 'sweet crispy rich', rate: '⭐️⭐️⭐️⭐️' },
             { id: 20, price: '48', name: "yogurt 雪酪", onsale: true, tag: 'creamy tangy sweet', rate: '⭐️⭐️⭐️⭐️' }
         ])
+        const newRows = newTableData.map((data, index) => {
+            // return data; 需要ID作為Table取得key的手段
+            return {url: data.url, id: index, price: data.price, name: data.name, onsale: data.onsale, tag: data.tag, rate: data.rate}
+        })
         setTableData(newTableData);
+        setRows(newRows);
     }, [])
     return <section className="section" id="cookie">
             <Table columns={columns} rows={rows}/>
