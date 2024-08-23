@@ -7042,6 +7042,15 @@ function NavigationBar({ width }) {
     /* @__PURE__ */ jsxRuntimeExports.jsx("div", { onClick: handleClick, id: "navSlider", children: /* @__PURE__ */ jsxRuntimeExports.jsx("p", { children: isOpen ? "X" : "≡" }) })
   ] });
 }
+function useWindowSize() {
+  const [size, setSize] = reactExports.useState([window.innerWidth, window.innerHeight]);
+  reactExports.useLayoutEffect(() => {
+    const updateSize = () => setSize([window.innerWidth, window.innerHeight]);
+    window.addEventListener("resize", updateSize);
+    return () => window.removeEventListener("resize", updateSize);
+  }, []);
+  return size;
+}
 function WorkerWrapper(options) {
   return new Worker(
     "/vite-deploy/assets/worker-z9YZT4ad.js",
@@ -7173,9 +7182,6 @@ function lokaVolterraAlgorithm() {
     this.dlength = data.dlength * 1e-3;
     this.speed = data.speed;
   };
-  this.timeBefore = Date.now();
-  const DELAY = new Array(100);
-  DELAY.fill(17);
   this.render = (ctx) => {
     clearBoard(ctx);
     ctx.save();
@@ -7190,6 +7196,7 @@ function lokaVolterraAlgorithm() {
     this.transitionRadian += this.trasitionOmega * this.speed;
     this.motion(width, height);
     this.addTexture(width, height, ctx);
+    this.updateFps(width, height, ctx);
   };
   this.reset = (width, height) => {
     const len = 2e3;
@@ -7336,6 +7343,97 @@ function lokaVolterraAlgorithm() {
     }
     return this.delta * x2 * y2 - this.gamma * y2;
   };
+  this.timeBefore = Date.now();
+  const delay = new Array(100);
+  delay.fill(16);
+  this.updateFps = (width, height, ctx) => {
+    const duration = Date.now() - this.timeBefore;
+    this.timeBefore = Date.now();
+    delay.push(duration);
+    delay.shift();
+    const sum = delay.reduce((total, current) => {
+      return total + current;
+    }, 0);
+    const fps = Math.round(1e3 / (sum / delay.length));
+    const angle = Math.PI * (Date.now() % 3e3) / 1500;
+    const size = (height + width) * 3e-3;
+    const x2 = width * 0.5;
+    const y2 = height - size * 20;
+    const blue = y2 / width * 255;
+    const green = x2 / width * 255;
+    const red = Math.sin(this.transitionRadian) * 255;
+    const transitionColor = "rgb(" + Math.abs(red).toString() + "," + Math.abs(green).toString() + "," + Math.abs(blue).toString() + ")";
+    const backgroundColor = "rgb(" + Math.abs(red * 0.3).toString() + "," + Math.abs(green * 0.2).toString() + "," + Math.abs(blue * 0.4).toString() + ")";
+    const circle = {
+      "name": "circle",
+      "ctx": ctx,
+      "r": size * 10,
+      "x": x2,
+      "y": y2,
+      "color": backgroundColor
+    };
+    const crescent1 = {
+      "name": "crescent",
+      "ctx": ctx,
+      "size": size,
+      "a": 1,
+      "b": 9,
+      "angle": angle * 3,
+      "x": x2,
+      "y": y2,
+      "color": transitionColor
+    };
+    const crescent2 = {
+      "name": "crescent",
+      "ctx": ctx,
+      "size": size,
+      "a": 1,
+      "b": 8,
+      "angle": angle * 2,
+      "x": x2,
+      "y": y2,
+      "color": transitionColor
+    };
+    const crescent3 = {
+      "name": "crescent",
+      "ctx": ctx,
+      "size": size,
+      "a": 1,
+      "b": 7,
+      "angle": angle * 1,
+      "x": x2,
+      "y": y2,
+      "color": transitionColor
+    };
+    const text1 = {
+      "name": "text",
+      "ctx": ctx,
+      "text": "fps",
+      "size": size * 4,
+      "x": x2,
+      "y": y2 - size * 3,
+      "color": transitionColor
+    };
+    const text2 = {
+      "name": "text",
+      "ctx": ctx,
+      "text": fps,
+      "size": size * 4,
+      "x": x2,
+      "y": y2 + size * 3,
+      "color": transitionColor
+    };
+    const text3 = {
+      "name": "text",
+      "ctx": ctx,
+      "text": "Res: " + Math.round(width) + " x " + Math.round(height),
+      "size": size * 4,
+      "x": x2,
+      "y": y2 + size * 13,
+      "color": transitionColor
+    };
+    painter.works.push(circle, crescent1, crescent2, crescent3, text1, text2, text3);
+  };
   return this;
 }
 const createLokaVolterra = function() {
@@ -7374,7 +7472,7 @@ const createLokaVolterra = function() {
   this.pauseWorker = (isPause) => {
     myWorker.postMessage({ "name": isPause ? "requestAnimation" : "cancelAnimation" });
   };
-  this.render = (function renderS1() {
+  this.renderS1 = (function renderS1() {
     this.algorithm.render(this.ctx);
   }).bind(this);
   this.updateS1 = (function updateS1() {
@@ -7487,7 +7585,7 @@ const CanvasSectionS1 = ({ section, manager: manager2, myMouse, canvas, ratio, m
   const bitmap = reactExports.useRef();
   reactExports.useEffect(() => {
     lokaVolterra.setCanvas(canvas.current, bitmap.current);
-    manager2.addAnimationCallback(lokaVolterra.render);
+    manager2.addAnimationCallback(lokaVolterra.renderS1);
     manager2.addAnimationCallback(lokaVolterra.updateS1);
     lokaVolterra.algorithm.mouse = myMouse;
   }, []);
@@ -13201,6 +13299,7 @@ function Table({ columns, rows }) {
 }
 function CookieTable() {
   const [tableData, setTableData] = reactExports.useState([]);
+  const [rows, setRows] = reactExports.useState([]);
   const columns = [
     { accessor: "price", label: "售價" },
     { accessor: "name", label: "品名" },
@@ -13208,9 +13307,6 @@ function CookieTable() {
     { accessor: "tag", label: "標籤" },
     { accessor: "rate", label: "顧客評價" }
   ];
-  const rows = tableData.map((data, index) => {
-    return { url: data.url, id: index, price: data.price, name: data.name, onsale: data.onsale, tag: data.tag, rate: data.rate };
-  });
   reactExports.useEffect(() => {
     const newTableData = tableData.concat([
       { id: 1, price: "50", name: "potatochip 洋芋片", onsale: true, tag: "salty crispy delicious", rate: "⭐️⭐️⭐️⭐️" },
@@ -13234,7 +13330,11 @@ function CookieTable() {
       { id: 19, price: "58", name: "caramelpopcorn 焦糖爆米花", onsale: false, tag: "sweet crispy rich", rate: "⭐️⭐️⭐️⭐️" },
       { id: 20, price: "48", name: "yogurt 雪酪", onsale: true, tag: "creamy tangy sweet", rate: "⭐️⭐️⭐️⭐️" }
     ]);
+    const newRows = newTableData.map((data, index) => {
+      return { url: data.url, id: index, price: data.price, name: data.name, onsale: data.onsale, tag: data.tag, rate: data.rate };
+    });
     setTableData(newTableData);
+    setRows(newRows);
   }, []);
   return /* @__PURE__ */ jsxRuntimeExports.jsx("section", { className: "section", id: "cookie", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Table, { columns, rows }) });
 }
@@ -13392,10 +13492,17 @@ class Path extends PathConfig {
   }
 }
 function Playground({ margin }) {
-  let w2 = window.innerWidth - margin * 2;
-  let h = window.innerHeight - margin * 2;
-  const [ratio, setRatio] = reactExports.useState(window.innerWidth > 992 ? 1 : 2);
-  const [max, setMax] = reactExports.useState(getMax);
+  const [width, height] = useWindowSize();
+  const [ratio, setRatio] = reactExports.useState(width > 992 ? 1 : 2);
+  const [max, setMax] = reactExports.useState(getMax(width, height));
+  reactExports.useEffect(() => {
+    setRatio(width > 992 ? 1 : 2);
+    setMax(getMax(width, height));
+  }, [width]);
+  function getMax(w2, h) {
+    if (w2 > 992) return w2 < h ? w2 : h;
+    else return w2 * 2 < h ? w2 : h / 2;
+  }
   const sections = [reactExports.useRef(), reactExports.useRef(), reactExports.useRef()];
   const [myMouse] = reactExports.useState(new Path());
   reactExports.useEffect(() => {
@@ -13418,16 +13525,6 @@ function Playground({ margin }) {
       myMouse.NewTarget(a, b, frames);
     }
   }
-  function getMax() {
-    if (window.innerWidth > 992) return w2 < h ? w2 : h;
-    else return w2 * 2 < h ? w2 : h / 2;
-  }
-  window.onresize = function handleResize() {
-    w2 = window.innerWidth - margin * 2;
-    h = window.innerHeight - margin * 2;
-    setRatio(window.innerWidth > 992 ? 1 : 2);
-    setMax(getMax);
-  };
   const audio = reactExports.useRef();
   const canvas = { "S1": reactExports.useRef(), "S2": reactExports.useRef(), "S3": reactExports.useRef() };
   const [media] = reactExports.useState({});
@@ -35620,4 +35717,4 @@ window.addEventListener("load", function() {
   }
   const frame = new Averager(60);
 });
-//# sourceMappingURL=index-BGSnmcnv.js.map
+//# sourceMappingURL=index-BMijQuhH.js.map
