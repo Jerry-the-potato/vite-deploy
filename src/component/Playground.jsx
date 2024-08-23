@@ -5,6 +5,7 @@ import CanvasSectionS3 from './CanvasSection3.jsx';
 import CookieTable from './CookieTable.jsx';
 import downloadMedia from '../js/downloadMedia.js';
 import manager from '../js/animateManager.js';
+import { Path, PathConfig } from "../js/path.js";
 // import {updateS1, renderS1} from '../js/lokaVolterra.js';
 
 function Playground({margin}){
@@ -15,14 +16,28 @@ function Playground({margin}){
     const [max, setMax] = useState(getMax);
     
     const sections = [useRef(), useRef(), useRef()];
+    const [myMouse] = useState(new Path());
     useEffect(()=>{
         const elements = sections.map((obj) => {
             if(obj.current) return obj.current;
         })
         manager.addIntersectionObserver();
         manager.addSubjectElements(elements)
+        PathConfig.resetPath();
+        PathConfig.resetLeap();
+        manager.addAnimationCallback(myMouse.NextFrame)
         console.log(manager);
     }, [])
+
+    function handleMouseMove(e){
+        const rect = e.target.getBoundingClientRect();
+        if(true){
+            const a = ((e.pageX - rect.x)) / (rect.width);
+            const b = ((e.pageY - rect.y)) / (rect.height);
+            const frames = 30;
+            myMouse.NewTarget(a, b, frames);
+        }
+    }
 
     function getMax(){
         if(window.innerWidth > 992) return (w < h ? w : h);
@@ -39,7 +54,7 @@ function Playground({margin}){
     const canvas = {"S1": useRef(), "S2": useRef(), "S3": useRef()};
     const [media] = useState({});
     const [status, setStatus] = useState("Record");
-    function handleClick(e){
+    function handleRecord(e){
         if(status == "Stop"){
             setStatus("Record")
             media.recorder.stop();
@@ -64,20 +79,17 @@ function Playground({margin}){
     }
 
     return (
-        <div id="playground"
+        <div id="playground" onMouseMove={handleMouseMove} 
             style={{"width": max + "px",
                      "height": window.innerWidth<992 ? max*2 : max + "px",
                      "margin": margin +"px auto"}}>
 
-            <CanvasSectionS1 section={sections[0]} canvas={canvas.S1} ratio={ratio} max={max} status={status} handleClick={handleClick} manager={manager}/>
-            <CanvasSectionS2 section={sections[1]} canvas={canvas.S2} audio={audio} ratio={ratio} max={max} status={status} handleClick={handleClick}/>
-            <CanvasSectionS3 section={sections[2]} canvas={canvas.S3} ratio={ratio} max={max} status={status} handleClick={handleClick}/>
+            <CanvasSectionS1 section={sections[0]} canvas={canvas.S1} ratio={ratio} max={max} status={status} handleClick={handleRecord} manager={manager} myMouse={myMouse}/>
+            <CanvasSectionS2 section={sections[1]} canvas={canvas.S2} audio={audio} ratio={ratio} max={max} status={status} handleClick={handleRecord} manager={manager} myMouse={myMouse}/>
+            <CanvasSectionS3 section={sections[2]} canvas={canvas.S3} ratio={ratio} max={max} status={status} handleClick={handleRecord} manager={manager} myMouse={myMouse}/>
             <CookieTable></CookieTable>
         </div>
     )
 }
-
-
-
 
 export default Playground;

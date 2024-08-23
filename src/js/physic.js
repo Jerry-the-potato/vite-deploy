@@ -1,4 +1,4 @@
-import {Path, PathConfig} from './cursor';
+import {Path, PathConfig} from './path.js';
 
 window.addEventListener("load", function () {
     const canvas_border = "black";

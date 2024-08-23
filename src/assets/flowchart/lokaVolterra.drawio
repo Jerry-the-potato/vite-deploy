@@ -1,113 +1,386 @@
 <mxfile host="65bd71144e">
     <diagram id="rOhNWZg4kqReY9OZdnnV" name="Page-1">
-        <mxGraphModel dx="611" dy="639" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="1654" math="0" shadow="0">
+        <mxGraphModel dx="1820" dy="2063" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="1654" math="0" shadow="0">
             <root>
                 <mxCell id="0"/>
                 <mxCell id="1" parent="0"/>
-                <mxCell id="22" value="實例化" style="edgeStyle=none;shape=flexArrow;html=1;fontSize=20;" edge="1" parent="1" source="4" target="7">
-                    <mxGeometry relative="1" as="geometry"/>
-                </mxCell>
-                <mxCell id="4" value="畫筆生成器" style="ellipse;whiteSpace=wrap;html=1;fontSize=20;" vertex="1" parent="1">
-                    <mxGeometry x="330" y="270" width="120" height="80" as="geometry"/>
-                </mxCell>
-                <mxCell id="20" style="edgeStyle=none;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;fontSize=20;shape=flexArrow;" edge="1" parent="1" source="5" target="12">
-                    <mxGeometry relative="1" as="geometry"/>
-                </mxCell>
-                <mxCell id="21" value="實例化" style="edgeStyle=none;shape=flexArrow;html=1;fontSize=20;" edge="1" parent="1" source="5" target="12">
-                    <mxGeometry relative="1" as="geometry"/>
-                </mxCell>
-                <mxCell id="5" value="粒子生成器" style="ellipse;whiteSpace=wrap;html=1;fontSize=20;" vertex="1" parent="1">
-                    <mxGeometry x="110" y="270" width="120" height="80" as="geometry"/>
-                </mxCell>
-                <mxCell id="23" value="實例化" style="edgeStyle=none;shape=flexArrow;html=1;fontSize=20;" edge="1" parent="1" source="6" target="11">
-                    <mxGeometry relative="1" as="geometry"/>
-                </mxCell>
-                <mxCell id="6" value="管理員&lt;br&gt;生成器" style="ellipse;whiteSpace=wrap;html=1;fontSize=20;" vertex="1" parent="1">
-                    <mxGeometry x="550" y="270" width="120" height="80" as="geometry"/>
-                </mxCell>
-                <mxCell id="19" value="" style="edgeStyle=none;html=1;fontSize=20;" edge="1" parent="1" source="7" target="11">
-                    <mxGeometry relative="1" as="geometry"/>
-                </mxCell>
-                <mxCell id="7" value="畫筆" style="rounded=0;whiteSpace=wrap;html=1;fontSize=20;" vertex="1" parent="1">
-                    <mxGeometry x="330" y="100" width="120" height="60" as="geometry"/>
-                </mxCell>
-                <mxCell id="11" value="繪圖管理員" style="rounded=0;whiteSpace=wrap;html=1;fontSize=20;" vertex="1" parent="1">
-                    <mxGeometry x="550" y="100" width="120" height="60" as="geometry"/>
-                </mxCell>
-                <mxCell id="15" value="" style="edgeStyle=none;html=1;fontSize=20;" edge="1" parent="1" source="12" target="7">
-                    <mxGeometry relative="1" as="geometry"/>
-                </mxCell>
-                <mxCell id="12" value="粒子系統" style="rounded=0;whiteSpace=wrap;html=1;fontSize=20;" vertex="1" parent="1">
-                    <mxGeometry x="110" y="100" width="120" height="60" as="geometry"/>
-                </mxCell>
-                <mxCell id="25" value="獨立作用域（document原生方法）" style="swimlane;whiteSpace=wrap;html=1;fontSize=20;" vertex="1" parent="1">
-                    <mxGeometry x="50" y="30" width="660" height="380" as="geometry"/>
-                </mxCell>
                 <mxCell id="32" value="React Dom" style="swimlane;startSize=20;horizontal=1;containerType=tree;fontSize=20;" vertex="1" parent="1">
-                    <mxGeometry x="740" y="40" width="410" height="320" as="geometry"/>
+                    <mxGeometry x="750" y="60" width="410" height="320" as="geometry"/>
                 </mxCell>
-                <mxCell id="33" value="" style="edgeStyle=elbowEdgeStyle;elbow=vertical;sourcePerimeterSpacing=0;targetPerimeterSpacing=0;startArrow=none;endArrow=none;rounded=0;curved=0;fontSize=20;" edge="1" parent="32" source="34" target="35">
+                <mxCell id="33" value="" style="edgeStyle=elbowEdgeStyle;elbow=vertical;sourcePerimeterSpacing=0;targetPerimeterSpacing=0;startArrow=none;endArrow=none;rounded=0;curved=0;fontSize=16;" edge="1" parent="32" source="34" target="35">
                     <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
-                <mxCell id="34" value="&lt;span style=&quot;color: rgb(78, 201, 176); font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 14px; background-color: rgb(31, 31, 31);&quot;&gt;App&lt;/span&gt;" style="whiteSpace=wrap;html=1;treeFolding=1;treeMoving=1;newEdgeStyle={&quot;edgeStyle&quot;:&quot;elbowEdgeStyle&quot;,&quot;startArrow&quot;:&quot;none&quot;,&quot;endArrow&quot;:&quot;none&quot;};fontSize=20;" vertex="1" parent="32">
-                    <mxGeometry x="135" y="40" width="120" height="40" as="geometry"/>
+                <mxCell id="34" value="&lt;span style=&quot;color: rgb(78, 201, 176); font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 16px; background-color: rgb(31, 31, 31);&quot;&gt;App&lt;/span&gt;" style="whiteSpace=wrap;html=1;treeFolding=1;treeMoving=1;newEdgeStyle={&quot;edgeStyle&quot;:&quot;elbowEdgeStyle&quot;,&quot;startArrow&quot;:&quot;none&quot;,&quot;endArrow&quot;:&quot;none&quot;};fontSize=16;" vertex="1" parent="32">
+                    <mxGeometry x="150" y="40" width="120" height="40" as="geometry"/>
                 </mxCell>
-                <mxCell id="35" value="&lt;span style=&quot;color: rgb(78, 201, 176); font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 14px; background-color: rgb(31, 31, 31);&quot;&gt;NavigationBar&lt;/span&gt;" style="whiteSpace=wrap;html=1;treeFolding=1;treeMoving=1;newEdgeStyle={&quot;edgeStyle&quot;:&quot;elbowEdgeStyle&quot;,&quot;startArrow&quot;:&quot;none&quot;,&quot;endArrow&quot;:&quot;none&quot;};fontSize=20;" vertex="1" parent="32">
-                    <mxGeometry x="270" y="120" width="120" height="40" as="geometry"/>
+                <mxCell id="35" value="&lt;span style=&quot;color: rgb(78, 201, 176); font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 16px; background-color: rgb(31, 31, 31);&quot;&gt;NavigationBar&lt;/span&gt;" style="whiteSpace=wrap;html=1;treeFolding=1;treeMoving=1;newEdgeStyle={&quot;edgeStyle&quot;:&quot;elbowEdgeStyle&quot;,&quot;startArrow&quot;:&quot;none&quot;,&quot;endArrow&quot;:&quot;none&quot;};fontSize=16;" vertex="1" parent="32">
+                    <mxGeometry x="260" y="120" width="120" height="40" as="geometry"/>
                 </mxCell>
-                <mxCell id="37" value="&lt;span style=&quot;color: rgb(78, 201, 176); font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 14px; background-color: rgb(31, 31, 31);&quot;&gt;Playground&lt;/span&gt;" style="whiteSpace=wrap;html=1;treeFolding=1;treeMoving=1;newEdgeStyle={&quot;edgeStyle&quot;:&quot;elbowEdgeStyle&quot;,&quot;startArrow&quot;:&quot;none&quot;,&quot;endArrow&quot;:&quot;none&quot;};fontSize=20;" vertex="1" parent="32">
+                <mxCell id="37" value="&lt;span style=&quot;color: rgb(78, 201, 176); font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 16px; background-color: rgb(31, 31, 31);&quot;&gt;Playground&lt;/span&gt;" style="whiteSpace=wrap;html=1;treeFolding=1;treeMoving=1;newEdgeStyle={&quot;edgeStyle&quot;:&quot;elbowEdgeStyle&quot;,&quot;startArrow&quot;:&quot;none&quot;,&quot;endArrow&quot;:&quot;none&quot;};fontSize=16;" vertex="1" parent="32">
                     <mxGeometry x="90" y="120" width="120" height="40" as="geometry"/>
                 </mxCell>
-                <mxCell id="38" value="" style="edgeStyle=elbowEdgeStyle;elbow=vertical;sourcePerimeterSpacing=0;targetPerimeterSpacing=0;startArrow=none;endArrow=none;rounded=0;curved=0;fontSize=20;" edge="1" parent="32" source="34" target="37">
+                <mxCell id="38" value="" style="edgeStyle=elbowEdgeStyle;elbow=vertical;sourcePerimeterSpacing=0;targetPerimeterSpacing=0;startArrow=none;endArrow=none;rounded=0;curved=0;fontSize=16;" edge="1" parent="32" source="34" target="37">
                     <mxGeometry relative="1" as="geometry">
                         <mxPoint x="195" y="80" as="sourcePoint"/>
                         <mxPoint x="125" y="120" as="targetPoint"/>
                     </mxGeometry>
                 </mxCell>
-                <mxCell id="39" value="&lt;div style=&quot;color: rgb(204, 204, 204); background-color: rgb(31, 31, 31); font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 14px; line-height: 19px;&quot;&gt;&lt;span style=&quot;color: #4ec9b0;&quot;&gt;SectionS1&lt;/span&gt;&lt;/div&gt;" style="whiteSpace=wrap;html=1;treeFolding=1;treeMoving=1;newEdgeStyle={&quot;edgeStyle&quot;:&quot;elbowEdgeStyle&quot;,&quot;startArrow&quot;:&quot;none&quot;,&quot;endArrow&quot;:&quot;none&quot;};fontSize=20;" vertex="1" collapsed="1" parent="32">
+                <mxCell id="39" value="&lt;div style=&quot;color: rgb(204, 204, 204); background-color: rgb(31, 31, 31); font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 16px; line-height: 19px;&quot;&gt;&lt;span style=&quot;color: rgb(78, 201, 176); font-size: 16px;&quot;&gt;SectionS1&lt;/span&gt;&lt;/div&gt;" style="whiteSpace=wrap;html=1;treeFolding=1;treeMoving=1;newEdgeStyle={&quot;edgeStyle&quot;:&quot;elbowEdgeStyle&quot;,&quot;startArrow&quot;:&quot;none&quot;,&quot;endArrow&quot;:&quot;none&quot;};fontSize=16;" vertex="1" collapsed="1" parent="32">
                     <mxGeometry x="15" y="200" width="120" height="40" as="geometry"/>
                 </mxCell>
-                <mxCell id="40" value="" style="edgeStyle=elbowEdgeStyle;elbow=vertical;sourcePerimeterSpacing=0;targetPerimeterSpacing=0;startArrow=none;endArrow=none;rounded=0;curved=0;fontSize=20;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" edge="1" parent="32" source="37" target="39">
+                <mxCell id="40" value="" style="edgeStyle=elbowEdgeStyle;elbow=vertical;sourcePerimeterSpacing=0;targetPerimeterSpacing=0;startArrow=none;endArrow=none;rounded=0;curved=0;fontSize=16;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" edge="1" parent="32" source="37" target="39">
                     <mxGeometry relative="1" as="geometry">
                         <mxPoint x="195" y="80" as="sourcePoint"/>
                         <mxPoint x="275" y="120" as="targetPoint"/>
                     </mxGeometry>
                 </mxCell>
-                <mxCell id="43" value="" style="edgeStyle=elbowEdgeStyle;elbow=vertical;sourcePerimeterSpacing=0;targetPerimeterSpacing=0;startArrow=none;endArrow=none;rounded=0;curved=0;fontSize=20;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" edge="1" target="44" source="37" parent="32">
+                <mxCell id="43" value="" style="edgeStyle=elbowEdgeStyle;elbow=vertical;sourcePerimeterSpacing=0;targetPerimeterSpacing=0;startArrow=none;endArrow=none;rounded=0;curved=0;fontSize=16;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" edge="1" target="44" source="37" parent="32">
                     <mxGeometry relative="1" as="geometry">
                         <mxPoint x="1025" y="190" as="sourcePoint"/>
                         <mxPoint x="275" y="120" as="targetPoint"/>
                     </mxGeometry>
                 </mxCell>
-                <mxCell id="44" value="&lt;span style=&quot;color: rgb(78, 201, 176); font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 14px; background-color: rgb(31, 31, 31);&quot;&gt;SectionS3&lt;/span&gt;" style="whiteSpace=wrap;html=1;treeFolding=1;treeMoving=1;newEdgeStyle={&quot;edgeStyle&quot;:&quot;elbowEdgeStyle&quot;,&quot;startArrow&quot;:&quot;none&quot;,&quot;endArrow&quot;:&quot;none&quot;};fontSize=20;" vertex="1" collapsed="1" parent="32">
+                <mxCell id="44" value="&lt;span style=&quot;color: rgb(78, 201, 176); font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 16px; background-color: rgb(31, 31, 31);&quot;&gt;SectionS3&lt;/span&gt;" style="whiteSpace=wrap;html=1;treeFolding=1;treeMoving=1;newEdgeStyle={&quot;edgeStyle&quot;:&quot;elbowEdgeStyle&quot;,&quot;startArrow&quot;:&quot;none&quot;,&quot;endArrow&quot;:&quot;none&quot;};fontSize=16;" vertex="1" collapsed="1" parent="32">
                     <mxGeometry x="280" y="200" width="120" height="40" as="geometry"/>
                 </mxCell>
-                <mxCell id="46" value="" style="edgeStyle=elbowEdgeStyle;elbow=vertical;sourcePerimeterSpacing=0;targetPerimeterSpacing=0;startArrow=none;endArrow=none;rounded=0;curved=0;fontSize=20;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" edge="1" target="47" source="37" parent="32">
+                <mxCell id="46" value="" style="edgeStyle=elbowEdgeStyle;elbow=vertical;sourcePerimeterSpacing=0;targetPerimeterSpacing=0;startArrow=none;endArrow=none;rounded=0;curved=0;fontSize=16;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" edge="1" target="47" source="37" parent="32">
                     <mxGeometry relative="1" as="geometry">
                         <mxPoint x="1025" y="190" as="sourcePoint"/>
                         <mxPoint x="275" y="120" as="targetPoint"/>
                     </mxGeometry>
                 </mxCell>
-                <mxCell id="47" value="&lt;div style=&quot;color: rgb(204, 204, 204); background-color: rgb(31, 31, 31); font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 14px; line-height: 19px;&quot;&gt;&lt;span style=&quot;color: #4ec9b0;&quot;&gt;SectionS2&lt;/span&gt;&lt;/div&gt;" style="whiteSpace=wrap;html=1;treeFolding=1;treeMoving=1;newEdgeStyle={&quot;edgeStyle&quot;:&quot;elbowEdgeStyle&quot;,&quot;startArrow&quot;:&quot;none&quot;,&quot;endArrow&quot;:&quot;none&quot;};fontSize=20;" vertex="1" collapsed="1" parent="32">
+                <mxCell id="47" value="&lt;div style=&quot;color: rgb(204, 204, 204); background-color: rgb(31, 31, 31); font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 16px; line-height: 19px;&quot;&gt;&lt;span style=&quot;color: rgb(78, 201, 176); font-size: 16px;&quot;&gt;SectionS2&lt;/span&gt;&lt;/div&gt;" style="whiteSpace=wrap;html=1;treeFolding=1;treeMoving=1;newEdgeStyle={&quot;edgeStyle&quot;:&quot;elbowEdgeStyle&quot;,&quot;startArrow&quot;:&quot;none&quot;,&quot;endArrow&quot;:&quot;none&quot;};fontSize=16;" vertex="1" collapsed="1" parent="32">
                     <mxGeometry x="150" y="200" width="120" height="40" as="geometry"/>
                 </mxCell>
-                <mxCell id="48" value="" style="edgeStyle=elbowEdgeStyle;elbow=vertical;sourcePerimeterSpacing=0;targetPerimeterSpacing=0;startArrow=none;endArrow=none;rounded=0;curved=0;fontSize=20;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" edge="1" target="49" source="44" parent="32">
+                <mxCell id="48" value="" style="edgeStyle=elbowEdgeStyle;elbow=vertical;sourcePerimeterSpacing=0;targetPerimeterSpacing=0;startArrow=none;endArrow=none;rounded=0;curved=0;fontSize=16;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" edge="1" target="49" source="44" parent="32">
                     <mxGeometry relative="1" as="geometry">
                         <mxPoint x="1025" y="190" as="sourcePoint"/>
                         <mxPoint x="275" y="120" as="targetPoint"/>
                     </mxGeometry>
                 </mxCell>
-                <mxCell id="49" value="&lt;span style=&quot;color: rgb(78, 201, 176); font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 14px; background-color: rgb(31, 31, 31);&quot;&gt;MenuS3&lt;/span&gt;" style="whiteSpace=wrap;html=1;treeFolding=1;treeMoving=1;newEdgeStyle={&quot;edgeStyle&quot;:&quot;elbowEdgeStyle&quot;,&quot;startArrow&quot;:&quot;none&quot;,&quot;endArrow&quot;:&quot;none&quot;};fontSize=20;" vertex="1" collapsed="1" parent="32">
+                <mxCell id="49" value="&lt;span style=&quot;color: rgb(78, 201, 176); font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 16px; background-color: rgb(31, 31, 31);&quot;&gt;MenuS3&lt;/span&gt;" style="whiteSpace=wrap;html=1;treeFolding=1;treeMoving=1;newEdgeStyle={&quot;edgeStyle&quot;:&quot;elbowEdgeStyle&quot;,&quot;startArrow&quot;:&quot;none&quot;,&quot;endArrow&quot;:&quot;none&quot;};fontSize=16;" vertex="1" collapsed="1" parent="32">
                     <mxGeometry x="280" y="260" width="120" height="40" as="geometry"/>
                 </mxCell>
-                <mxCell id="50" value="" style="edgeStyle=elbowEdgeStyle;elbow=vertical;sourcePerimeterSpacing=0;targetPerimeterSpacing=0;startArrow=none;endArrow=none;rounded=0;curved=0;fontSize=20;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" edge="1" target="51" source="39" parent="32">
+                <mxCell id="50" value="" style="edgeStyle=elbowEdgeStyle;elbow=vertical;sourcePerimeterSpacing=0;targetPerimeterSpacing=0;startArrow=none;endArrow=none;rounded=0;curved=0;fontSize=16;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" edge="1" target="51" source="39" parent="32">
                     <mxGeometry relative="1" as="geometry">
                         <mxPoint x="1025" y="190" as="sourcePoint"/>
                         <mxPoint x="275" y="120" as="targetPoint"/>
                     </mxGeometry>
                 </mxCell>
-                <mxCell id="51" value="&lt;div style=&quot;color: rgb(204, 204, 204); background-color: rgb(31, 31, 31); font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 14px; line-height: 19px;&quot;&gt;&lt;span style=&quot;color: #4ec9b0;&quot;&gt;MenuS1&lt;/span&gt;&lt;/div&gt;" style="whiteSpace=wrap;html=1;treeFolding=1;treeMoving=1;newEdgeStyle={&quot;edgeStyle&quot;:&quot;elbowEdgeStyle&quot;,&quot;startArrow&quot;:&quot;none&quot;,&quot;endArrow&quot;:&quot;none&quot;};fontSize=20;" vertex="1" collapsed="1" parent="32">
+                <mxCell id="51" value="&lt;div style=&quot;color: rgb(204, 204, 204); background-color: rgb(31, 31, 31); font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 16px; line-height: 19px;&quot;&gt;&lt;span style=&quot;color: rgb(78, 201, 176); font-size: 16px;&quot;&gt;MenuS1&lt;/span&gt;&lt;/div&gt;" style="whiteSpace=wrap;html=1;treeFolding=1;treeMoving=1;newEdgeStyle={&quot;edgeStyle&quot;:&quot;elbowEdgeStyle&quot;,&quot;startArrow&quot;:&quot;none&quot;,&quot;endArrow&quot;:&quot;none&quot;};fontSize=16;" vertex="1" collapsed="1" parent="32">
                     <mxGeometry x="15" y="260" width="120" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="55" value="React被忽略" style="edgeStyle=orthogonalEdgeStyle;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;fontSize=20;dashed=1;" edge="1" parent="1" source="59" target="39">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="58" value="呼叫全域方法&lt;br&gt;進行註冊" style="edgeStyle=orthogonalEdgeStyle;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;fontSize=20;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="1" source="11" target="109">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="160" y="240" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="60" style="edgeStyle=orthogonalEdgeStyle;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;fontSize=20;" edge="1" parent="1" source="59" target="12">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="59" value="從html載入" style="rounded=1;whiteSpace=wrap;html=1;fontSize=20;" vertex="1" parent="1">
+                    <mxGeometry x="542.5" y="310" width="115" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="62" value="React Dom" style="swimlane;startSize=20;horizontal=1;containerType=tree;fontSize=20;" vertex="1" parent="1">
+                    <mxGeometry x="740" y="940" width="410" height="570" as="geometry"/>
+                </mxCell>
+                <mxCell id="63" value="" style="edgeStyle=elbowEdgeStyle;elbow=vertical;sourcePerimeterSpacing=0;targetPerimeterSpacing=0;startArrow=none;endArrow=none;rounded=0;curved=0;fontSize=16;" edge="1" parent="62" source="64" target="65">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="64" value="&lt;span style=&quot;color: rgb(78, 201, 176); font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 16px; background-color: rgb(31, 31, 31);&quot;&gt;App&lt;/span&gt;" style="whiteSpace=wrap;html=1;treeFolding=1;treeMoving=1;newEdgeStyle={&quot;edgeStyle&quot;:&quot;elbowEdgeStyle&quot;,&quot;startArrow&quot;:&quot;none&quot;,&quot;endArrow&quot;:&quot;none&quot;};fontSize=16;" vertex="1" parent="62">
+                    <mxGeometry x="145" y="40" width="120" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="65" value="&lt;span style=&quot;color: rgb(78, 201, 176); font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 16px; background-color: rgb(31, 31, 31);&quot;&gt;NavigationBar&lt;/span&gt;" style="whiteSpace=wrap;html=1;treeFolding=1;treeMoving=1;newEdgeStyle={&quot;edgeStyle&quot;:&quot;elbowEdgeStyle&quot;,&quot;startArrow&quot;:&quot;none&quot;,&quot;endArrow&quot;:&quot;none&quot;};fontSize=16;" vertex="1" parent="62">
+                    <mxGeometry x="270" y="120" width="120" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="66" value="&lt;span style=&quot;color: rgb(78, 201, 176); font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 16px; background-color: rgb(31, 31, 31);&quot;&gt;Playground&lt;/span&gt;" style="whiteSpace=wrap;html=1;treeFolding=1;treeMoving=1;newEdgeStyle={&quot;edgeStyle&quot;:&quot;elbowEdgeStyle&quot;,&quot;startArrow&quot;:&quot;none&quot;,&quot;endArrow&quot;:&quot;none&quot;};fontSize=16;" vertex="1" parent="62">
+                    <mxGeometry x="90" y="120" width="120" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="67" value="" style="edgeStyle=elbowEdgeStyle;elbow=vertical;sourcePerimeterSpacing=0;targetPerimeterSpacing=0;startArrow=none;endArrow=none;rounded=0;curved=0;fontSize=16;" edge="1" parent="62" source="64" target="66">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="195" y="80" as="sourcePoint"/>
+                        <mxPoint x="125" y="120" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="68" value="&lt;div style=&quot;color: rgb(204, 204, 204); background-color: rgb(31, 31, 31); font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 16px; line-height: 19px;&quot;&gt;&lt;span style=&quot;color: rgb(78, 201, 176); font-size: 16px;&quot;&gt;SectionS1&lt;/span&gt;&lt;/div&gt;" style="whiteSpace=wrap;html=1;treeFolding=1;treeMoving=1;newEdgeStyle={&quot;edgeStyle&quot;:&quot;elbowEdgeStyle&quot;,&quot;startArrow&quot;:&quot;none&quot;,&quot;endArrow&quot;:&quot;none&quot;};fontSize=16;" vertex="1" collapsed="1" parent="62">
+                    <mxGeometry x="15" y="240" width="120" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="69" value="傳遞管理員" style="edgeStyle=elbowEdgeStyle;elbow=vertical;sourcePerimeterSpacing=0;targetPerimeterSpacing=0;startArrow=none;endArrow=none;rounded=0;curved=0;fontSize=16;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" edge="1" parent="62" source="66" target="68">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="195" y="80" as="sourcePoint"/>
+                        <mxPoint x="275" y="120" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="70" value="傳遞管理員" style="edgeStyle=elbowEdgeStyle;elbow=vertical;sourcePerimeterSpacing=0;targetPerimeterSpacing=0;startArrow=none;endArrow=none;rounded=0;curved=0;fontSize=16;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" edge="1" parent="62" source="66" target="71">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="1025" y="190" as="sourcePoint"/>
+                        <mxPoint x="275" y="120" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="71" value="&lt;span style=&quot;color: rgb(78, 201, 176); font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 16px; background-color: rgb(31, 31, 31);&quot;&gt;SectionS3&lt;/span&gt;" style="whiteSpace=wrap;html=1;treeFolding=1;treeMoving=1;newEdgeStyle={&quot;edgeStyle&quot;:&quot;elbowEdgeStyle&quot;,&quot;startArrow&quot;:&quot;none&quot;,&quot;endArrow&quot;:&quot;none&quot;};fontSize=16;" vertex="1" collapsed="1" parent="62">
+                    <mxGeometry x="280" y="240" width="120" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="72" value="" style="edgeStyle=elbowEdgeStyle;elbow=vertical;sourcePerimeterSpacing=0;targetPerimeterSpacing=0;startArrow=none;endArrow=none;rounded=0;curved=0;fontSize=16;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" edge="1" parent="62" source="66" target="73">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="1025" y="190" as="sourcePoint"/>
+                        <mxPoint x="275" y="120" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="73" value="&lt;div style=&quot;color: rgb(204, 204, 204); background-color: rgb(31, 31, 31); font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 16px; line-height: 19px;&quot;&gt;&lt;span style=&quot;color: rgb(78, 201, 176); font-size: 16px;&quot;&gt;SectionS2&lt;/span&gt;&lt;/div&gt;" style="whiteSpace=wrap;html=1;treeFolding=1;treeMoving=1;newEdgeStyle={&quot;edgeStyle&quot;:&quot;elbowEdgeStyle&quot;,&quot;startArrow&quot;:&quot;none&quot;,&quot;endArrow&quot;:&quot;none&quot;};fontSize=16;" vertex="1" collapsed="1" parent="62">
+                    <mxGeometry x="150" y="240" width="120" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="74" value="" style="edgeStyle=elbowEdgeStyle;elbow=vertical;sourcePerimeterSpacing=0;targetPerimeterSpacing=0;startArrow=none;endArrow=none;rounded=0;curved=0;fontSize=16;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" edge="1" parent="62" source="71" target="75">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="1025" y="230" as="sourcePoint"/>
+                        <mxPoint x="275" y="160" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="75" value="&lt;span style=&quot;color: rgb(78, 201, 176); font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 16px; background-color: rgb(31, 31, 31);&quot;&gt;MenuS3&lt;/span&gt;" style="whiteSpace=wrap;html=1;treeFolding=1;treeMoving=1;newEdgeStyle={&quot;edgeStyle&quot;:&quot;elbowEdgeStyle&quot;,&quot;startArrow&quot;:&quot;none&quot;,&quot;endArrow&quot;:&quot;none&quot;};fontSize=16;" vertex="1" collapsed="1" parent="62">
+                    <mxGeometry x="280" y="300" width="120" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="76" value="傳遞管理員" style="edgeStyle=elbowEdgeStyle;elbow=vertical;sourcePerimeterSpacing=0;targetPerimeterSpacing=0;startArrow=none;endArrow=none;rounded=0;curved=0;fontSize=16;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" edge="1" parent="62" source="68" target="77">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="1025" y="190" as="sourcePoint"/>
+                        <mxPoint x="275" y="120" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="77" value="&lt;div style=&quot;color: rgb(204, 204, 204); background-color: rgb(31, 31, 31); font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 16px; line-height: 19px;&quot;&gt;&lt;span style=&quot;color: rgb(78, 201, 176); font-size: 16px;&quot;&gt;MenuS1&lt;/span&gt;&lt;/div&gt;" style="whiteSpace=wrap;html=1;treeFolding=1;treeMoving=1;newEdgeStyle={&quot;edgeStyle&quot;:&quot;elbowEdgeStyle&quot;,&quot;startArrow&quot;:&quot;none&quot;,&quot;endArrow&quot;:&quot;none&quot;};fontSize=16;" vertex="1" collapsed="1" parent="62">
+                    <mxGeometry x="15" y="390" width="120" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="78" value="" style="group" vertex="1" connectable="0" parent="1">
+                    <mxGeometry x="30" y="1234" width="683.2432432432433" height="420" as="geometry"/>
+                </mxCell>
+                <mxCell id="85" value="粒子系統模組" style="swimlane;whiteSpace=wrap;html=1;fontSize=20;" vertex="1" parent="78">
+                    <mxGeometry y="-20" width="683.2432432432433" height="420" as="geometry"/>
+                </mxCell>
+                <mxCell id="148" value="" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeWidth=1;fontSize=20;fillColor=#4f4f4f;shape=link;" edge="1" parent="85" source="91" target="147">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="156" value="" style="edgeStyle=orthogonalEdgeStyle;shape=link;html=1;strokeWidth=1;fontSize=20;fillColor=#4f4f4f;" edge="1" parent="85" source="91" target="155">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="158" value="" style="edgeStyle=orthogonalEdgeStyle;shape=link;html=1;strokeWidth=1;fontSize=20;fillColor=#4f4f4f;" edge="1" parent="85" source="91" target="157">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="400" y="143"/>
+                            <mxPoint x="400" y="346"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="91" value="&lt;div style=&quot;&quot;&gt;&lt;span style=&quot;background-color: initial;&quot;&gt;繪圖管理員&amp;nbsp;&lt;/span&gt;&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;fontSize=20;align=right;" vertex="1" parent="85">
+                    <mxGeometry x="27.16216216216216" y="40" width="344.05405405405406" height="206" as="geometry"/>
+                </mxCell>
+                <mxCell id="86" value="粒子建構式" style="ellipse;whiteSpace=wrap;html=1;fontSize=20;fillColor=#302d34;" vertex="1" parent="85">
+                    <mxGeometry x="144.86486486486487" y="330" width="108.64864864864865" height="80" as="geometry"/>
+                </mxCell>
+                <mxCell id="87" value="粒子系統&amp;nbsp;&amp;nbsp;" style="rounded=0;whiteSpace=wrap;html=1;fontSize=20;align=right;fillColor=#302d34;" vertex="1" parent="85">
+                    <mxGeometry x="36.21621621621622" y="70" width="217.2972972972973" height="166" as="geometry"/>
+                </mxCell>
+                <mxCell id="89" value="" style="edgeStyle=orthogonalEdgeStyle;shape=flexArrow;html=1;fontSize=20;entryX=0.75;entryY=1;entryDx=0;entryDy=0;fillColor=#302d34;" edge="1" parent="85" source="86" target="87">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="90" value="管理員&lt;br&gt;建構式" style="ellipse;whiteSpace=wrap;html=1;fontSize=20;" vertex="1" parent="85">
+                    <mxGeometry x="235.4054054054054" y="280" width="99.5945945945946" height="73.33" as="geometry"/>
+                </mxCell>
+                <mxCell id="92" value="" style="edgeStyle=none;shape=flexArrow;html=1;fontSize=20;entryX=0.75;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="85" source="90" target="91">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="81" value="畫筆" style="rounded=0;whiteSpace=wrap;html=1;fontSize=20;fillColor=#4f4f4f;" vertex="1" parent="85">
+                    <mxGeometry x="45.27027027027027" y="170" width="108.64864864864865" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="79" value="畫筆建構式" style="ellipse;whiteSpace=wrap;html=1;fontSize=20;fillColor=#4f4f4f;" vertex="1" parent="85">
+                    <mxGeometry x="45.27027027027027" y="270" width="108.64864864864865" height="80" as="geometry"/>
+                </mxCell>
+                <mxCell id="82" value="" style="edgeStyle=none;shape=flexArrow;html=1;fontSize=20;fillColor=#4f4f4f;" edge="1" parent="85" source="79" target="81">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="147" value="Dom方法" style="whiteSpace=wrap;html=1;fontSize=20;align=center;rounded=0;" vertex="1" parent="85">
+                    <mxGeometry x="494.32" y="113" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="155" value="包裝函式" style="whiteSpace=wrap;html=1;fontSize=20;align=center;rounded=0;" vertex="1" parent="85">
+                    <mxGeometry x="495.00324324324333" y="210" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="157" value="事件方法" style="whiteSpace=wrap;html=1;fontSize=20;align=center;rounded=0;" vertex="1" parent="85">
+                    <mxGeometry x="494.3232432432433" y="306" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="118" value="" style="group" vertex="1" connectable="0" parent="1">
+                    <mxGeometry x="20" y="20" width="670" height="240" as="geometry"/>
+                </mxCell>
+                <mxCell id="56" value="全域" style="swimlane;whiteSpace=wrap;html=1;fontSize=20;" vertex="1" parent="118">
+                    <mxGeometry x="40" y="20" width="630" height="220" as="geometry"/>
+                </mxCell>
+                <mxCell id="104" style="edgeStyle=orthogonalEdgeStyle;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;fontSize=20;shape=link;" edge="1" parent="56" source="57" target="101">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="57" value="動畫管理員" style="rounded=0;whiteSpace=wrap;html=1;fontSize=20;" vertex="1" parent="56">
+                    <mxGeometry x="40" y="125" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="108" value="切換動畫" style="edgeStyle=orthogonalEdgeStyle;html=1;fontSize=20;" edge="1" parent="56" source="101" target="107">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="101" value="動畫管理員" style="whiteSpace=wrap;html=1;fontSize=20;rounded=0;" vertex="1" parent="56">
+                    <mxGeometry x="220" y="125" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="107" value="執行" style="whiteSpace=wrap;html=1;fontSize=20;rounded=0;" vertex="1" parent="56">
+                    <mxGeometry x="480" y="125" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="109" value="註冊方法" style="rounded=0;whiteSpace=wrap;html=1;fontSize=20;" vertex="1" parent="56">
+                    <mxGeometry x="40" y="125" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="111" value="" style="edgeStyle=orthogonalEdgeStyle;html=1;fontSize=20;shape=link;" edge="1" parent="56" source="110" target="101">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="110" value="事件監聽" style="whiteSpace=wrap;html=1;fontSize=20;rounded=0;" vertex="1" parent="56">
+                    <mxGeometry x="220" y="40" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="113" value="頁面2呼叫" style="edgeStyle=orthogonalEdgeStyle;html=1;fontSize=20;" edge="1" parent="118" target="109">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="140" as="sourcePoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="116" value="頁面3&lt;br&gt;呼叫" style="edgeStyle=orthogonalEdgeStyle;html=1;fontSize=20;" edge="1" parent="118" target="109">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint y="175" as="sourcePoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="119" value="" style="group" vertex="1" connectable="0" parent="1">
+                    <mxGeometry y="860" width="670" height="240" as="geometry"/>
+                </mxCell>
+                <mxCell id="120" value="動畫管理模組" style="swimlane;whiteSpace=wrap;html=1;fontSize=20;" vertex="1" parent="119">
+                    <mxGeometry x="40" y="20" width="630" height="220" as="geometry"/>
+                </mxCell>
+                <mxCell id="121" style="edgeStyle=orthogonalEdgeStyle;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;fontSize=20;shape=link;" edge="1" parent="120" source="122" target="124">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="122" value="動畫管理員" style="rounded=0;whiteSpace=wrap;html=1;fontSize=20;" vertex="1" parent="120">
+                    <mxGeometry x="40" y="125" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="123" value="切換動畫" style="edgeStyle=orthogonalEdgeStyle;html=1;fontSize=20;" edge="1" parent="120" source="124" target="125">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="124" value="動畫管理員" style="whiteSpace=wrap;html=1;fontSize=20;rounded=0;" vertex="1" parent="120">
+                    <mxGeometry x="220" y="125" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="125" value="執行" style="whiteSpace=wrap;html=1;fontSize=20;rounded=0;" vertex="1" parent="120">
+                    <mxGeometry x="480" y="125" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="126" value="註冊方法" style="rounded=0;whiteSpace=wrap;html=1;fontSize=20;" vertex="1" parent="120">
+                    <mxGeometry x="40" y="125" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="127" value="" style="edgeStyle=orthogonalEdgeStyle;html=1;fontSize=20;shape=link;" edge="1" parent="120" source="128" target="124">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="128" value="監聽" style="whiteSpace=wrap;html=1;fontSize=20;rounded=0;" vertex="1" parent="120">
+                    <mxGeometry x="220" y="40" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="135" value="import" style="edgeStyle=orthogonalEdgeStyle;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;fontSize=20;" edge="1" parent="1" source="124" target="66">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="136" value="getElementById" style="edgeStyle=orthogonalEdgeStyle;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;fontSize=20;dashed=1;entryX=0.5;entryY=1;entryDx=0;entryDy=0;strokeWidth=1;" edge="1" parent="1" source="132" target="51">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="825.1764705882354" y="360" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="146" value="import" style="edgeStyle=orthogonalEdgeStyle;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;strokeWidth=1;fontSize=20;fillColor=#4f4f4f;" edge="1" parent="1" target="68">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="401" y="1310" as="sourcePoint"/>
+                        <Array as="points">
+                            <mxPoint x="460" y="1310"/>
+                            <mxPoint x="460" y="1200"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="165" value="useRef" style="edgeStyle=orthogonalEdgeStyle;html=1;startArrow=none;endArrow=none;exitX=0.25;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;strokeColor=default;strokeWidth=1;fontSize=20;fontColor=#FFFFFF;fillColor=#4f4f4f;startFill=0;endFill=0;dashed=1;" edge="1" parent="1" source="68" target="147">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="785" y="1250"/>
+                            <mxPoint x="584" y="1250"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="169" value="向管理員註冊" style="edgeStyle=orthogonalEdgeStyle;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0.387;entryY=1.064;entryDx=0;entryDy=0;entryPerimeter=0;strokeColor=default;strokeWidth=1;fontSize=20;fontColor=#FFFFFF;startArrow=none;startFill=0;endArrow=none;endFill=0;fillColor=#4f4f4f;dashed=1;" edge="1" parent="1" source="155" target="68">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="670" y="1454"/>
+                            <mxPoint x="670" y="1290"/>
+                            <mxPoint x="801" y="1290"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="170" value="觸發事件（按鈕）" style="edgeStyle=elbowEdgeStyle;html=1;startArrow=none;endArrow=none;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;strokeColor=default;strokeWidth=1;fontSize=20;fontColor=#FFFFFF;fillColor=#4f4f4f;dashed=1;" edge="1" parent="1" source="77" target="157">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="815" y="1470"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="177" style="edgeStyle=orthogonalEdgeStyle;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;dashed=1;dashPattern=12 12;strokeColor=#FFF824;strokeWidth=1;fontSize=36;fontColor=#FFF824;startArrow=none;startFill=0;endArrow=none;endFill=0;fillColor=#4f4f4f;" edge="1" parent="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="20" y="71" as="targetPoint"/>
+                        <mxPoint x="1020" y="21" as="sourcePoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="172" value="修改前" style="text;strokeColor=none;fillColor=none;html=1;fontSize=36;fontStyle=1;verticalAlign=middle;align=center;labelBackgroundColor=none;fontColor=#FFF824;" vertex="1" parent="1">
+                    <mxGeometry x="1020" y="1" width="100" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="173" value="" style="group" vertex="1" connectable="0" parent="1">
+                    <mxGeometry x="50" y="407" width="850" height="420" as="geometry"/>
+                </mxCell>
+                <mxCell id="25" value="獨立作用域（document原生方法）" style="swimlane;whiteSpace=wrap;html=1;fontSize=20;container=0;" vertex="1" parent="173">
+                    <mxGeometry width="850" height="420" as="geometry"/>
+                </mxCell>
+                <mxCell id="11" value="包裝函式" style="rounded=0;whiteSpace=wrap;html=1;fontSize=20;" vertex="1" parent="25">
+                    <mxGeometry x="50" y="60" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="132" value="事件監聽" style="rounded=0;whiteSpace=wrap;html=1;fontSize=20;" vertex="1" parent="25">
+                    <mxGeometry x="715" y="120" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="5" value="粒子建構式" style="ellipse;whiteSpace=wrap;html=1;fontSize=20;" vertex="1" parent="173">
+                    <mxGeometry x="490" y="280" width="120" height="80" as="geometry"/>
+                </mxCell>
+                <mxCell id="100" value="演算法" style="edgeStyle=orthogonalEdgeStyle;html=1;exitX=0.25;exitY=0;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;fontSize=20;" edge="1" parent="173" source="12" target="11">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="164" style="edgeStyle=orthogonalEdgeStyle;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;strokeColor=default;strokeWidth=1;fontSize=20;fontColor=#FFFFFF;fillColor=#4f4f4f;shape=link;" edge="1" parent="173" source="12" target="132">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="12" value="粒子系統" style="rounded=0;whiteSpace=wrap;html=1;fontSize=20;" vertex="1" parent="173">
+                    <mxGeometry x="490" y="120" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="20" style="edgeStyle=none;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;fontSize=20;shape=flexArrow;" edge="1" parent="173" source="5" target="12">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="21" value="實例化" style="edgeStyle=none;shape=flexArrow;html=1;fontSize=20;" edge="1" parent="173" source="5" target="12">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="99" value="繪圖方法" style="edgeStyle=orthogonalEdgeStyle;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;fontSize=20;" edge="1" parent="173" source="7" target="11">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="7" value="畫筆" style="rounded=0;whiteSpace=wrap;html=1;fontSize=20;" vertex="1" parent="173">
+                    <mxGeometry x="240" y="120" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="15" value="推送資料" style="edgeStyle=none;html=1;fontSize=20;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="173" target="7">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="490" y="150" as="sourcePoint"/>
+                        <mxPoint x="410" y="150" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="4" value="畫筆建構式" style="ellipse;whiteSpace=wrap;html=1;fontSize=20;" vertex="1" parent="173">
+                    <mxGeometry x="240" y="280" width="120" height="80" as="geometry"/>
+                </mxCell>
+                <mxCell id="22" value="實例化" style="edgeStyle=none;shape=flexArrow;html=1;fontSize=20;" edge="1" parent="173" source="4" target="7">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="175" style="edgeStyle=orthogonalEdgeStyle;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;strokeColor=#FFF824;strokeWidth=1;fontSize=36;fontColor=#FFF824;startArrow=none;startFill=0;endArrow=none;endFill=0;fillColor=#4f4f4f;dashed=1;dashPattern=12 12;" edge="1" parent="1" source="174">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="20" y="900" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="174" value="修改後" style="text;strokeColor=none;fillColor=none;html=1;fontSize=36;fontStyle=1;verticalAlign=middle;align=center;labelBackgroundColor=none;fontColor=#FFF824;" vertex="1" parent="1">
+                    <mxGeometry x="1010" y="830" width="100" height="40" as="geometry"/>
                 </mxCell>
             </root>
         </mxGraphModel>

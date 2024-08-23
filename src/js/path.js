@@ -7,14 +7,14 @@ class PathConfig{
     static leapEasein = -2;
     static leapEaseout = 2;
     
-    static setPath(linear = 1, easein = 0, easeout = 0){
+    static resetPath(linear = 1, easein = 0, easeout = 0){
         if(linear + easein + easeout != 1) console.warn("sum of parameter is recommend to be 1");
         PathConfig.linear = linear;
         PathConfig.easein = easein;
         PathConfig.easeout = easeout;
     }
 
-    static setLeap(linear = 0, easein = 0, easeout = 0){
+    static resetLeap(linear = 0, easein = 0, easeout = 0){
         PathConfig.leapLinear = linear;
         PathConfig.leapEasein = easein;
         PathConfig.leapEaseout = easeout;
@@ -83,18 +83,6 @@ class Path extends PathConfig{
         }
     }.bind(this);
 }
-// const gameBox = document.getElementById("gameBox");
-// gameBox.addEventListener("mousemove", function(e){
-//     let Rect = gameBox.getBoundingClientRect();
-//     if(true){
-//         a = ((e.pageX - Rect.x)) / (Rect.width);
-//         b = ((e.pageY - Rect.y)) / (Rect.height);
-//         const frames = 30;
-//         myMouse.NewTarget(a, b, frames);
-//     }
-// }, false);
-// myMouse = new Path(0, 0);
-// manager.addAnimationCallback(myMouse.NextFrame);
 
 export { Path };
 export { PathConfig };

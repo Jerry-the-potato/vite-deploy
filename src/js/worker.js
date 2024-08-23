@@ -138,13 +138,13 @@ function main() {
 	// console.log(painter.works);
 	painter.works.forEach(obj => {painter.draw(obj);});
 	painter.works = [];
-	let bitmap = board.transferToImageBitmap();
+	const bitmap = board.transferToImageBitmap();
 	self.postMessage({"name": "drawImage", "bitmap": bitmap});
 	requestID.painter = requestAnimationFrame(main);
 }
 
 function clearBoard() {
-	board_ctx.fillStyle = "black";
+	board_ctx.fillStyle = 'rgba(255,255,255,0)';
 	board_ctx.fillRect(0, 0, board.width, board.height);
 }
 
