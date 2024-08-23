@@ -7042,15 +7042,9 @@ function NavigationBar({ width }) {
     /* @__PURE__ */ jsxRuntimeExports.jsx("div", { onClick: handleClick, id: "navSlider", children: /* @__PURE__ */ jsxRuntimeExports.jsx("p", { children: isOpen ? "X" : "≡" }) })
   ] });
 }
-function Input({ text, type, id: id2, value }) {
-  return /* @__PURE__ */ jsxRuntimeExports.jsx(jsxRuntimeExports.Fragment, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs("label", { className: "label", children: [
-    text,
-    /* @__PURE__ */ jsxRuntimeExports.jsx("input", { type, id: id2, defaultValue: value })
-  ] }) });
-}
 function WorkerWrapper(options) {
   return new Worker(
-    "/vite-deploy/assets/worker-PpdV9tWO.js",
+    "/vite-deploy/assets/worker-z9YZT4ad.js",
     {
       name: options == null ? void 0 : options.name
     }
@@ -7156,18 +7150,29 @@ function clearBoard(ctx) {
   ctx.fillStyle = "black";
   ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 }
-const lokaVolterraAlgorithm = function() {
+function lokaVolterraAlgorithm() {
   const painter = new createPainter();
   this.transitionRadian = 0;
   this.trasitionOmega = Math.PI / 1e4;
-  this.alpha = 0.5;
-  this.beta = 1;
-  this.gamma = 0.5;
-  this.delta = 1;
-  this.dlength = 0.1;
+  this.alpha = 5;
+  this.beta = 10;
+  this.gamma = 5;
+  this.delta = 10;
+  this.dlength = 0.01;
   this.speed = 1;
-  this.mouseOn = false;
-  this.transform = true;
+  this.mouse = {};
+  this.useMouse = false;
+  this.isTransform = true;
+  this.updateData = (data) => {
+    this.useMouse = data.useMouse;
+    this.isTransform = data.isTransform;
+    this.alpha = data.alpha;
+    this.beta = data.beta;
+    this.gamma = data.gamma;
+    this.delta = data.delta;
+    this.dlength = data.dlength * 1e-3;
+    this.speed = data.speed;
+  };
   this.timeBefore = Date.now();
   const DELAY = new Array(100);
   DELAY.fill(17);
@@ -7224,7 +7229,7 @@ const lokaVolterraAlgorithm = function() {
       const rad = this.transitionRadian;
       const p2 = Math.sin(rad);
       const p3 = Math.sin(rad * 2);
-      const d = this.transform ? point.d / 2 : point.d / 3 * (0.05 + 0.95 * (1 - p3));
+      const d = this.isTransform ? point.d / 2 : point.d / 3 * (0.05 + 0.95 * (1 - p3));
       const w2 = d * p2 * 0.1;
       point.r += Math.PI / 1e3;
       point.x -= point.fakeX;
@@ -7318,24 +7323,30 @@ const lokaVolterraAlgorithm = function() {
     }
   };
   this.equation1 = (x2, y2) => {
+    if (this.useMouse) {
+      const ratio = this.mouse.pointY > 0.2 ? this.mouse.pointY : 0.2;
+      return this.alpha * x2 - 1 / ratio * this.alpha * x2 * y2;
+    }
     return this.alpha * x2 - this.beta * x2 * y2;
   };
   this.equation2 = (x2, y2) => {
+    if (this.useMouse) {
+      const ratio = this.mouse.pointX > 0.2 ? this.mouse.pointX : 0.2;
+      return 1 / ratio * this.gamma * x2 * y2 - this.gamma * y2;
+    }
     return this.delta * x2 * y2 - this.gamma * y2;
   };
   return this;
-};
+}
 const createLokaVolterra = function() {
   const myWorker = new WorkerWrapper();
-  const algorithm = new lokaVolterraAlgorithm();
+  this.algorithm = new lokaVolterraAlgorithm();
   this.setCanvas = (canvas, bitmap) => {
-    algorithm.reset(canvas.width, canvas.height);
+    this.algorithm.reset(canvas.width, canvas.height);
     this.canvas = canvas;
     this.ctx = this.canvas.getContext("2d");
     this.bitmap = bitmap;
     const bitmapCtx = this.bitmap.getContext("bitmaprenderer");
-    this.bitmap.width = this.bitmap.offsetWidth;
-    this.bitmap.height = this.bitmap.offsetHeight;
     myWorker.addEventListener("message", function handleMessageFromWorker(msg) {
       switch (msg.data.name) {
         case "drawImage":
@@ -7364,15 +7375,21 @@ const createLokaVolterra = function() {
     myWorker.postMessage({ "name": isPause ? "requestAnimation" : "cancelAnimation" });
   };
   this.render = (function renderS1() {
-    algorithm.render(this.ctx);
+    this.algorithm.render(this.ctx);
   }).bind(this);
   this.updateS1 = (function updateS1() {
-    algorithm.update(this.ctx, this.canvas.width, this.canvas.height);
+    this.algorithm.update(this.ctx, this.canvas.width, this.canvas.height);
   }).bind(this);
   return this;
 };
 const lokaVolterra = new createLokaVolterra();
-function MenuS1({ manager: manager2 }) {
+function Input({ text, type, id: id2, value }) {
+  return /* @__PURE__ */ jsxRuntimeExports.jsx(jsxRuntimeExports.Fragment, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs("label", { className: "label", children: [
+    text,
+    /* @__PURE__ */ jsxRuntimeExports.jsx("input", { type, id: id2, defaultValue: value })
+  ] }) });
+}
+function MenuS1({ manager: manager2, lokaVolterra: lokaVolterra2 }) {
   const menu = reactExports.useRef();
   function handleSlideMenu(e) {
     const m2 = menu.current;
@@ -7388,6 +7405,35 @@ function MenuS1({ manager: manager2 }) {
       b.innerText = "△";
     }
   }
+  const state = {
+    "useMouse": reactExports.useState(0),
+    "isTransform": reactExports.useState(0),
+    "alpha": reactExports.useState(5),
+    "beta": reactExports.useState(10),
+    "gamma": reactExports.useState(5),
+    "delta": reactExports.useState(10),
+    "dlength": reactExports.useState(10),
+    "speed": reactExports.useState(10)
+  };
+  function handleCanvasControl(e) {
+    const ID = e.target.id;
+    const value = e.target.value;
+    if (!state[ID]) {
+      console.warn("invalid key(ID): " + ID + ", check whether it is in object state");
+      return;
+    }
+    const setState = state[ID][1];
+    setState(value * 1);
+  }
+  reactExports.useEffect(() => {
+    const data = {};
+    Object.keys(state).forEach((key) => {
+      data[key] = state[key][0];
+    });
+    lokaVolterra2.algorithm.updateData(data);
+  }, [state]);
+  const [isMain, setIsMain] = reactExports.useState(true);
+  const [isWorker, setIsWorker] = reactExports.useState(true);
   function handlePauseMain() {
     const name = (!isMain ? "request" : "cancel") + "AnimationByName";
     manager2[name]("renderS1");
@@ -7395,51 +7441,68 @@ function MenuS1({ manager: manager2 }) {
     setIsMain(!isMain);
   }
   function handlePauseWorker() {
-    lokaVolterra["pauseWorker"](!isWorker);
+    lokaVolterra2["pauseWorker"](!isWorker);
     setIsWorker(!isWorker);
   }
-  const [isMain, setIsMain] = reactExports.useState(true);
-  const [isWorker, setIsWorker] = reactExports.useState(true);
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { ref: menu, className: "gamemenu", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsx("header", { id: "header", children: /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { children: "Lotka Volterra 實驗場 + Web Woker" }) }),
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "parameter", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx(Input, { text: "Alpha :", type: "number", id: "alpha-equation", value: "5" }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx(Input, { text: "Beta :", type: "number", id: "beta-equation", value: "10" }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx(Input, { text: "Gamma :", type: "number", id: "gamma-equation", value: "5" }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx(Input, { text: "Delta :", type: "number", id: "delta-equation", value: "10" }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx(Input, { text: "Vector Size :", type: "number", id: "dlength", value: "10" }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx(Input, { text: "Transform Speed :", type: "number", id: "speed", value: "10" })
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("label", { children: [
+        "Alpha",
+        /* @__PURE__ */ jsxRuntimeExports.jsx("input", { onChange: handleCanvasControl, type: "number", id: "alpha", value: state.alpha[0] })
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("label", { children: [
+        "Beta",
+        /* @__PURE__ */ jsxRuntimeExports.jsx("input", { onChange: handleCanvasControl, type: "number", id: "beta", value: state.beta[0] })
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("label", { children: [
+        "Gamma",
+        /* @__PURE__ */ jsxRuntimeExports.jsx("input", { onChange: handleCanvasControl, type: "number", id: "gamma", value: state.gamma[0] })
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("label", { children: [
+        "Delta",
+        /* @__PURE__ */ jsxRuntimeExports.jsx("input", { onChange: handleCanvasControl, type: "number", id: "delta", value: state.delta[0] })
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("label", { children: [
+        "Vector Size",
+        /* @__PURE__ */ jsxRuntimeExports.jsx("input", { onChange: handleCanvasControl, type: "number", id: "dlength", value: state.dlength[0] })
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("label", { children: [
+        "Transform Speed",
+        /* @__PURE__ */ jsxRuntimeExports.jsx("input", { onChange: handleCanvasControl, type: "number", id: "speed", value: state.speed[0] })
+      ] })
     ] }),
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "controlpanel", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsx("label", { children: "★" }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx("button", { id: "mouseOn", children: "跟隨滑鼠" }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx("button", { id: "transform", children: "取消縮放" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: handleCanvasControl, id: "useMouse", value: state.useMouse[0] ? 0 : 1, children: state.useMouse[0] ? "取消跟隨" : "跟隨滑鼠" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: handleCanvasControl, id: "isTransform", value: state.isTransform[0] ? 0 : 1, children: state.isTransform[0] == "1" ? "取消縮放" : "加入縮放" }),
       /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: handlePauseMain, id: "pauseMain", children: isMain ? "停止(左)" : "開始(左)" }),
       /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: handlePauseWorker, id: "pauseWorker", children: isWorker ? "停止(右)" : "開始(右)" })
     ] }),
-    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { id: "dialogbox", content: /* @__PURE__ */ jsxRuntimeExports.jsx("p", { id: "dialog", children: "∫此微分方程用於描述捕食者和獵物的此消彼長，沿著中心點呈現漩渦紋理" }) }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { id: "dialogbox", children: /* @__PURE__ */ jsxRuntimeExports.jsx("p", { id: "dialog", children: "∫此微分方程用於描述捕食者和獵物的此消彼長，沿著中心點呈現漩渦紋理" }) }),
     /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: handleSlideMenu, className: "slideMenu", children: "△" })
   ] });
 }
-const CanvasSectionS1 = ({ section, manager: manager2, canvas, ratio, max, status, handleClick }) => {
+const CanvasSectionS1 = ({ section, manager: manager2, myMouse, canvas, ratio, max, status, handleClick }) => {
   const bitmap = reactExports.useRef();
   reactExports.useEffect(() => {
     lokaVolterra.setCanvas(canvas.current, bitmap.current);
     manager2.addAnimationCallback(lokaVolterra.render);
     manager2.addAnimationCallback(lokaVolterra.updateS1);
+    lokaVolterra.algorithm.mouse = myMouse;
   }, []);
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("section", { ref: section, className: "section", id: "S1", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsx("canvas", { id: "canvasS1", ref: canvas, width: max * ratio, height: window.innerWidth < 992 ? ratio * max * 2 : ratio * max }),
     /* @__PURE__ */ jsxRuntimeExports.jsx("canvas", { id: "bitmap", ref: bitmap, width: max * ratio, height: window.innerWidth < 992 ? ratio * max * 2 : ratio * max }),
     /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: handleClick, value: "S1", className: "record", children: status }),
-    /* @__PURE__ */ jsxRuntimeExports.jsx(MenuS1, { manager: manager2 })
+    /* @__PURE__ */ jsxRuntimeExports.jsx(MenuS1, { manager: manager2, lokaVolterra })
   ] });
 };
 const audioUrl = "/vite-deploy/assets/Lovely%20Piano%20Song-D2Oyr38W.mp3";
 const SectionS2 = ({ section, audio, canvas, ratio, max, status, handleClick }) => {
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("section", { ref: section, className: "section", id: "S2", children: [
-    /* @__PURE__ */ jsxRuntimeExports.jsx("audio", { ref: audio, controls: true, id: "myAudio", style: { "position": "absolute", "left": "10px", "bottom": "10px", "zIndex": "100" }, children: /* @__PURE__ */ jsxRuntimeExports.jsx("source", { src: audioUrl }) }),
     /* @__PURE__ */ jsxRuntimeExports.jsx("canvas", { id: "canvasS2", ref: canvas, width: max * ratio, height: window.innerWidth < 992 ? ratio * max * 2 : ratio * max }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx("audio", { ref: audio, controls: true, id: "myAudio", style: { "position": "absolute", "left": "10px", "bottom": "10px" }, children: /* @__PURE__ */ jsxRuntimeExports.jsx("source", { src: audioUrl }) }),
     /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: handleClick, value: "S2", className: "record", children: status })
   ] });
 };
@@ -13250,20 +13313,111 @@ const managerMaker = function() {
   return this;
 };
 const manager$1 = new managerMaker();
+const _PathConfig = class _PathConfig {
+  static resetPath(linear = 1, easein = 0, easeout = 0) {
+    if (linear + easein + easeout != 1) console.warn("sum of parameter is recommend to be 1");
+    _PathConfig.linear = linear;
+    _PathConfig.easein = easein;
+    _PathConfig.easeout = easeout;
+  }
+  static resetLeap(linear = 0, easein = 0, easeout = 0) {
+    _PathConfig.leapLinear = linear;
+    _PathConfig.leapEasein = easein;
+    _PathConfig.leapEaseout = easeout;
+  }
+  getPath() {
+    return [_PathConfig.linear, _PathConfig.easein, _PathConfig.easeout];
+  }
+  getLeap() {
+    return [_PathConfig.leapLinear, _PathConfig.leapEasein, _PathConfig.leapEaseout];
+  }
+};
+__publicField(_PathConfig, "linear", -1);
+__publicField(_PathConfig, "easein", 0);
+__publicField(_PathConfig, "easeout", 2);
+__publicField(_PathConfig, "leapLinear", 0);
+__publicField(_PathConfig, "leapEasein", -2);
+__publicField(_PathConfig, "leapEaseout", 2);
+let PathConfig = _PathConfig;
+class Path extends PathConfig {
+  constructor(x2 = 0, y2 = 0) {
+    super();
+    __publicField(this, "NewTarget", function(targetX, targetY, frames) {
+      this.targetX = targetX;
+      this.targetY = targetY;
+      this.originX = this.pointX;
+      this.originY = this.pointY;
+      this.timer = frames;
+      this.period = frames;
+    });
+    __publicField(this, "ResetTo", function(x2 = x2, y2 = y2) {
+      this.pointX = x2;
+      this.pointY = y2;
+      this.timer = 0;
+    });
+    __publicField(this, "NextFrame", (function validInS1_S2_S3() {
+      if (this.timer > 0) {
+        this.timer--;
+        const dX = this.targetX - this.originX;
+        const dY = this.targetY - this.originY;
+        const t2 = this.timer;
+        const p2 = this.period;
+        const linear = 1 / p2;
+        const easeout = Math.pow((t2 + 1) / p2, 2) - Math.pow(t2 / p2, 2);
+        const easein = Math.pow(1 - (t2 - 1) / p2, 2) - Math.pow(1 - t2 / p2, 2);
+        const [a, b, c] = this.getPath();
+        const [d, e, f2] = this.getLeap();
+        this.pointX += (a * linear + b * easein + c * easeout) * dX;
+        this.pointY += (a * linear + b * easein + c * easeout) * dY + (d * linear + e * easein + f2 * easeout) * (-dX / 5 + 10 * -dX / Math.abs(dX == 0 ? 1 : dX));
+      } else if (this.timer == 0) {
+        this.timer--;
+        this.pointX = this.targetX;
+        this.pointY = this.targetY;
+      }
+    }).bind(this));
+    this.pointX = x2;
+    this.pointY = y2;
+    this.originX = x2;
+    this.originY = y2;
+    this.targetX = x2;
+    this.targetY = y2;
+    this.period = 90;
+    this.timer = 0;
+  }
+  getPath() {
+    return super.getPath();
+  }
+  getLeap() {
+    return super.getLeap();
+  }
+}
 function Playground({ margin }) {
   let w2 = window.innerWidth - margin * 2;
   let h = window.innerHeight - margin * 2;
   const [ratio, setRatio] = reactExports.useState(window.innerWidth > 992 ? 1 : 2);
   const [max, setMax] = reactExports.useState(getMax);
   const sections = [reactExports.useRef(), reactExports.useRef(), reactExports.useRef()];
+  const [myMouse] = reactExports.useState(new Path());
   reactExports.useEffect(() => {
     const elements = sections.map((obj) => {
       if (obj.current) return obj.current;
     });
     manager$1.addIntersectionObserver();
     manager$1.addSubjectElements(elements);
+    PathConfig.resetPath();
+    PathConfig.resetLeap();
+    manager$1.addAnimationCallback(myMouse.NextFrame);
     console.log(manager$1);
   }, []);
+  function handleMouseMove(e) {
+    const rect = e.target.getBoundingClientRect();
+    {
+      const a = (e.pageX - rect.x) / rect.width;
+      const b = (e.pageY - rect.y) / rect.height;
+      const frames = 30;
+      myMouse.NewTarget(a, b, frames);
+    }
+  }
   function getMax() {
     if (window.innerWidth > 992) return w2 < h ? w2 : h;
     else return w2 * 2 < h ? w2 : h / 2;
@@ -13278,7 +13432,7 @@ function Playground({ margin }) {
   const canvas = { "S1": reactExports.useRef(), "S2": reactExports.useRef(), "S3": reactExports.useRef() };
   const [media] = reactExports.useState({});
   const [status, setStatus] = reactExports.useState("Record");
-  function handleClick(e) {
+  function handleRecord(e) {
     if (status == "Stop") {
       setStatus("Record");
       media.recorder.stop();
@@ -13308,15 +13462,16 @@ function Playground({ margin }) {
     "div",
     {
       id: "playground",
+      onMouseMove: handleMouseMove,
       style: {
         "width": max + "px",
         "height": window.innerWidth < 992 ? max * 2 : max + "px",
         "margin": margin + "px auto"
       },
       children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(CanvasSectionS1, { section: sections[0], canvas: canvas.S1, ratio, max, status, handleClick, manager: manager$1 }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(SectionS2, { section: sections[1], canvas: canvas.S2, audio, ratio, max, status, handleClick }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(CanvasSectionS3, { section: sections[2], canvas: canvas.S3, ratio, max, status, handleClick }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(CanvasSectionS1, { section: sections[0], canvas: canvas.S1, ratio, max, status, handleClick: handleRecord, manager: manager$1, myMouse }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(SectionS2, { section: sections[1], canvas: canvas.S2, audio, ratio, max, status, handleClick: handleRecord, manager: manager$1, myMouse }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(CanvasSectionS3, { section: sections[2], canvas: canvas.S3, ratio, max, status, handleClick: handleRecord, manager: manager$1, myMouse }),
         /* @__PURE__ */ jsxRuntimeExports.jsx(CookieTable, {})
       ]
     }
@@ -34628,84 +34783,6 @@ window.addEventListener("load", function() {
     LP.add(frame, "fps", 0, 120, 0.1).listen().name("FPS");
   }
 });
-const _PathConfig = class _PathConfig {
-  static setPath(linear = 1, easein = 0, easeout = 0) {
-    if (linear + easein + easeout != 1) console.warn("sum of parameter is recommend to be 1");
-    _PathConfig.linear = linear;
-    _PathConfig.easein = easein;
-    _PathConfig.easeout = easeout;
-  }
-  static setLeap(linear = 0, easein = 0, easeout = 0) {
-    _PathConfig.leapLinear = linear;
-    _PathConfig.leapEasein = easein;
-    _PathConfig.leapEaseout = easeout;
-  }
-  getPath() {
-    return [_PathConfig.linear, _PathConfig.easein, _PathConfig.easeout];
-  }
-  getLeap() {
-    return [_PathConfig.leapLinear, _PathConfig.leapEasein, _PathConfig.leapEaseout];
-  }
-};
-__publicField(_PathConfig, "linear", -1);
-__publicField(_PathConfig, "easein", 0);
-__publicField(_PathConfig, "easeout", 2);
-__publicField(_PathConfig, "leapLinear", 0);
-__publicField(_PathConfig, "leapEasein", -2);
-__publicField(_PathConfig, "leapEaseout", 2);
-let PathConfig = _PathConfig;
-class Path extends PathConfig {
-  constructor(x2 = 0, y2 = 0) {
-    super();
-    __publicField(this, "NewTarget", function(targetX, targetY, frames) {
-      this.targetX = targetX;
-      this.targetY = targetY;
-      this.originX = this.pointX;
-      this.originY = this.pointY;
-      this.timer = frames;
-      this.period = frames;
-    });
-    __publicField(this, "ResetTo", function(x2 = x2, y2 = y2) {
-      this.pointX = x2;
-      this.pointY = y2;
-      this.timer = 0;
-    });
-    __publicField(this, "NextFrame", (function validInS1_S2_S3() {
-      if (this.timer > 0) {
-        this.timer--;
-        const dX = this.targetX - this.originX;
-        const dY = this.targetY - this.originY;
-        const t2 = this.timer;
-        const p2 = this.period;
-        const linear = 1 / p2;
-        const easeout = Math.pow((t2 + 1) / p2, 2) - Math.pow(t2 / p2, 2);
-        const easein = Math.pow(1 - (t2 - 1) / p2, 2) - Math.pow(1 - t2 / p2, 2);
-        const [a, b, c] = this.getPath();
-        const [d, e, f2] = this.getLeap();
-        this.pointX += (a * linear + b * easein + c * easeout) * dX;
-        this.pointY += (a * linear + b * easein + c * easeout) * dY + (d * linear + e * easein + f2 * easeout) * (-dX / 5 + 10 * -dX / Math.abs(dX == 0 ? 1 : dX));
-      } else if (this.timer == 0) {
-        this.timer--;
-        this.pointX = this.targetX;
-        this.pointY = this.targetY;
-      }
-    }).bind(this));
-    this.pointX = x2;
-    this.pointY = y2;
-    this.originX = x2;
-    this.originY = y2;
-    this.targetX = x2;
-    this.targetY = y2;
-    this.period = 90;
-    this.timer = 0;
-  }
-  getPath() {
-    return super.getPath();
-  }
-  getLeap() {
-    return super.getLeap();
-  }
-}
 window.addEventListener("load", function() {
   const canvas_background = "black";
   const canvas = document.getElementById("canvasS3");
@@ -35543,4 +35620,4 @@ window.addEventListener("load", function() {
   }
   const frame = new Averager(60);
 });
-//# sourceMappingURL=index-CWzH6JQU.js.map
+//# sourceMappingURL=index-BGSnmcnv.js.map

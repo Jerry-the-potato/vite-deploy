@@ -137,7 +137,7 @@
       painter.draw(obj);
     });
     painter.works = [];
-    let bitmap = board.transferToImageBitmap();
+    const bitmap = board.transferToImageBitmap();
     self.postMessage({ "name": "drawImage", "bitmap": bitmap });
     requestID.painter = requestAnimationFrame(main);
   }
@@ -389,4 +389,4 @@
     painter.works.push(circle, crescent1, crescent2, crescent3, text1, text2, text3);
   }
 })();
-//# sourceMappingURL=worker-PpdV9tWO.js.map
+//# sourceMappingURL=worker-z9YZT4ad.js.map

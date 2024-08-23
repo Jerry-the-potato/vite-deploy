@@ -115,6 +115,7 @@ div#playground section{
   margin-bottom: 20px;
   color: var(--soft-color);
   background-color: black;
+  overflow: hidden;
 }
 div#playground section h4{
   position: absolute;
@@ -139,7 +140,6 @@ div#playground section h4{
   font-size: 1rem;
   background-color: rgba(0, 0, 0, 0.6);
   transition: all 1s ease-in-out;
-  overflow: hidden;
 }
   .gamemenu header{
       position: relative;
