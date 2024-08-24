@@ -7042,10 +7042,10 @@ function NavigationBar({ width }) {
     /* @__PURE__ */ jsxRuntimeExports.jsx("div", { onClick: handleClick, id: "navSlider", children: /* @__PURE__ */ jsxRuntimeExports.jsx("p", { children: isOpen ? "X" : "≡" }) })
   ] });
 }
-function useWindowSize() {
-  const [size, setSize] = reactExports.useState([window.innerWidth, window.innerHeight]);
+function useWindowSize(margin) {
+  const [size, setSize] = reactExports.useState([window.innerWidth - margin * 2, window.innerHeight - margin * 2]);
   reactExports.useLayoutEffect(() => {
-    const updateSize = () => setSize([window.innerWidth, window.innerHeight]);
+    const updateSize = () => setSize([window.innerWidth - margin * 2, window.innerHeight - margin * 2]);
     window.addEventListener("resize", updateSize);
     return () => window.removeEventListener("resize", updateSize);
   }, []);
@@ -7169,7 +7169,7 @@ function lokaVolterraAlgorithm() {
   this.delta = 10;
   this.dlength = 0.01;
   this.speed = 1;
-  this.mouse = {};
+  this.myMouse = {};
   this.useMouse = false;
   this.isTransform = true;
   this.updateData = (data) => {
@@ -7301,8 +7301,8 @@ function lokaVolterraAlgorithm() {
       const y2 = point.y;
       const ex = x2 / width;
       const ey = y2 / height;
-      const dx = this.equation1(ex, ey) * width;
-      const dy = this.equation2(ex, ey) * height;
+      const dx = this.equation1(ex, ey, height) * width;
+      const dy = this.equation2(ex, ey, width) * height;
       const blue = y2 / width * 255;
       const green = x2 / width * 255;
       const red = Math.sin(this.transitionRadian) * 255;
@@ -7329,16 +7329,16 @@ function lokaVolterraAlgorithm() {
       painter.works.push(myline);
     }
   };
-  this.equation1 = (x2, y2) => {
+  this.equation1 = (x2, y2, height) => {
     if (this.useMouse) {
-      const ratio = this.mouse.pointY > 0.2 ? this.mouse.pointY : 0.2;
+      const ratio = this.myMouse.pointY / height > 0.2 ? this.myMouse.pointY / height : 0.2;
       return this.alpha * x2 - 1 / ratio * this.alpha * x2 * y2;
     }
     return this.alpha * x2 - this.beta * x2 * y2;
   };
-  this.equation2 = (x2, y2) => {
+  this.equation2 = (x2, y2, width) => {
     if (this.useMouse) {
-      const ratio = this.mouse.pointX > 0.2 ? this.mouse.pointX : 0.2;
+      const ratio = this.myMouse.pointX / width > 0.2 ? this.myMouse.pointX / width : 0.2;
       return 1 / ratio * this.gamma * x2 * y2 - this.gamma * y2;
     }
     return this.delta * x2 * y2 - this.gamma * y2;
@@ -7481,15 +7481,8 @@ const createLokaVolterra = function() {
   return this;
 };
 const lokaVolterra = new createLokaVolterra();
-function Input({ text, type, id: id2, value }) {
-  return /* @__PURE__ */ jsxRuntimeExports.jsx(jsxRuntimeExports.Fragment, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs("label", { className: "label", children: [
-    text,
-    /* @__PURE__ */ jsxRuntimeExports.jsx("input", { type, id: id2, defaultValue: value })
-  ] }) });
-}
-function MenuS1({ manager: manager2, lokaVolterra: lokaVolterra2 }) {
-  const menu = reactExports.useRef();
-  function handleSlideMenu(e) {
+function SlideMenuBtn({ menu }) {
+  function handleClick(e) {
     const m2 = menu.current;
     const b = e.target;
     const rectMenu = m2.getBoundingClientRect();
@@ -7503,6 +7496,10 @@ function MenuS1({ manager: manager2, lokaVolterra: lokaVolterra2 }) {
       b.innerText = "△";
     }
   }
+  return /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: handleClick, className: "slideMenu", children: "△" });
+}
+function MenuS1({ manager: manager2, lokaVolterra: lokaVolterra2 }) {
+  const menu = reactExports.useRef();
   const state = {
     "useMouse": reactExports.useState(0),
     "isTransform": reactExports.useState(0),
@@ -7533,9 +7530,9 @@ function MenuS1({ manager: manager2, lokaVolterra: lokaVolterra2 }) {
   const [isMain, setIsMain] = reactExports.useState(true);
   const [isWorker, setIsWorker] = reactExports.useState(true);
   function handlePauseMain() {
-    const name = (!isMain ? "request" : "cancel") + "AnimationByName";
-    manager2[name]("renderS1");
-    manager2[name]("updateS1");
+    const name2 = (!isMain ? "request" : "cancel") + "AnimationByName";
+    manager2[name2]("renderS1");
+    manager2[name2]("updateS1");
     setIsMain(!isMain);
   }
   function handlePauseWorker() {
@@ -7545,30 +7542,18 @@ function MenuS1({ manager: manager2, lokaVolterra: lokaVolterra2 }) {
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { ref: menu, className: "gamemenu", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsx("header", { id: "header", children: /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { children: "Lotka Volterra 實驗場 + Web Woker" }) }),
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "parameter", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsxs("label", { children: [
-        "Alpha",
-        /* @__PURE__ */ jsxRuntimeExports.jsx("input", { onChange: handleCanvasControl, type: "number", id: "alpha", value: state.alpha[0] })
-      ] }),
-      /* @__PURE__ */ jsxRuntimeExports.jsxs("label", { children: [
-        "Beta",
-        /* @__PURE__ */ jsxRuntimeExports.jsx("input", { onChange: handleCanvasControl, type: "number", id: "beta", value: state.beta[0] })
-      ] }),
-      /* @__PURE__ */ jsxRuntimeExports.jsxs("label", { children: [
-        "Gamma",
-        /* @__PURE__ */ jsxRuntimeExports.jsx("input", { onChange: handleCanvasControl, type: "number", id: "gamma", value: state.gamma[0] })
-      ] }),
-      /* @__PURE__ */ jsxRuntimeExports.jsxs("label", { children: [
-        "Delta",
-        /* @__PURE__ */ jsxRuntimeExports.jsx("input", { onChange: handleCanvasControl, type: "number", id: "delta", value: state.delta[0] })
-      ] }),
-      /* @__PURE__ */ jsxRuntimeExports.jsxs("label", { children: [
-        "Vector Size",
-        /* @__PURE__ */ jsxRuntimeExports.jsx("input", { onChange: handleCanvasControl, type: "number", id: "dlength", value: state.dlength[0] })
-      ] }),
-      /* @__PURE__ */ jsxRuntimeExports.jsxs("label", { children: [
-        "Transform Speed",
-        /* @__PURE__ */ jsxRuntimeExports.jsx("input", { onChange: handleCanvasControl, type: "number", id: "speed", value: state.speed[0] })
-      ] })
+      /* @__PURE__ */ jsxRuntimeExports.jsx("label", { children: "Alpha" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("input", { onChange: handleCanvasControl, type: "number", id: "alpha", value: state.alpha[0] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("label", { children: "Beta" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("input", { onChange: handleCanvasControl, type: "number", id: "beta", value: state.beta[0] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("label", { children: "Gamma" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("input", { onChange: handleCanvasControl, type: "number", id: "gamma", value: state.gamma[0] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("label", { children: "Delta" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("input", { onChange: handleCanvasControl, type: "number", id: "delta", value: state.delta[0] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("label", { children: "Vector Size" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("input", { onChange: handleCanvasControl, type: "number", id: "dlength", value: state.dlength[0] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("label", { children: "Transform Speed" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("input", { onChange: handleCanvasControl, type: "number", id: "speed", value: state.speed[0] })
     ] }),
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "controlpanel", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsx("label", { children: "★" }),
@@ -7578,7 +7563,7 @@ function MenuS1({ manager: manager2, lokaVolterra: lokaVolterra2 }) {
       /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: handlePauseWorker, id: "pauseWorker", children: isWorker ? "停止(右)" : "開始(右)" })
     ] }),
     /* @__PURE__ */ jsxRuntimeExports.jsx("div", { id: "dialogbox", children: /* @__PURE__ */ jsxRuntimeExports.jsx("p", { id: "dialog", children: "∫此微分方程用於描述捕食者和獵物的此消彼長，沿著中心點呈現漩渦紋理" }) }),
-    /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: handleSlideMenu, className: "slideMenu", children: "△" })
+    /* @__PURE__ */ jsxRuntimeExports.jsx(SlideMenuBtn, { menu })
   ] });
 }
 const CanvasSectionS1 = ({ section, manager: manager2, myMouse, canvas, ratio, max, status, handleClick }) => {
@@ -7587,7 +7572,7 @@ const CanvasSectionS1 = ({ section, manager: manager2, myMouse, canvas, ratio, m
     lokaVolterra.setCanvas(canvas.current, bitmap.current);
     manager2.addAnimationCallback(lokaVolterra.renderS1);
     manager2.addAnimationCallback(lokaVolterra.updateS1);
-    lokaVolterra.algorithm.mouse = myMouse;
+    lokaVolterra.algorithm.myMouse = myMouse;
   }, []);
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("section", { ref: section, className: "section", id: "S1", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsx("canvas", { id: "canvasS1", ref: canvas, width: max * ratio, height: window.innerWidth < 992 ? ratio * max * 2 : ratio * max }),
@@ -7604,53 +7589,945 @@ const SectionS2 = ({ section, audio, canvas, ratio, max, status, handleClick }) 
     /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: handleClick, value: "S2", className: "record", children: status })
   ] });
 };
-function MenuS3() {
-  const menu = reactExports.useRef();
-  function handleClick(e) {
-    const m2 = menu.current;
-    const b = e.target;
-    const rectMenu = m2.getBoundingClientRect();
-    const rectButton = b.getBoundingClientRect();
-    const height = rectButton.y - rectMenu.y;
-    if (b.innerText == "△") {
-      m2.style.top = "-" + height + "px";
-      b.innerText = "▽";
-    } else {
-      m2.style.top = "1%";
-      b.innerText = "△";
+const _PathConfig = class _PathConfig {
+  static resetPath(linear = 1, easein = 0, easeout = 0) {
+    if (linear + easein + easeout != 1) console.warn("sum of parameter is recommend to be 1");
+    _PathConfig.linear = linear;
+    _PathConfig.easein = easein;
+    _PathConfig.easeout = easeout;
+  }
+  static resetLeap(linear = 0, easein = 0, easeout = 0) {
+    _PathConfig.leapLinear = linear;
+    _PathConfig.leapEasein = easein;
+    _PathConfig.leapEaseout = easeout;
+  }
+  getPath() {
+    return [_PathConfig.linear, _PathConfig.easein, _PathConfig.easeout];
+  }
+  getLeap() {
+    return [_PathConfig.leapLinear, _PathConfig.leapEasein, _PathConfig.leapEaseout];
+  }
+};
+__publicField(_PathConfig, "linear", -1);
+__publicField(_PathConfig, "easein", 0);
+__publicField(_PathConfig, "easeout", 2);
+__publicField(_PathConfig, "leapLinear", 0);
+__publicField(_PathConfig, "leapEasein", -2);
+__publicField(_PathConfig, "leapEaseout", 2);
+let PathConfig = _PathConfig;
+class Path extends PathConfig {
+  constructor(x2 = 0, y2 = 0) {
+    super();
+    __publicField(this, "NewTarget", function(targetX, targetY, frames) {
+      this.targetX = targetX;
+      this.targetY = targetY;
+      this.originX = this.pointX;
+      this.originY = this.pointY;
+      this.timer = frames;
+      this.period = frames;
+    });
+    __publicField(this, "ResetTo", function(x2 = x2, y2 = y2) {
+      this.pointX = x2;
+      this.pointY = y2;
+      this.timer = 0;
+    });
+    __publicField(this, "NextFrame", (function validInS1_S2_S3() {
+      if (this.timer > 0) {
+        this.timer--;
+        const dX = this.targetX - this.originX;
+        const dY = this.targetY - this.originY;
+        const t2 = this.timer;
+        const p2 = this.period;
+        const linear = 1 / p2;
+        const easeout = Math.pow((t2 + 1) / p2, 2) - Math.pow(t2 / p2, 2);
+        const easein = Math.pow(1 - (t2 - 1) / p2, 2) - Math.pow(1 - t2 / p2, 2);
+        const [a, b, c] = this.getPath();
+        const [d, e, f2] = this.getLeap();
+        this.pointX += (a * linear + b * easein + c * easeout) * dX;
+        this.pointY += (a * linear + b * easein + c * easeout) * dY + (d * linear + e * easein + f2 * easeout) * (-dX / 5 + 10 * -dX / Math.abs(dX == 0 ? 1 : dX));
+      } else if (this.timer == 0) {
+        this.timer--;
+        this.pointX = this.targetX;
+        this.pointY = this.targetY;
+      }
+    }).bind(this));
+    this.pointX = x2;
+    this.pointY = y2;
+    this.originX = x2;
+    this.originY = y2;
+    this.targetX = x2;
+    this.targetY = y2;
+    this.period = 90;
+    this.timer = 0;
+  }
+  getPath() {
+    return super.getPath();
+  }
+  getLeap() {
+    return super.getLeap();
+  }
+}
+class SortAlgorithm {
+  constructor() {
+    this.secondColumns = [];
+    this.sortFunction = function() {
+    };
+    this.isSorting = false;
+    this.log = document.createElement("div");
+  }
+  setLog() {
+    this.log = log;
+  }
+  start(name2, columns) {
+    this.send(name2 + " is processing");
+    this.sortFunction = this[name2];
+    this.timesEveryFrame = Math.ceil(columns.length / 25);
+    this.isSorting = true;
+    this[name2 + "Setting"](columns);
+  }
+  update(columns) {
+    if (!this.isSorting) return;
+    this.times = this.timesEveryFrame;
+    while (this.times--) {
+      const isStoping = this.sortFunction(columns);
+      if (isStoping === true) {
+        [this.isStoping, this.times] = [true, 0];
+        const message = this.sortFunction.name + " is done.";
+        this.send(message);
+      }
+    }
+    if (this.isStoping) {
+      this.isSorting = false;
+      this.isStoping = false;
     }
   }
-  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { ref: menu, className: "gamemenu", children: [
-    /* @__PURE__ */ jsxRuntimeExports.jsx("header", { id: "", children: /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { children: "粒子系統" }) }),
-    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { id: "pathConfig", className: "parameter", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx(Input, { text: "linear :", type: "number", id: "linear", value: "0" }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx(Input, { text: "easein :", type: "number", id: "easein", value: "-2" }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx(Input, { text: "easeout :", type: "number", id: "easeout", value: "2" })
-    ] }),
-    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { id: "sortAlgorithm", className: "controlpanel", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx("label", { children: "★" }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx("button", { id: "bubbleSort", children: "泡沫排序" }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx("button", { id: "selectionSort", children: "選擇排序" }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx("button", { id: "insertionSort", children: "插入排序" }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx("button", { id: "quickSort", children: "快速排序" }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx("button", { id: "mergeSort", children: "合併排序" }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx("button", { id: "heapSort", children: "堆排序" }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx("button", { id: "shellSort", children: "希爾排序" }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx("button", { id: "countingSort", children: "計數排序" }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx("button", { id: "cancelSort", children: "取消" }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx("button", { id: "stepByStep", children: "一步一步來" }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx("button", { id: "randomSort", children: "打亂" }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx("button", { id: "instantRandomSort", children: "立刻打亂" })
-    ] }),
-    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { id: "sortLog", children: /* @__PURE__ */ jsxRuntimeExports.jsx("p", { id: "", children: "碰撞模擬和重力引擎" }) }),
-    /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: handleClick, className: "slideMenu", children: "△" })
-  ] });
+  send(message) {
+    this.log.innerText = message;
+  }
+  // 記得要用 entries 製作迭代物件，改寫程式碼
+  static swapColumn(a, b, frame) {
+    [a.path.pointX, b.path.pointX] = [b.path.pointX, a.path.pointX];
+    [a.path.pointY, b.path.pointY] = [b.path.pointY, a.path.pointY];
+    a.path.NewTarget(a.x, a.y, frame);
+    b.path.NewTarget(b.x, b.y, frame);
+    [a.height, b.height] = [b.height, a.height];
+  }
+  bubbleSortSetting(columns) {
+    this.i = 0;
+    this.j = 0;
+  }
+  // 備份
+  // bubbleSort(columns){
+  //     const len = columns.length;
+  //     const i = this.i;
+  //     const j = this.j;
+  //     if (i < len - 1) {
+  //         if (j < len - 1 - i) {
+  //             const a = columns[j];
+  //             const b = columns[j + 1];
+  //             if (a.height > b.height) SortAlgorithm.swapColumn(a, b, 30);
+  //             this.j++;
+  //         }
+  //         else{
+  //             this.j = 0;
+  //             this.i++;
+  //         }
+  //     }
+  //     else return true;
+  // }
+  bubbleSort(columns) {
+    const len = columns.length;
+    const i = this.i;
+    const j = this.j;
+    if (i == len - 1) return true;
+    if (j == len - 1 - i) {
+      this.j = 0;
+      this.i++;
+      return false;
+    }
+    const a = columns[j];
+    const b = columns[j + 1];
+    if (a.height > b.height) SortAlgorithm.swapColumn(a, b, 30);
+    this.j++;
+  }
+  selectionSortSetting() {
+    this.i = 0;
+    this.j = 1;
+    this.minIndex = 0;
+  }
+  // selectionSort(columns){
+  //     const len = columns.length;
+  //     const i = this.i;
+  //     const j = this.j;
+  //     if (i == len - 1) return true;
+  //     if (j < len) {
+  //         if (columns[this.minIndex].height > columns[j].height){
+  //             this.minIndex = j;
+  //         }
+  //         this.j++;
+  //     }
+  //     else{
+  //         if(i != this.minIndex){
+  //             const a = columns[i];
+  //             const b = columns[this.minIndex];
+  //             const frame = 60;
+  //             SortAlgorithm.swapColumn(a, b, frame);
+  //         }
+  //         this.i++;
+  //         this.minIndex = this.i;
+  //         this.j = this.i + 1;
+  //     }
+  // }
+  selectionSort(columns) {
+    const len = columns.length;
+    const i = this.i;
+    const j = this.j;
+    const min = this.minIndex;
+    if (i == len - 1) return true;
+    if (j == len) {
+      this.i++;
+      this.minIndex = this.i;
+      this.j = this.i + 1;
+      if (i == this.minIndex) return false;
+      const a = columns[i];
+      const b = columns[min];
+      const frame = 60;
+      SortAlgorithm.swapColumn(a, b, frame);
+      return false;
+    }
+    if (columns[this.minIndex].height > columns[j].height) this.minIndex = j;
+    this.j++;
+  }
+  insertionSortSetting(columns) {
+    this.i = 1;
+    this.key = columns[1].height;
+    this.j = 0;
+  }
+  insertionSort(columns) {
+    const len = columns.length;
+    const i = this.i;
+    const j = this.j;
+    if (i < len) {
+      if (j >= 0 && columns[j].height > columns[j + 1].height) {
+        const a = columns[j + 1];
+        const b = columns[j];
+        const frame = 30 + Math.ceil((this.timesEveryFrame - this.times) * 20 / this.timesEveryFrame);
+        SortAlgorithm.swapColumn(a, b, frame);
+        this.j--;
+      } else {
+        this.i++;
+        if (this.i >= len) return true;
+        this.j = this.i - 1;
+      }
+    } else return true;
+  }
+  quickSortSetting(columns) {
+    this.stack = [{ "left": 0, "right": columns.length - 1 }];
+    this.partitionPhase = "0.SetPivot";
+    this.pivot = Math.floor(columns.length - 1);
+    this.j = 0;
+  }
+  quickSort(columns) {
+    const len = this.stack.length;
+    const { left, right } = this.stack[len - 1];
+    const pivot = this.pivot;
+    const frame = 60;
+    switch (this.partitionPhase) {
+      case "0.SetPivot":
+        const a = columns[Math.floor((left + right) / 2)];
+        const b = columns[right];
+        SortAlgorithm.swapColumn(a, b, frame);
+        this.leftBound = left;
+        this.rightBound = right - 1;
+        this.pivot = right;
+        this.partitionPhase = "1.FindLeftBound";
+        this.j = 0;
+        break;
+      case "1.FindLeftBound":
+        if (columns[this.leftBound + this.j].height >= columns[pivot].height) {
+          this.leftBound = this.leftBound + this.j;
+          this.partitionPhase = "2.FindRightBound";
+          this.j = 0;
+          break;
+        }
+        this.j++;
+        break;
+      case "2.FindRightBound":
+        if (columns[pivot].height >= columns[this.rightBound - this.j].height || this.rightBound - this.j <= this.leftBound) {
+          this.rightBound = this.rightBound - this.j;
+          this.partitionPhase = "3.SwapBoth";
+          break;
+        }
+        this.j++;
+        break;
+      case "3.SwapBoth":
+        if (this.leftBound < this.rightBound) {
+          const a2 = columns[this.leftBound];
+          const b2 = columns[this.rightBound];
+          SortAlgorithm.swapColumn(a2, b2, frame);
+          this.partitionPhase = "1.FindLeftBound";
+          this.j = 0;
+          this.leftBound++;
+          this.rightBound--;
+        } else {
+          const a2 = columns[this.leftBound];
+          const b2 = columns[pivot];
+          SortAlgorithm.swapColumn(a2, b2, frame);
+          this.partitionPhase = "4.EndPartition";
+          this.pivot = this.leftBound;
+        }
+        break;
+      case "4.EndPartition":
+        this.stack.pop();
+        if (left < pivot - 1) this.stack.push({ "left": left, "right": pivot - 1 });
+        if (pivot + 1 < right) this.stack.push({ "left": pivot + 1, "right": right });
+        if (this.stack.length == 0) return true;
+        this.partitionPhase = "0.SetPivot";
+        break;
+    }
+  }
+  mergeSortSetting(columns) {
+    const heights = columns.map((column) => {
+      return column.height;
+    });
+    this.height = Math.max(...heights);
+    this.stack = [[], []];
+    this.stack[0][0] = { "left": 0, "right": columns.length - 1 };
+    this.mergePhase = "0.Split";
+    this.i = 0;
+    this.j = 0;
+  }
+  mergeSort(columns) {
+    const len0 = this.stack[0].length;
+    const len1 = this.stack[1].length;
+    const { min, mid, max } = this.stack[1][len1 - 1] ? this.stack[1][len1 - 1] : {};
+    const i = this.i;
+    const j = mid - min + this.j;
+    const col = this.secondColumns.slice(min, max + 1);
+    const frame = Math.min(30 + Math.floor((max - j + mid - i) / (len0 + len1)), 90);
+    switch (this.mergePhase) {
+      case "0.Split":
+        if (len0 == 0) {
+          this.mergePhase = "1.Copy";
+          this.timesEveryFrame = 1;
+          this.secondColumns = JSON.parse(JSON.stringify(columns.slice(0, columns.length + 1)));
+          this.secondColumns.forEach((column, index) => {
+            column.path = new Path(column.x, column.y);
+            column.path.NewTarget(column.x, column.y - this.height, 20);
+            column.width /= 3;
+          });
+          return;
+        }
+        const { left, right } = this.stack[0][len0 - 1];
+        const middle = Math.ceil((left + right) / 2);
+        this.stack[0].pop();
+        if (left != right) {
+          this.stack[0].push({ "left": left, "right": middle - 1 });
+          this.stack[0].push({ "left": middle, "right": right });
+          this.stack[1].push({ "min": left, "mid": middle, "max": right });
+        }
+        break;
+      case "1.Copy":
+        if (len1 == 0) {
+          return true;
+        }
+        col.forEach((column, index) => {
+          column.height = columns[min + index].height;
+          column.width = columns[min + index].width / 2;
+          column.path.NewTarget(column.x, column.y - this.height, 20);
+        });
+        this.mergePhase = "2.Merge";
+        break;
+      case "2.Merge":
+        if (col[i].height > col[j].height) {
+          const a = col[j];
+          const b = columns[min + this.i + this.j];
+          SortAlgorithm.swapColumn(a, b, frame);
+          a.height = 0;
+          this.j++;
+          if (this.j > max - mid) {
+            this.mergePhase = "3.MergeLeft";
+          }
+        } else {
+          const a = col[i];
+          const b = columns[min + this.i + this.j];
+          SortAlgorithm.swapColumn(a, b, frame);
+          a.height = 0;
+          this.i++;
+          if (this.i > mid - min) {
+            this.i--;
+            this.j++;
+          }
+          if (this.i >= mid - min) {
+            this.mergePhase = "4.MergeRight";
+          }
+        }
+        break;
+      case "3.MergeLeft":
+        if (i >= mid - min) {
+          this.i = 0;
+          this.j = 0;
+          this.stack[1].pop();
+          if (this.stack[1].length == 0) {
+            this.isStoping = true;
+            return;
+          }
+          this.mergePhase = "1.Copy";
+          col.forEach((column, index) => {
+            column.height = columns[min + index].height;
+            column.path.NewTarget(column.x, column.y - this.height, 20);
+            column.width /= 3;
+          });
+        } else {
+          const a = col[i];
+          const b = columns[min + this.i + this.j];
+          SortAlgorithm.swapColumn(a, b, frame);
+          a.height = 0;
+          this.i++;
+        }
+        break;
+      case "4.MergeRight":
+        if (j > max - min) {
+          this.i = 0;
+          this.j = 0;
+          this.stack[1].pop();
+          if (this.stack[1].length == 0) {
+            this.isStoping = true;
+            return;
+          }
+          this.mergePhase = "1.Copy";
+          col.forEach((column, index) => {
+            column.height = columns[min + index].height;
+            column.path.NewTarget(column.x, column.y - this.height, 20);
+            column.width /= 3;
+          });
+        } else {
+          const a = col[j];
+          const b = columns[min + this.i + this.j];
+          SortAlgorithm.swapColumn(a, b, frame);
+          a.height = 0;
+          this.j++;
+        }
+        break;
+    }
+  }
+  static heapify(columns, len, i) {
+    let largest = i;
+    const left = 2 * i + 1;
+    const right = 2 * i + 2;
+    if (left < len && columns[left].height > columns[largest].height) {
+      largest = left;
+    }
+    if (right < len && columns[right].height > columns[largest].height) {
+      largest = right;
+    }
+    if (largest !== i) {
+      const a = columns[i];
+      const b = columns[largest];
+      SortAlgorithm.swapColumn(a, b, 60);
+      return largest;
+    }
+    return -1;
+  }
+  heapSortSetting(columns) {
+    this.i = Math.floor(columns.length / 2) - 1;
+    this.j = this.i;
+    this.heapPhase = "1.build";
+  }
+  heapSort(columns) {
+    const len = columns.length;
+    const i = this.i;
+    const j = this.j;
+    switch (this.heapPhase) {
+      case "1.build":
+        this.j = SortAlgorithm.heapify(columns, len, j);
+        if (this.j == -1) {
+          this.i--;
+          this.j = this.i;
+          if (this.i < 0) {
+            this.i = len - 1;
+            this.j = 0;
+            this.heapPhase = "2.swap";
+          }
+        }
+        break;
+      case "2.swap":
+        const a = columns[0];
+        const b = columns[i];
+        SortAlgorithm.swapColumn(a, b, 60);
+        this.heapPhase = "3.sort";
+        break;
+      case "3.sort":
+        this.j = SortAlgorithm.heapify(columns, i, j);
+        if (this.j == -1) {
+          this.j = 0;
+          this.i--;
+          this.heapPhase = "2.swap";
+          if (this.i < 0) return true;
+        }
+        break;
+    }
+  }
+  shellSortSetting(columns) {
+    this.gap = Math.floor(columns.length / 2);
+    this.i = this.gap;
+    this.j = this.i;
+  }
+  shellSort(columns) {
+    const len = columns.length;
+    const gap = this.gap;
+    const i = this.i;
+    const j = this.j;
+    if (gap > 0) {
+      if (i < len) {
+        if (j >= gap && columns[j - gap].height > columns[j].height) {
+          const a = columns[j];
+          const b = columns[j - gap];
+          ParticleSystem.swapColumn(a, b, 60);
+          this.j -= gap;
+        } else {
+          this.i++;
+          this.j = this.i;
+        }
+      } else {
+        this.gap = Math.floor(gap / 2);
+        this.i = this.gap;
+        this.j = this.i;
+      }
+    } else return;
+  }
+  countingSortSetting(columns) {
+    const heights = columns.map((column) => {
+      return column.height;
+    });
+    this.maxValue = Math.max(...heights);
+    this.count = new Array(Math.floor(this.maxValue)).fill(0);
+    this.secondColumns = new Array(columns.length);
+    this.i = 0;
+    this.countingPhase = "1.count";
+  }
+  countingSort(columns) {
+    const len = columns.length;
+    const i = this.i;
+    switch (this.countingPhase) {
+      case "1.count":
+        this.count[Math.round(columns[i].height)]++;
+        this.i++;
+        if (this.i >= len) {
+          this.i = 1;
+          this.countingPhase = "2.sum";
+        }
+        break;
+      case "2.sum":
+        this.count[i] += this.count[i - 1];
+        this.i++;
+        if (this.i > this.maxValue) {
+          this.i = len - 1;
+          this.countingPhase = "3.build";
+          this.timesEveryFrame = 1;
+        }
+        break;
+      case "3.build":
+        const index = this.count[Math.round(columns[i].height) - 1];
+        this.secondColumns[index] = JSON.parse(JSON.stringify(columns[i]));
+        this.secondColumns[index].y = columns[i].y - this.height;
+        this.secondColumns[index].width /= 2;
+        this.secondColumns[index].path = new Path(columns[i].x, columns[i].y);
+        this.secondColumns[index].path.NewTarget(columns[index].x, columns[i].y - 400, 60 + Math.round(i / len * 60));
+        this.count[columns[i]]--;
+        this.i--;
+        if (this.i < 0) {
+          this.i = 0;
+          this.countingPhase = "4.output";
+        }
+        break;
+      case "4.output":
+        const a = this.secondColumns[i];
+        const b = columns[i];
+        SortAlgorithm.swapColumn(a, b, 30 + Math.round(i / len * 60));
+        a.height = 0;
+        this.i++;
+        if (this.i >= len) return true;
+        break;
+    }
+  }
+  randomSortSetting() {
+    this.i = 0;
+    this.j = 0;
+    this.timesEveryFrame = 1;
+  }
+  randomSort(columns) {
+    const len = columns.length;
+    const i = this.i;
+    const j = this.j;
+    if (i >= len) return true;
+    if (j >= len) {
+      this.i = this.i * this.i + 1;
+      this.j = i;
+      return false;
+    }
+    const a = columns[j];
+    const b = columns[(j * j + 1) % len];
+    SortAlgorithm.swapColumn(a, b, 60 - this.timesEveryFrame * 2);
+    this.j = this.i + this.j + 1;
+  }
+  instantRandomSortSetting() {
+    this.i = 0;
+    this.j = 0;
+    this.timesEveryFrame = 30;
+  }
+  instantRandomSort(columns) {
+    return this.randomSort(columns);
+  }
 }
-const CanvasSectionS3 = ({ section, canvas, ratio, max, status, handleClick }) => {
+let ParticleSystem$1 = class ParticleSystem2 {
+  constructor(x2, y2) {
+    this.sort = new SortAlgorithm();
+    this.x = x2;
+    this.y = y2;
+    this.slow = 0.999;
+    this.friction = 0.997;
+    this.i = 0;
+    this.j = 0;
+    this.maxValue = 865 * 0.4;
+    const length = Math.floor(x2 - 200);
+    const width = Math.max(Math.floor(x2 * 2 / length), 0.5);
+    this.columns = new Array(length).fill().map((v2, i) => {
+      return this.createColumn(x2 - width * length / 2 + width * i, y2 * 1.8, width, (i + 1) / length * this.maxValue);
+    });
+    this.walls = new Array(5).fill().map((v2, i) => {
+      return this.createWall("arc", x2, y2 - x2 / 2, 865 / 2 / 25 * (1 + i * i), 3, 0 + Math.PI / 16 * (4 - i), Math.PI / 16 * (12 + i), Math.PI / 15 * i, 865 / 2 / 25);
+    });
+    const ballLen = Math.min(length * 2, 500);
+    const ballSize = 2 + Math.floor(width / 3);
+    this.balls = new Array(ballLen).fill().map((v2, i) => {
+      const r2 = Math.pow(Math.random(), 0.6) * 865 / 4;
+      const theta = Math.random() * 2 * Math.PI;
+      return this.createBall(x2 + r2 * Math.cos(theta), 0.5 * y2 + r2 * Math.sin(theta), ballSize);
+    });
+    this.rects = [
+      { "left": 0, "top": 0, "right": x2 * 2, "bottom": 10 },
+      { "left": 0, "top": y2 * 2 - 10, "right": x2 * 2, "bottom": y2 * 2 },
+      { "left": 0, "top": 0, "right": 10, "bottom": y2 * 2 },
+      { "left": x2 * 2 - 10, "top": 0, "right": x2 * 2, "bottom": y2 * 2 }
+    ];
+    const fontpx = Math.floor(this.x / 15);
+    this.texts = { "log": { "text": "Welcome to Sorting Algorithm animation", "fontpx": fontpx, "x": this.x, "y": this.y * 2 - fontpx * 1 } };
+  }
+  createColumn(x2, y2, width, height) {
+    const path = new Path(x2, y2);
+    const column = { x: x2, y: y2, width, height, path };
+    return column;
+  }
+  createWall(type = "arc", centerX, centerY, length, thick = 5, startAngle = 0, endAngle = 2 * Math.PI, period = 0, swing) {
+    if (!swing) swing = length / 20;
+    const x2 = centerX;
+    const y2 = centerY;
+    const wall = { type, centerX, centerY, x: x2, y: y2, thick, length, startAngle, endAngle, period, swing };
+    return wall;
+  }
+  createBall(x2 = this.x, y2 = this.y, r2 = 3) {
+    const vx = Math.random() * 100 - 50;
+    const vy = Math.random() * 100 - 50;
+    const ax = 0;
+    const ay = 9.8 * 10;
+    const ball = { x: x2, y: y2, r: r2, vx, vy, ax, ay };
+    return ball;
+  }
+  getDist(a, b) {
+    const x2 = a.x - b.x;
+    const y2 = a.y - b.y;
+    const dist = Math.sqrt(x2 * x2 + y2 * y2);
+    return dist;
+  }
+  isCollide(target, wall) {
+    if (wall.type == "arc") {
+      const x2 = target.x - wall.x;
+      const y2 = target.y - wall.y;
+      const dist = Math.sqrt(x2 * x2 + y2 * y2);
+      return dist + target.r >= wall.length - wall.thick && dist < wall.length + wall.thick ? dist : 0;
+    }
+    return 0;
+  }
+  handleBallCollision(ball, anotherBall, dist) {
+    const x2 = (ball.x + anotherBall.x) / 2;
+    const y2 = (ball.y + anotherBall.y) / 2;
+    ball.x = x2 + (ball.x - x2) / (dist / 2) * ball.r;
+    ball.y = y2 + (ball.y - y2) / (dist / 2) * ball.r;
+    anotherBall.x = x2 + (anotherBall.x - x2) / (dist / 2) * anotherBall.r;
+    anotherBall.y = y2 + (anotherBall.y - y2) / (dist / 2) * anotherBall.r;
+    const vx = (ball.vx - anotherBall.vx) / 2;
+    const vy = (ball.vy - anotherBall.vy) / 2;
+    const averageVx = (ball.vx + anotherBall.vx) / 2;
+    const averageVy = (ball.vy + anotherBall.vy) / 2;
+    const angle = Math.atan((ball.y - y2) / (ball.x - x2));
+    const vectorT = -vx * Math.sin(angle) + vy * Math.cos(angle);
+    const vectorN = -1 * (vx * Math.cos(angle) + vy * Math.sin(angle));
+    const relativeX = -vectorT * Math.sin(angle) + vectorN * Math.cos(angle);
+    const relativeY = vectorT * Math.cos(angle) + vectorN * Math.sin(angle);
+    ball.vx = (averageVx + relativeX) * this.friction;
+    ball.vy = (averageVy + relativeY) * this.friction;
+    anotherBall.vx = (averageVx - relativeX) * this.friction;
+    anotherBall.vy = (averageVy - relativeY) * this.friction;
+  }
+  handleWallCollision(ball, wall, dist) {
+    const x2 = wall.x + (ball.x - wall.x) / dist * wall.length;
+    const y2 = wall.y + (ball.y - wall.y) / dist * wall.length;
+    const atan = Math.atan((y2 - wall.y) / (x2 - wall.x));
+    const theta = atan > 0 ? atan : atan + Math.PI;
+    const quadrant = y2 > wall.y ? theta : theta + Math.PI;
+    if (quadrant > wall.endAngle || quadrant < wall.startAngle) return;
+    const isInside = dist <= wall.length ? 1 : -1;
+    ball.x = x2 + (ball.x - x2) / (wall.length - dist) * (ball.r + wall.thick) * isInside;
+    ball.y = y2 + (ball.y - y2) / (wall.length - dist) * (ball.r + wall.thick) * isInside;
+    const angle = Math.atan((ball.y - y2) / (ball.x - x2));
+    const vectorT = -ball.vx * Math.sin(angle) + ball.vy * Math.cos(angle);
+    const vectorN = -1 * (ball.vx * Math.cos(angle) + ball.vy * Math.sin(angle));
+    ball.vx = (-vectorT * Math.sin(angle) + vectorN * Math.cos(angle)) * this.friction;
+    ball.vy = (vectorT * Math.cos(angle) + vectorN * Math.sin(angle)) * this.friction;
+  }
+  handleColumnCollision(ball, column) {
+    const columnTop = column.path.pointY - column.height;
+    const columnBottom = column.path.pointY;
+    const columnLeft = column.path.pointX - column.width / 2;
+    const columnRight = column.path.pointX + column.width / 2;
+    if (ball.x + ball.r > columnLeft && ball.x - ball.r < columnRight && ball.y + ball.r > columnTop && ball.y - ball.r < columnBottom) {
+      const overlapX = Math.min(ball.x + ball.r - columnLeft, columnRight - ball.x + ball.r);
+      const overlapY = Math.min(ball.y + ball.r - columnTop, columnBottom - ball.y + ball.r);
+      if (overlapX < overlapY) {
+        ball.vx = -ball.vx * this.friction;
+        if (ball.x < column.path.pointX) {
+          ball.x = columnLeft - ball.r;
+        } else {
+          ball.x = columnRight + ball.r;
+        }
+      } else {
+        ball.vy = -ball.vy * this.friction;
+        if (ball.y < column.path.pointY) {
+          ball.y = columnTop - ball.r;
+        } else {
+          ball.y = columnBottom + ball.r;
+        }
+      }
+    }
+  }
+  handleRectCollision(ball, rect) {
+    if (ball.x + ball.r > rect.left && ball.x - ball.r < rect.right && ball.y + ball.r > rect.top && ball.y - ball.r < rect.bottom) {
+      const overlapX = Math.min(ball.x + ball.r - rect.left, rect.right - ball.x + ball.r);
+      const overlapY = Math.min(ball.y + ball.r - rect.top, rect.bottom - ball.y + ball.r);
+      if (overlapX < overlapY) {
+        ball.vx = -ball.vx * this.friction;
+        if (ball.x < (rect.left + rect.right) / 2) {
+          ball.x = rect.left - ball.r;
+        } else {
+          ball.x = rect.right + ball.r;
+        }
+      } else {
+        ball.vy = -ball.vy * this.friction;
+        if (ball.y < (rect.top + rect.bottom) / 2) {
+          ball.y = rect.top - ball.r;
+        } else {
+          ball.y = rect.bottom + ball.r;
+        }
+      }
+    }
+  }
+  update() {
+    this.sort.update(this.columns);
+    this.texts.log.text = this.sort.log.innerText;
+    this.columns.forEach((column) => {
+      if (column.path != void 0) {
+        if (column.path.__proto__.constructor.name == "Path") {
+          column.path.NextFrame();
+        }
+      }
+    });
+    this.sort.secondColumns.forEach((column, index) => {
+      if (column.path == void 0) return;
+      const funcitonName = column.path.__proto__.constructor.name;
+      if (funcitonName != "Path") return console.warn("the path of columns[ " + index + " ] was never constructed by Path");
+      column.path.NextFrame();
+    });
+    this.walls.forEach((wall) => {
+      wall.period += 0.25 * 2 * Math.PI / 60;
+      wall.x = wall.centerX + wall.swing * Math.cos(wall.period);
+      wall.y = wall.centerY + wall.swing * Math.sin(wall.period);
+    });
+    this.balls.forEach((ball) => {
+      ball.x = ball.x + ball.vx / 60;
+      ball.y = ball.y + ball.vy / 60;
+      ball.vx = (ball.vx + ball.ax / 60) * this.slow;
+      ball.vy = (ball.vy + ball.ay / 60) * this.slow;
+      this.balls.forEach((anotherBall, index2) => {
+        if (ball == anotherBall) return;
+        const dist = this.getDist(ball, anotherBall);
+        if (dist < ball.r + anotherBall.r) {
+          this.handleBallCollision(ball, anotherBall, dist);
+        }
+      });
+      this.walls.forEach((wall) => {
+        const dist = this.isCollide(ball, wall);
+        if (dist > 0) {
+          this.handleWallCollision(ball, wall, dist);
+        }
+      });
+      this.columns.forEach((column) => {
+        this.handleColumnCollision(ball, column);
+      });
+      this.sort.secondColumns.forEach((column) => {
+        this.handleColumnCollision(ball, column);
+      });
+      this.rects.forEach((rect) => {
+        this.handleRectCollision(ball, rect);
+      });
+    });
+  }
+  getRender(ctx) {
+    ctx.fillStyle = "black";
+    ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+    this.walls.forEach((wall) => {
+      ctx.beginPath();
+      ctx.arc(wall.x, wall.y, wall.length, wall.startAngle, wall.endAngle, false);
+      ctx.strokeStyle = "rgba(40, 60, 80, 1)";
+      ctx.lineWidth = wall.thick * 2;
+      ctx.stroke();
+    });
+    function drawColumn(column) {
+      ctx.beginPath();
+      ctx.moveTo(column.path.pointX, column.path.pointY);
+      ctx.lineTo(column.path.pointX, column.path.pointY - column.height);
+      const c = column.height / 865 * 2;
+      const r2 = 246 + c * (195 - 246);
+      const g = 211 + c * (160 - 211);
+      const b = 101 + c * (133 - 101);
+      ctx.strokeStyle = "rgba(" + r2 + "," + g + "," + b + ",1)";
+      ctx.lineWidth = column.width;
+      ctx.stroke();
+    }
+    this.columns.forEach((column) => {
+      drawColumn(column);
+    });
+    if (this.sort.secondColumns)
+      this.sort.secondColumns.forEach((column) => {
+        drawColumn(column);
+      });
+    this.balls.forEach((ball) => {
+      ctx.beginPath();
+      ctx.arc(ball.x, ball.y, ball.r, 0, 2 * Math.PI, false);
+      ctx.fillStyle = "#FFFFFF";
+      ctx.fill();
+    });
+    Object.keys(this.texts).forEach((key) => {
+      const text = this.texts[key];
+      ctx.beginPath();
+      ctx.fillStyle = "#FFFFFF";
+      ctx.font = text.fontpx + "px IBM Plex Sans";
+      ctx.fillText(text.text, text.x, text.y);
+    });
+  }
+};
+class Averager {
+  constructor(length) {
+    this.length = length;
+    this.value = new Array(length).fill(0.0167);
+    this.index = 0;
+    this.average = 0.0167;
+    this.fps = 60;
+  }
+  updateValue(value) {
+    this.value[this.index] = value;
+    this.index = ++this.index >= this.length ? 0 : this.index;
+  }
+  getAverage() {
+    this.average = 1 / this.length * this.value.reduce((sum, value) => {
+      return sum + value;
+    }, 0);
+    return this.average;
+  }
+  getFPS() {
+    this.fps = 1 / this.getAverage();
+    return this.fps;
+  }
+}
+const createPhysic = function() {
+  new Averager(60);
+  this.update = () => {
+    this.system.update();
+  };
+  this.render = () => {
+    this.system.getRender(this.ctx);
+  };
+  this.setCanvas = (canvas, log2) => {
+    this.system = new ParticleSystem$1(canvas.width / 2, canvas.height / 2);
+    this.system.sort.log = log2;
+    this.ctx = canvas.getContext("2d");
+    this.ctx.lineCap = "butt";
+    this.ctx.textAlign = "center";
+  };
+  this.start = (e) => {
+    const ID = e.target.id;
+    if (!this.system.sort[ID]) {
+      console.warn("invalid function name. Button id " + ID + " is not any of sortFunctions");
+      return;
+    }
+    this.system.sort.start(ID, this.system.columns);
+  };
+  this.cancel = () => {
+    this.system.sort.isSorting = false;
+    this.system.sort.send(name + " is interrupted!");
+  };
+  this.stepByStep = () => {
+    this.system.sort.isSorting = true;
+    this.system.sort.isStoping = true;
+    this.system.sort.send(name + " is proceeding step by step. Click again!");
+  };
+  this.setPath = (e) => {
+    const ID = e.target.id;
+    PathConfig[ID] = e.target.value;
+  };
+  return this;
+};
+const physic = new createPhysic();
+const CanvasSectionS3 = ({ section, canvas, manager: manager2, ratio, max, status, handleClick }) => {
+  const menu = reactExports.useRef();
+  const log2 = reactExports.useRef();
+  const controlpanel = reactExports.useRef();
+  reactExports.useEffect(() => {
+    physic.setCanvas(canvas.current, log2.current);
+    manager2.registerAnimationCallback("updateS3", physic.update);
+    manager2.registerAnimationCallback("renderS3", physic.render);
+  }, []);
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("section", { ref: section, className: "section", id: "S3", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsx("canvas", { id: "canvasS3", ref: canvas, width: max * ratio, height: window.innerWidth < 992 ? ratio * max * 2 : ratio * max }),
     /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: handleClick, value: "S3", className: "record", children: status }),
-    /* @__PURE__ */ jsxRuntimeExports.jsx(MenuS3, {})
+    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { ref: menu, className: "gamemenu", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx("header", { id: "", children: /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { children: "粒子系統" }) }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { id: "pathConfig", className: "parameter", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("label", { children: "linear :" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("input", { onChange: physic.setPath, type: "number", id: "leapLinear", defaultValue: "0" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("label", { children: "easein :" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("input", { onChange: physic.setPath, type: "number", id: "leapEasein", defaultValue: "-2" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("label", { children: "easeout :" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("input", { onChange: physic.setPath, type: "number", id: "leapEaseout", defaultValue: "2" })
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { ref: controlpanel, className: "controlpanel", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("label", { children: "★" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: physic.start, id: "bubbleSort", children: "泡沫排序" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: physic.start, id: "selectionSort", children: "選擇排序" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: physic.start, id: "insertionSort", children: "插入排序" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: physic.start, id: "quickSort", children: "快速排序" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: physic.start, id: "mergeSort", children: "合併排序" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: physic.start, id: "heapSort", children: "堆排序" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: physic.start, id: "shellSort", children: "希爾排序" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: physic.start, id: "countingSort", children: "計數排序" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: physic.start, id: "randomSort", children: "打亂" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: physic.start, id: "instantRandomSort", children: "立刻打亂" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: physic.cancel, id: "cancelSort", children: "取消" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: physic.stepByStep, id: "stepByStep", children: "一步一步來" })
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { ref: log2, id: "sortLog", children: /* @__PURE__ */ jsxRuntimeExports.jsx("p", { id: "", children: "碰撞模擬和重力引擎" }) }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(SlideMenuBtn, { menu })
+    ] })
   ] });
 };
 var lodash = { exports: {} };
@@ -13379,22 +14256,31 @@ const managerMaker = function() {
       request.ID = requestAnimationFrame(request.method);
     });
   };
-  this.cancelAnimationByName = (name) => {
-    cancelAnimationFrame(this.request[name].ID);
+  this.cancelAnimationByName = (name2) => {
+    cancelAnimationFrame(this.request[name2].ID);
   };
-  this.requestAnimationByName = (name) => {
-    this.request[name].ID = requestAnimationFrame(this.request[name].method);
+  this.requestAnimationByName = (name2) => {
+    this.request[name2].ID = requestAnimationFrame(this.request[name2].method);
   };
   this.addAnimationCallback = (callback) => {
     const string = callback.name || "#" + Math.random();
-    const name = string.match(" ") ? string.split(" ")[1] : string;
-    this.request[name] = this.request[name] || {};
-    this.request[name].method = (function animate() {
+    const name2 = string.match(" ") ? string.split(" ")[1] : string;
+    this.request[name2] = this.request[name2] || {};
+    this.request[name2].method = (function animate() {
       callback();
-      this.request[name].ID = requestAnimationFrame(animate.bind(this));
+      this.request[name2].ID = requestAnimationFrame(animate.bind(this));
     }).bind(this);
-    const valid = this.validId.some((ID) => name.includes(ID));
-    if (!valid) console.warn("naming issue: " + name + " should include one of following letters: " + this.validId);
+    const valid = this.validId.some((ID) => name2.includes(ID));
+    if (!valid) console.warn("naming issue: " + name2 + " should include one of following letters: " + this.validId);
+  };
+  this.registerAnimationCallback = (name2, callback) => {
+    this.request[name2] = this.request[name2] || {};
+    this.request[name2].method = (function animate() {
+      callback();
+      this.request[name2].ID = requestAnimationFrame(animate.bind(this));
+    }).bind(this);
+    const valid = this.validId.some((ID) => name2.includes(ID));
+    if (!valid) console.warn("naming issue: " + name2 + " should include one of following letters: " + this.validId);
   };
   this.addIntersectionObserver = () => {
     this.io = new IntersectionObserver((entries) => {
@@ -13413,86 +14299,8 @@ const managerMaker = function() {
   return this;
 };
 const manager$1 = new managerMaker();
-const _PathConfig = class _PathConfig {
-  static resetPath(linear = 1, easein = 0, easeout = 0) {
-    if (linear + easein + easeout != 1) console.warn("sum of parameter is recommend to be 1");
-    _PathConfig.linear = linear;
-    _PathConfig.easein = easein;
-    _PathConfig.easeout = easeout;
-  }
-  static resetLeap(linear = 0, easein = 0, easeout = 0) {
-    _PathConfig.leapLinear = linear;
-    _PathConfig.leapEasein = easein;
-    _PathConfig.leapEaseout = easeout;
-  }
-  getPath() {
-    return [_PathConfig.linear, _PathConfig.easein, _PathConfig.easeout];
-  }
-  getLeap() {
-    return [_PathConfig.leapLinear, _PathConfig.leapEasein, _PathConfig.leapEaseout];
-  }
-};
-__publicField(_PathConfig, "linear", -1);
-__publicField(_PathConfig, "easein", 0);
-__publicField(_PathConfig, "easeout", 2);
-__publicField(_PathConfig, "leapLinear", 0);
-__publicField(_PathConfig, "leapEasein", -2);
-__publicField(_PathConfig, "leapEaseout", 2);
-let PathConfig = _PathConfig;
-class Path extends PathConfig {
-  constructor(x2 = 0, y2 = 0) {
-    super();
-    __publicField(this, "NewTarget", function(targetX, targetY, frames) {
-      this.targetX = targetX;
-      this.targetY = targetY;
-      this.originX = this.pointX;
-      this.originY = this.pointY;
-      this.timer = frames;
-      this.period = frames;
-    });
-    __publicField(this, "ResetTo", function(x2 = x2, y2 = y2) {
-      this.pointX = x2;
-      this.pointY = y2;
-      this.timer = 0;
-    });
-    __publicField(this, "NextFrame", (function validInS1_S2_S3() {
-      if (this.timer > 0) {
-        this.timer--;
-        const dX = this.targetX - this.originX;
-        const dY = this.targetY - this.originY;
-        const t2 = this.timer;
-        const p2 = this.period;
-        const linear = 1 / p2;
-        const easeout = Math.pow((t2 + 1) / p2, 2) - Math.pow(t2 / p2, 2);
-        const easein = Math.pow(1 - (t2 - 1) / p2, 2) - Math.pow(1 - t2 / p2, 2);
-        const [a, b, c] = this.getPath();
-        const [d, e, f2] = this.getLeap();
-        this.pointX += (a * linear + b * easein + c * easeout) * dX;
-        this.pointY += (a * linear + b * easein + c * easeout) * dY + (d * linear + e * easein + f2 * easeout) * (-dX / 5 + 10 * -dX / Math.abs(dX == 0 ? 1 : dX));
-      } else if (this.timer == 0) {
-        this.timer--;
-        this.pointX = this.targetX;
-        this.pointY = this.targetY;
-      }
-    }).bind(this));
-    this.pointX = x2;
-    this.pointY = y2;
-    this.originX = x2;
-    this.originY = y2;
-    this.targetX = x2;
-    this.targetY = y2;
-    this.period = 90;
-    this.timer = 0;
-  }
-  getPath() {
-    return super.getPath();
-  }
-  getLeap() {
-    return super.getLeap();
-  }
-}
 function Playground({ margin }) {
-  const [width, height] = useWindowSize();
+  const [width, height] = useWindowSize(margin);
   const [ratio, setRatio] = reactExports.useState(width > 992 ? 1 : 2);
   const [max, setMax] = reactExports.useState(getMax(width, height));
   reactExports.useEffect(() => {
@@ -13511,16 +14319,14 @@ function Playground({ margin }) {
     });
     manager$1.addIntersectionObserver();
     manager$1.addSubjectElements(elements);
-    PathConfig.resetPath();
-    PathConfig.resetLeap();
     manager$1.addAnimationCallback(myMouse.NextFrame);
     console.log(manager$1);
   }, []);
   function handleMouseMove(e) {
     const rect = e.target.getBoundingClientRect();
     {
-      const a = (e.pageX - rect.x) / rect.width;
-      const b = (e.pageY - rect.y) / rect.height;
+      const a = e.pageX - rect.x;
+      const b = e.pageY - rect.y;
       const frames = 30;
       myMouse.NewTarget(a, b, frames);
     }
@@ -13566,9 +14372,9 @@ function Playground({ margin }) {
         "margin": margin + "px auto"
       },
       children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(CanvasSectionS3, { section: sections[2], canvas: canvas.S3, ratio, max, status, handleClick: handleRecord, manager: manager$1, myMouse }),
         /* @__PURE__ */ jsxRuntimeExports.jsx(CanvasSectionS1, { section: sections[0], canvas: canvas.S1, ratio, max, status, handleClick: handleRecord, manager: manager$1, myMouse }),
         /* @__PURE__ */ jsxRuntimeExports.jsx(SectionS2, { section: sections[1], canvas: canvas.S2, audio, ratio, max, status, handleClick: handleRecord, manager: manager$1, myMouse }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(CanvasSectionS3, { section: sections[2], canvas: canvas.S3, ratio, max, status, handleClick: handleRecord, manager: manager$1, myMouse }),
         /* @__PURE__ */ jsxRuntimeExports.jsx(CookieTable, {})
       ]
     }
@@ -14403,8 +15209,8 @@ function arrayNeedsUint32(array) {
   }
   return false;
 }
-function createElementNS(name) {
-  return document.createElementNS("http://www.w3.org/1999/xhtml", name);
+function createElementNS(name2) {
+  return document.createElementNS("http://www.w3.org/1999/xhtml", name2);
 }
 function createCanvasElement() {
   const canvas = createElementNS("canvas");
@@ -18033,25 +18839,25 @@ class Object3D extends EventDispatcher {
   getObjectById(id2) {
     return this.getObjectByProperty("id", id2);
   }
-  getObjectByName(name) {
-    return this.getObjectByProperty("name", name);
+  getObjectByName(name2) {
+    return this.getObjectByProperty("name", name2);
   }
-  getObjectByProperty(name, value) {
-    if (this[name] === value) return this;
+  getObjectByProperty(name2, value) {
+    if (this[name2] === value) return this;
     for (let i = 0, l2 = this.children.length; i < l2; i++) {
       const child = this.children[i];
-      const object = child.getObjectByProperty(name, value);
+      const object = child.getObjectByProperty(name2, value);
       if (object !== void 0) {
         return object;
       }
     }
     return void 0;
   }
-  getObjectsByProperty(name, value, result2 = []) {
-    if (this[name] === value) result2.push(this);
+  getObjectsByProperty(name2, value, result2 = []) {
+    if (this[name2] === value) result2.push(this);
     const children = this.children;
     for (let i = 0, l2 = children.length; i < l2; i++) {
-      children[i].getObjectsByProperty(name, value, result2);
+      children[i].getObjectsByProperty(name2, value, result2);
     }
     return result2;
   }
@@ -18753,9 +19559,9 @@ let Color$1 = class Color {
     let m2;
     if (m2 = /^(\w+)\(([^\)]*)\)/.exec(style)) {
       let color;
-      const name = m2[1];
+      const name2 = m2[1];
       const components = m2[2];
-      switch (name) {
+      switch (name2) {
         case "rgb":
         case "rgba":
           if (color = /^\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*(?:,\s*(\d*\.?\d+)\s*)?$/.exec(components)) {
@@ -19651,19 +20457,19 @@ class BufferGeometry extends EventDispatcher {
     }
     return this;
   }
-  getAttribute(name) {
-    return this.attributes[name];
+  getAttribute(name2) {
+    return this.attributes[name2];
   }
-  setAttribute(name, attribute) {
-    this.attributes[name] = attribute;
+  setAttribute(name2, attribute) {
+    this.attributes[name2] = attribute;
     return this;
   }
-  deleteAttribute(name) {
-    delete this.attributes[name];
+  deleteAttribute(name2) {
+    delete this.attributes[name2];
     return this;
   }
-  hasAttribute(name) {
-    return this.attributes[name] !== void 0;
+  hasAttribute(name2) {
+    return this.attributes[name2] !== void 0;
   }
   addGroup(start, count, materialIndex = 0) {
     this.groups.push({
@@ -20021,21 +20827,21 @@ class BufferGeometry extends EventDispatcher {
     const geometry2 = new BufferGeometry();
     const indices = this.index.array;
     const attributes = this.attributes;
-    for (const name in attributes) {
-      const attribute = attributes[name];
+    for (const name2 in attributes) {
+      const attribute = attributes[name2];
       const newAttribute = convertBufferAttribute(attribute, indices);
-      geometry2.setAttribute(name, newAttribute);
+      geometry2.setAttribute(name2, newAttribute);
     }
     const morphAttributes = this.morphAttributes;
-    for (const name in morphAttributes) {
+    for (const name2 in morphAttributes) {
       const morphArray = [];
-      const morphAttribute = morphAttributes[name];
+      const morphAttribute = morphAttributes[name2];
       for (let i = 0, il2 = morphAttribute.length; i < il2; i++) {
         const attribute = morphAttribute[i];
         const newAttribute = convertBufferAttribute(attribute, indices);
         morphArray.push(newAttribute);
       }
-      geometry2.morphAttributes[name] = morphArray;
+      geometry2.morphAttributes[name2] = morphArray;
     }
     geometry2.morphTargetsRelative = this.morphTargetsRelative;
     const groups = this.groups;
@@ -20125,18 +20931,18 @@ class BufferGeometry extends EventDispatcher {
       this.setIndex(index.clone(data));
     }
     const attributes = source.attributes;
-    for (const name in attributes) {
-      const attribute = attributes[name];
-      this.setAttribute(name, attribute.clone(data));
+    for (const name2 in attributes) {
+      const attribute = attributes[name2];
+      this.setAttribute(name2, attribute.clone(data));
     }
     const morphAttributes = source.morphAttributes;
-    for (const name in morphAttributes) {
+    for (const name2 in morphAttributes) {
       const array = [];
-      const morphAttribute = morphAttributes[name];
+      const morphAttribute = morphAttributes[name2];
       for (let i = 0, l2 = morphAttribute.length; i < l2; i++) {
         array.push(morphAttribute[i].clone(data));
       }
-      this.morphAttributes[name] = array;
+      this.morphAttributes[name2] = array;
     }
     this.morphTargetsRelative = source.morphTargetsRelative;
     const groups = source.groups;
@@ -20209,9 +21015,9 @@ class Mesh extends Object3D {
         this.morphTargetInfluences = [];
         this.morphTargetDictionary = {};
         for (let m2 = 0, ml2 = morphAttribute.length; m2 < ml2; m2++) {
-          const name = morphAttribute[m2].name || String(m2);
+          const name2 = morphAttribute[m2].name || String(m2);
           this.morphTargetInfluences.push(0);
-          this.morphTargetDictionary[name] = m2;
+          this.morphTargetDictionary[name2] = m2;
         }
       }
     }
@@ -20589,46 +21395,46 @@ class ShaderMaterial extends Material {
     const data = super.toJSON(meta);
     data.glslVersion = this.glslVersion;
     data.uniforms = {};
-    for (const name in this.uniforms) {
-      const uniform = this.uniforms[name];
+    for (const name2 in this.uniforms) {
+      const uniform = this.uniforms[name2];
       const value = uniform.value;
       if (value && value.isTexture) {
-        data.uniforms[name] = {
+        data.uniforms[name2] = {
           type: "t",
           value: value.toJSON(meta).uuid
         };
       } else if (value && value.isColor) {
-        data.uniforms[name] = {
+        data.uniforms[name2] = {
           type: "c",
           value: value.getHex()
         };
       } else if (value && value.isVector2) {
-        data.uniforms[name] = {
+        data.uniforms[name2] = {
           type: "v2",
           value: value.toArray()
         };
       } else if (value && value.isVector3) {
-        data.uniforms[name] = {
+        data.uniforms[name2] = {
           type: "v3",
           value: value.toArray()
         };
       } else if (value && value.isVector4) {
-        data.uniforms[name] = {
+        data.uniforms[name2] = {
           type: "v4",
           value: value.toArray()
         };
       } else if (value && value.isMatrix3) {
-        data.uniforms[name] = {
+        data.uniforms[name2] = {
           type: "m3",
           value: value.toArray()
         };
       } else if (value && value.isMatrix4) {
-        data.uniforms[name] = {
+        data.uniforms[name2] = {
           type: "m4",
           value: value.toArray()
         };
       } else {
-        data.uniforms[name] = {
+        data.uniforms[name2] = {
           value
         };
       }
@@ -22427,14 +23233,14 @@ function WebGLBindingStates(gl2, attributes) {
     const geometryAttributes = geometry.attributes;
     let attributesNum = 0;
     const programAttributes = program.getAttributes();
-    for (const name in programAttributes) {
-      const programAttribute = programAttributes[name];
+    for (const name2 in programAttributes) {
+      const programAttribute = programAttributes[name2];
       if (programAttribute.location >= 0) {
-        const cachedAttribute = cachedAttributes[name];
-        let geometryAttribute = geometryAttributes[name];
+        const cachedAttribute = cachedAttributes[name2];
+        let geometryAttribute = geometryAttributes[name2];
         if (geometryAttribute === void 0) {
-          if (name === "instanceMatrix" && object.instanceMatrix) geometryAttribute = object.instanceMatrix;
-          if (name === "instanceColor" && object.instanceColor) geometryAttribute = object.instanceColor;
+          if (name2 === "instanceMatrix" && object.instanceMatrix) geometryAttribute = object.instanceMatrix;
+          if (name2 === "instanceColor" && object.instanceColor) geometryAttribute = object.instanceColor;
         }
         if (cachedAttribute === void 0) return true;
         if (cachedAttribute.attribute !== geometryAttribute) return true;
@@ -22451,20 +23257,20 @@ function WebGLBindingStates(gl2, attributes) {
     const attributes2 = geometry.attributes;
     let attributesNum = 0;
     const programAttributes = program.getAttributes();
-    for (const name in programAttributes) {
-      const programAttribute = programAttributes[name];
+    for (const name2 in programAttributes) {
+      const programAttribute = programAttributes[name2];
       if (programAttribute.location >= 0) {
-        let attribute = attributes2[name];
+        let attribute = attributes2[name2];
         if (attribute === void 0) {
-          if (name === "instanceMatrix" && object.instanceMatrix) attribute = object.instanceMatrix;
-          if (name === "instanceColor" && object.instanceColor) attribute = object.instanceColor;
+          if (name2 === "instanceMatrix" && object.instanceMatrix) attribute = object.instanceMatrix;
+          if (name2 === "instanceColor" && object.instanceColor) attribute = object.instanceColor;
         }
         const data = {};
         data.attribute = attribute;
         if (attribute && attribute.data) {
           data.data = attribute.data;
         }
-        cache[name] = data;
+        cache[name2] = data;
         attributesNum++;
       }
     }
@@ -22517,13 +23323,13 @@ function WebGLBindingStates(gl2, attributes) {
     const geometryAttributes = geometry.attributes;
     const programAttributes = program.getAttributes();
     const materialDefaultAttributeValues = material.defaultAttributeValues;
-    for (const name in programAttributes) {
-      const programAttribute = programAttributes[name];
+    for (const name2 in programAttributes) {
+      const programAttribute = programAttributes[name2];
       if (programAttribute.location >= 0) {
-        let geometryAttribute = geometryAttributes[name];
+        let geometryAttribute = geometryAttributes[name2];
         if (geometryAttribute === void 0) {
-          if (name === "instanceMatrix" && object.instanceMatrix) geometryAttribute = object.instanceMatrix;
-          if (name === "instanceColor" && object.instanceColor) geometryAttribute = object.instanceColor;
+          if (name2 === "instanceMatrix" && object.instanceMatrix) geometryAttribute = object.instanceMatrix;
+          if (name2 === "instanceColor" && object.instanceColor) geometryAttribute = object.instanceColor;
         }
         if (geometryAttribute !== void 0) {
           const normalized = geometryAttribute.normalized;
@@ -22589,7 +23395,7 @@ function WebGLBindingStates(gl2, attributes) {
             }
           }
         } else if (materialDefaultAttributeValues !== void 0) {
-          const value = materialDefaultAttributeValues[name];
+          const value = materialDefaultAttributeValues[name2];
           if (value !== void 0) {
             switch (value.length) {
               case 2:
@@ -23726,12 +24532,12 @@ function WebGLCubeUVMaps(renderer) {
 }
 function WebGLExtensions(gl2) {
   const extensions = {};
-  function getExtension(name) {
-    if (extensions[name] !== void 0) {
-      return extensions[name];
+  function getExtension(name2) {
+    if (extensions[name2] !== void 0) {
+      return extensions[name2];
     }
     let extension;
-    switch (name) {
+    switch (name2) {
       case "WEBGL_depth_texture":
         extension = gl2.getExtension("WEBGL_depth_texture") || gl2.getExtension("MOZ_WEBGL_depth_texture") || gl2.getExtension("WEBKIT_WEBGL_depth_texture");
         break;
@@ -23745,14 +24551,14 @@ function WebGLExtensions(gl2) {
         extension = gl2.getExtension("WEBGL_compressed_texture_pvrtc") || gl2.getExtension("WEBKIT_WEBGL_compressed_texture_pvrtc");
         break;
       default:
-        extension = gl2.getExtension(name);
+        extension = gl2.getExtension(name2);
     }
-    extensions[name] = extension;
+    extensions[name2] = extension;
     return extension;
   }
   return {
-    has: function(name) {
-      return getExtension(name) !== null;
+    has: function(name2) {
+      return getExtension(name2) !== null;
     },
     init: function() {
       getExtension("EXT_color_buffer_float");
@@ -23762,10 +24568,10 @@ function WebGLExtensions(gl2) {
       getExtension("WEBGL_multisampled_render_to_texture");
       getExtension("WEBGL_render_shared_exponent");
     },
-    get: function(name) {
-      const extension = getExtension(name);
+    get: function(name2) {
+      const extension = getExtension(name2);
       if (extension === null) {
-        warnOnce("THREE.WebGLRenderer: " + name + " extension not supported.");
+        warnOnce("THREE.WebGLRenderer: " + name2 + " extension not supported.");
       }
       return extension;
     }
@@ -23779,11 +24585,11 @@ function WebGLGeometries(gl2, attributes, info, bindingStates) {
     if (geometry.index !== null) {
       attributes.remove(geometry.index);
     }
-    for (const name in geometry.attributes) {
-      attributes.remove(geometry.attributes[name]);
+    for (const name2 in geometry.attributes) {
+      attributes.remove(geometry.attributes[name2]);
     }
-    for (const name in geometry.morphAttributes) {
-      const array = geometry.morphAttributes[name];
+    for (const name2 in geometry.morphAttributes) {
+      const array = geometry.morphAttributes[name2];
       for (let i = 0, l2 = array.length; i < l2; i++) {
         attributes.remove(array[i]);
       }
@@ -23810,12 +24616,12 @@ function WebGLGeometries(gl2, attributes, info, bindingStates) {
   }
   function update(geometry) {
     const geometryAttributes = geometry.attributes;
-    for (const name in geometryAttributes) {
-      attributes.update(geometryAttributes[name], gl2.ARRAY_BUFFER);
+    for (const name2 in geometryAttributes) {
+      attributes.update(geometryAttributes[name2], gl2.ARRAY_BUFFER);
     }
     const morphAttributes = geometry.morphAttributes;
-    for (const name in morphAttributes) {
-      const array = morphAttributes[name];
+    for (const name2 in morphAttributes) {
+      const array = morphAttributes[name2];
       for (let i = 0, l2 = array.length; i < l2; i++) {
         attributes.update(array[i], gl2.ARRAY_BUFFER);
       }
@@ -24723,13 +25529,13 @@ class WebGLUniforms {
       parseUniform(info, addr, this);
     }
   }
-  setValue(gl2, name, value, textures) {
-    const u2 = this.map[name];
+  setValue(gl2, name2, value, textures) {
+    const u2 = this.map[name2];
     if (u2 !== void 0) u2.setValue(gl2, value, textures);
   }
-  setOptional(gl2, object, name) {
-    const v2 = object[name];
-    if (v2 !== void 0) this.setValue(gl2, name, v2);
+  setOptional(gl2, object, name2) {
+    const v2 = object[name2];
+    if (v2 !== void 0) this.setValue(gl2, name2, v2);
   }
   static upload(gl2, seq, values, textures) {
     for (let i = 0, n2 = seq.length; i !== n2; ++i) {
@@ -24858,10 +25664,10 @@ function generateVertexExtensions(parameters) {
 }
 function generateDefines(defines) {
   const chunks = [];
-  for (const name in defines) {
-    const value = defines[name];
+  for (const name2 in defines) {
+    const value = defines[name2];
     if (value === false) continue;
-    chunks.push("#define " + name + " " + value);
+    chunks.push("#define " + name2 + " " + value);
   }
   return chunks.join("\n");
 }
@@ -24870,14 +25676,14 @@ function fetchAttributeLocations(gl2, program) {
   const n2 = gl2.getProgramParameter(program, gl2.ACTIVE_ATTRIBUTES);
   for (let i = 0; i < n2; i++) {
     const info = gl2.getActiveAttrib(program, i);
-    const name = info.name;
+    const name2 = info.name;
     let locationSize = 1;
     if (info.type === gl2.FLOAT_MAT2) locationSize = 2;
     if (info.type === gl2.FLOAT_MAT3) locationSize = 3;
     if (info.type === gl2.FLOAT_MAT4) locationSize = 4;
-    attributes[name] = {
+    attributes[name2] = {
       type: info.type,
-      location: gl2.getAttribLocation(program, name),
+      location: gl2.getAttribLocation(program, name2),
       locationSize
     };
   }
@@ -25699,9 +26505,9 @@ function WebGLPrograms(renderer, cubemaps, cubeuvmaps, extensions, capabilities,
       array.push(parameters.customFragmentShaderID);
     }
     if (parameters.defines !== void 0) {
-      for (const name in parameters.defines) {
-        array.push(name);
-        array.push(parameters.defines[name]);
+      for (const name2 in parameters.defines) {
+        array.push(name2);
+        array.push(parameters.defines[name2]);
       }
     }
     if (parameters.isRawShaderMaterial === false) {
@@ -31673,9 +32479,9 @@ class Line extends Object3D {
         this.morphTargetInfluences = [];
         this.morphTargetDictionary = {};
         for (let m2 = 0, ml2 = morphAttribute.length; m2 < ml2; m2++) {
-          const name = morphAttribute[m2].name || String(m2);
+          const name2 = morphAttribute[m2].name || String(m2);
           this.morphTargetInfluences.push(0);
-          this.morphTargetDictionary[name] = m2;
+          this.morphTargetDictionary[name2] = m2;
         }
       }
     }
@@ -31814,9 +32620,9 @@ class Points extends Object3D {
         this.morphTargetInfluences = [];
         this.morphTargetDictionary = {};
         for (let m2 = 0, ml2 = morphAttribute.length; m2 < ml2; m2++) {
-          const name = morphAttribute[m2].name || String(m2);
+          const name2 = morphAttribute[m2].name || String(m2);
           this.morphTargetInfluences.push(0);
-          this.morphTargetDictionary[name] = m2;
+          this.morphTargetDictionary[name2] = m2;
         }
       }
     }
@@ -33952,18 +34758,18 @@ Common.extend(
       dom.unbind(window, "keydown", GUI._keydownHandler, false);
       removeListeners(this);
     },
-    addFolder: function addFolder(name) {
-      if (this.__folders[name] !== void 0) {
-        throw new Error('You already have a folder in this GUI by the name "' + name + '"');
+    addFolder: function addFolder(name2) {
+      if (this.__folders[name2] !== void 0) {
+        throw new Error('You already have a folder in this GUI by the name "' + name2 + '"');
       }
-      var newGuiParams = { name, parent: this };
+      var newGuiParams = { name: name2, parent: this };
       newGuiParams.autoPlace = this.autoPlace;
-      if (this.load && this.load.folders && this.load.folders[name]) {
-        newGuiParams.closed = this.load.folders[name].closed;
-        newGuiParams.load = this.load.folders[name];
+      if (this.load && this.load.folders && this.load.folders[name2]) {
+        newGuiParams.closed = this.load.folders[name2].closed;
+        newGuiParams.load = this.load.folders[name2];
       }
       var gui = new GUI(newGuiParams);
-      this.__folders[name] = gui;
+      this.__folders[name2] = gui;
       var li2 = addRow(this, gui.domElement);
       dom.addClass(li2, "folder");
       return gui;
@@ -34171,7 +34977,7 @@ function augmentController(gui, li2, controller) {
         });
       }
     },
-    name: function name(_name) {
+    name: function name2(_name) {
       controller.__li.firstElementChild.firstElementChild.innerHTML = _name;
       return controller;
     },
@@ -34291,11 +35097,11 @@ function _add(gui, object, property, params) {
   }
   recallSavedValue(gui, controller);
   dom.addClass(controller.domElement, "c");
-  var name = document.createElement("span");
-  dom.addClass(name, "property-name");
-  name.innerHTML = controller.property;
+  var name2 = document.createElement("span");
+  dom.addClass(name2, "property-name");
+  name2.innerHTML = controller.property;
   var container = document.createElement("div");
-  container.appendChild(name);
+  container.appendChild(name2);
   container.appendChild(controller.domElement);
   var li2 = addRow(gui, container, params.before);
   dom.addClass(li2, GUI.CLASS_CONTROLLER_ROW);
@@ -34311,10 +35117,10 @@ function _add(gui, object, property, params) {
 function getLocalStorageHash(gui, key) {
   return document.location.href + "." + key;
 }
-function addPresetOption(gui, name, setSelected) {
+function addPresetOption(gui, name2, setSelected) {
   var opt = document.createElement("option");
-  opt.innerHTML = name;
-  opt.value = name;
+  opt.innerHTML = name2;
+  opt.value = name2;
   gui.__preset_select.appendChild(opt);
   if (setSelected) {
     gui.__preset_select.selectedIndex = gui.__preset_select.length - 1;
@@ -34818,16 +35624,16 @@ window.addEventListener("load", function() {
   const myBuff = new BufferFactory();
   this.window.myBuff = myBuff;
   window.test = {};
-  const clock2 = new Clock();
-  window.clock = clock2;
-  clock2.fps = 0;
+  const clock = new Clock();
+  window.clock = clock;
+  clock.fps = 0;
   manager.addAnimationCallback(function renderS2() {
     myBuff.update();
-    frame.updateValue(clock2.getDelta());
+    frame.updateValue(clock.getDelta());
     frame.getFPS();
     renderer.render(scene, camera);
   });
-  class Averager {
+  class Averager2 {
     constructor(length) {
       this.length = length;
       this.value = new Array(length).fill(0.0167);
@@ -34850,7 +35656,7 @@ window.addEventListener("load", function() {
       return this.fps;
     }
   }
-  const frame = new Averager(120);
+  const frame = new Averager2(120);
   const radius = 200;
   {
     camera.position.set(radius / 4, radius / 2, radius / 2);
@@ -34880,841 +35686,4 @@ window.addEventListener("load", function() {
     LP.add(frame, "fps", 0, 120, 0.1).listen().name("FPS");
   }
 });
-window.addEventListener("load", function() {
-  const canvas_background = "black";
-  const canvas = document.getElementById("canvasS3");
-  const ctx = canvas.getContext("2d");
-  ctx.lineCap = "butt";
-  ctx.textAlign = "center";
-  class SortAlgorithm {
-    constructor() {
-      this.sortFunction = function() {
-      };
-      this.isSorting = false;
-      this.secondColumns = [];
-    }
-    start(name, columns) {
-      this.send(name + " is processing");
-      this.sortFunction = this[name];
-      this.timesEveryFrame = Math.ceil(columns.length / 25);
-      this.columns = columns;
-      this.secondColumns = [];
-      this.isSorting = true;
-      this[name + "Setting"](columns);
-    }
-    update(columns) {
-      if (!this.isSorting) return;
-      this.times = this.timesEveryFrame;
-      while (this.times--) {
-        const isStoping = this.sortFunction(columns);
-        if (isStoping === true) {
-          [this.isStoping, this.times] = [true, 0];
-          const message = this.sortFunction.name + " is done.";
-          this.send(message);
-        }
-      }
-      if (this.isStoping) {
-        this.isSorting = false;
-        this.isStoping = false;
-      }
-    }
-    send(message) {
-      const log = document.getElementById("sortLog").childNodes[0];
-      log.innerText = message;
-    }
-    // 記得要用 entries 製作迭代物件，改寫程式碼
-    static swapColumn(a, b, frame2) {
-      [a.path.pointX, b.path.pointX] = [b.path.pointX, a.path.pointX];
-      [a.path.pointY, b.path.pointY] = [b.path.pointY, a.path.pointY];
-      a.path.NewTarget(a.x, a.y, frame2);
-      b.path.NewTarget(b.x, b.y, frame2);
-      [a.height, b.height] = [b.height, a.height];
-    }
-    bubbleSortSetting(columns) {
-      this.i = 0;
-      this.j = 0;
-    }
-    // 備份
-    // bubbleSort(columns){
-    //     const len = columns.length;
-    //     const i = this.i;
-    //     const j = this.j;
-    //     if (i < len - 1) {
-    //         if (j < len - 1 - i) {
-    //             const a = columns[j];
-    //             const b = columns[j + 1];
-    //             if (a.height > b.height) SortAlgorithm.swapColumn(a, b, 30);
-    //             this.j++;
-    //         }
-    //         else{
-    //             this.j = 0;
-    //             this.i++;
-    //         }
-    //     }
-    //     else return true;
-    // }
-    bubbleSort(columns) {
-      const len = columns.length;
-      const i = this.i;
-      const j = this.j;
-      if (i == len - 1) return true;
-      if (j == len - 1 - i) {
-        this.j = 0;
-        this.i++;
-        return false;
-      }
-      const a = columns[j];
-      const b = columns[j + 1];
-      if (a.height > b.height) SortAlgorithm.swapColumn(a, b, 30);
-      this.j++;
-    }
-    selectionSortSetting() {
-      this.i = 0;
-      this.j = 1;
-      this.minIndex = 0;
-    }
-    // selectionSort(columns){
-    //     const len = columns.length;
-    //     const i = this.i;
-    //     const j = this.j;
-    //     if (i == len - 1) return true;
-    //     if (j < len) {
-    //         if (columns[this.minIndex].height > columns[j].height){
-    //             this.minIndex = j;
-    //         }
-    //         this.j++;
-    //     }
-    //     else{
-    //         if(i != this.minIndex){
-    //             const a = columns[i];
-    //             const b = columns[this.minIndex];
-    //             const frame = 60;
-    //             SortAlgorithm.swapColumn(a, b, frame);
-    //         }
-    //         this.i++;
-    //         this.minIndex = this.i;
-    //         this.j = this.i + 1;
-    //     }
-    // }
-    selectionSort(columns) {
-      const len = columns.length;
-      const i = this.i;
-      const j = this.j;
-      const min = this.minIndex;
-      if (i == len - 1) return true;
-      if (j == len) {
-        this.i++;
-        this.minIndex = this.i;
-        this.j = this.i + 1;
-        if (i == this.minIndex) return false;
-        const a = columns[i];
-        const b = columns[min];
-        const frame2 = 60;
-        SortAlgorithm.swapColumn(a, b, frame2);
-        return false;
-      }
-      if (columns[this.minIndex].height > columns[j].height) this.minIndex = j;
-      this.j++;
-    }
-    insertionSortSetting(columns) {
-      this.i = 1;
-      this.key = columns[1].height;
-      this.j = 0;
-    }
-    insertionSort(columns) {
-      const len = columns.length;
-      const i = this.i;
-      const j = this.j;
-      if (i < len) {
-        if (j >= 0 && columns[j].height > columns[j + 1].height) {
-          const a = columns[j + 1];
-          const b = columns[j];
-          const frame2 = 30 + Math.ceil((this.timesEveryFrame - this.times) * 20 / this.timesEveryFrame);
-          SortAlgorithm.swapColumn(a, b, frame2);
-          this.j--;
-        } else {
-          this.i++;
-          if (this.i >= len) return true;
-          this.j = this.i - 1;
-        }
-      } else return true;
-    }
-    quickSortSetting(columns) {
-      this.stack = [{ "left": 0, "right": columns.length - 1 }];
-      this.partitionPhase = "0.SetPivot";
-      this.pivot = Math.floor(columns.length - 1);
-      this.j = 0;
-    }
-    quickSort(columns) {
-      const len = this.stack.length;
-      const { left, right } = this.stack[len - 1];
-      const pivot = this.pivot;
-      const frame2 = 60;
-      switch (this.partitionPhase) {
-        case "0.SetPivot":
-          const a = columns[Math.floor((left + right) / 2)];
-          const b = columns[right];
-          SortAlgorithm.swapColumn(a, b, frame2);
-          this.leftBound = left;
-          this.rightBound = right - 1;
-          this.pivot = right;
-          this.partitionPhase = "1.FindLeftBound";
-          this.j = 0;
-          break;
-        case "1.FindLeftBound":
-          if (columns[this.leftBound + this.j].height >= columns[pivot].height) {
-            this.leftBound = this.leftBound + this.j;
-            this.partitionPhase = "2.FindRightBound";
-            this.j = 0;
-            break;
-          }
-          this.j++;
-          break;
-        case "2.FindRightBound":
-          if (columns[pivot].height >= columns[this.rightBound - this.j].height || this.rightBound - this.j <= this.leftBound) {
-            this.rightBound = this.rightBound - this.j;
-            this.partitionPhase = "3.SwapBoth";
-            break;
-          }
-          this.j++;
-          break;
-        case "3.SwapBoth":
-          if (this.leftBound < this.rightBound) {
-            const a2 = columns[this.leftBound];
-            const b2 = columns[this.rightBound];
-            SortAlgorithm.swapColumn(a2, b2, frame2);
-            this.partitionPhase = "1.FindLeftBound";
-            this.j = 0;
-            this.leftBound++;
-            this.rightBound--;
-          } else {
-            const a2 = columns[this.leftBound];
-            const b2 = columns[pivot];
-            SortAlgorithm.swapColumn(a2, b2, frame2);
-            this.partitionPhase = "4.EndPartition";
-            this.pivot = this.leftBound;
-          }
-          break;
-        case "4.EndPartition":
-          this.stack.pop();
-          if (left < pivot - 1) this.stack.push({ "left": left, "right": pivot - 1 });
-          if (pivot + 1 < right) this.stack.push({ "left": pivot + 1, "right": right });
-          if (this.stack.length == 0) return true;
-          this.partitionPhase = "0.SetPivot";
-          break;
-      }
-    }
-    mergeSortSetting(columns) {
-      this.stack = [[], []];
-      this.stack[0][0] = { "left": 0, "right": columns.length - 1 };
-      this.mergePhase = "0.Split";
-      this.i = 0;
-      this.j = 0;
-    }
-    mergeSort(columns) {
-      const len0 = this.stack[0].length;
-      const len1 = this.stack[1].length;
-      const { min, mid, max } = this.stack[1][len1 - 1] ? this.stack[1][len1 - 1] : {};
-      const i = this.i;
-      const j = mid - min + this.j;
-      const col = this.secondColumns.slice(min, max + 1);
-      const frame2 = Math.min(30 + Math.floor((max - j + mid - i) / (len0 + len1)), 90);
-      switch (this.mergePhase) {
-        case "0.Split":
-          if (len0 == 0) {
-            this.mergePhase = "1.Copy";
-            this.timesEveryFrame = 1;
-            this.secondColumns = JSON.parse(JSON.stringify(columns.slice(0, columns.length + 1)));
-            this.secondColumns.forEach((column, index) => {
-              column.path = new Path(column.x, column.y);
-              column.path.NewTarget(column.x, column.y - canvas.height * 0.4, 20);
-              column.width /= 3;
-            });
-            return;
-          }
-          const { left, right } = this.stack[0][len0 - 1];
-          const middle = Math.ceil((left + right) / 2);
-          this.stack[0].pop();
-          if (left != right) {
-            this.stack[0].push({ "left": left, "right": middle - 1 });
-            this.stack[0].push({ "left": middle, "right": right });
-            this.stack[1].push({ "min": left, "mid": middle, "max": right });
-          }
-          break;
-        case "1.Copy":
-          if (len1 == 0) {
-            return true;
-          }
-          col.forEach((column, index) => {
-            column.height = columns[min + index].height;
-            column.width = columns[min + index].width / 2;
-            column.path.NewTarget(column.x, column.y - canvas.height * 0.4, 20);
-          });
-          this.mergePhase = "2.Merge";
-          break;
-        case "2.Merge":
-          if (col[i].height > col[j].height) {
-            const a = col[j];
-            const b = columns[min + this.i + this.j];
-            SortAlgorithm.swapColumn(a, b, frame2);
-            a.height = 0;
-            this.j++;
-            if (this.j > max - mid) {
-              this.mergePhase = "3.MergeLeft";
-            }
-          } else {
-            const a = col[i];
-            const b = columns[min + this.i + this.j];
-            SortAlgorithm.swapColumn(a, b, frame2);
-            a.height = 0;
-            this.i++;
-            if (this.i > mid - min) {
-              this.i--;
-              this.j++;
-            }
-            if (this.i >= mid - min) {
-              this.mergePhase = "4.MergeRight";
-            }
-          }
-          break;
-        case "3.MergeLeft":
-          if (i >= mid - min) {
-            this.i = 0;
-            this.j = 0;
-            this.stack[1].pop();
-            if (this.stack[1].length == 0) {
-              this.isStoping = true;
-              return;
-            }
-            this.mergePhase = "1.Copy";
-            col.forEach((column, index) => {
-              column.height = columns[min + index].height;
-              column.path.NewTarget(column.x, column.y - canvas.height * 0.4, 20);
-              column.width /= 3;
-            });
-          } else {
-            const a = col[i];
-            const b = columns[min + this.i + this.j];
-            SortAlgorithm.swapColumn(a, b, frame2);
-            a.height = 0;
-            this.i++;
-          }
-          break;
-        case "4.MergeRight":
-          if (j > max - min) {
-            this.i = 0;
-            this.j = 0;
-            this.stack[1].pop();
-            if (this.stack[1].length == 0) {
-              this.isStoping = true;
-              return;
-            }
-            this.mergePhase = "1.Copy";
-            col.forEach((column, index) => {
-              column.height = columns[min + index].height;
-              column.path.NewTarget(column.x, column.y - 400, 20);
-              column.width /= 3;
-            });
-          } else {
-            const a = col[j];
-            const b = columns[min + this.i + this.j];
-            SortAlgorithm.swapColumn(a, b, frame2);
-            a.height = 0;
-            this.j++;
-          }
-          break;
-      }
-    }
-    static heapify(columns, len, i) {
-      let largest = i;
-      const left = 2 * i + 1;
-      const right = 2 * i + 2;
-      if (left < len && columns[left].height > columns[largest].height) {
-        largest = left;
-      }
-      if (right < len && columns[right].height > columns[largest].height) {
-        largest = right;
-      }
-      if (largest !== i) {
-        const a = columns[i];
-        const b = columns[largest];
-        SortAlgorithm.swapColumn(a, b, 60);
-        return largest;
-      }
-      return -1;
-    }
-    heapSortSetting(columns) {
-      this.i = Math.floor(columns.length / 2) - 1;
-      this.j = this.i;
-      this.heapPhase = "1.build";
-    }
-    heapSort(columns) {
-      const len = columns.length;
-      const i = this.i;
-      const j = this.j;
-      switch (this.heapPhase) {
-        case "1.build":
-          this.j = SortAlgorithm.heapify(columns, len, j);
-          if (this.j == -1) {
-            this.i--;
-            this.j = this.i;
-            if (this.i < 0) {
-              this.i = len - 1;
-              this.j = 0;
-              this.heapPhase = "2.swap";
-            }
-          }
-          break;
-        case "2.swap":
-          const a = columns[0];
-          const b = columns[i];
-          SortAlgorithm.swapColumn(a, b, 60);
-          this.heapPhase = "3.sort";
-          break;
-        case "3.sort":
-          this.j = SortAlgorithm.heapify(columns, i, j);
-          if (this.j == -1) {
-            this.j = 0;
-            this.i--;
-            this.heapPhase = "2.swap";
-            if (this.i < 0) return true;
-          }
-          break;
-      }
-    }
-    shellSortSetting(columns) {
-      this.gap = Math.floor(columns.length / 2);
-      this.i = this.gap;
-      this.j = this.i;
-    }
-    shellSort(columns) {
-      const len = columns.length;
-      const gap = this.gap;
-      const i = this.i;
-      const j = this.j;
-      if (gap > 0) {
-        if (i < len) {
-          if (j >= gap && columns[j - gap].height > columns[j].height) {
-            const a = columns[j];
-            const b = columns[j - gap];
-            ParticleSystem.swapColumn(a, b, 60);
-            this.j -= gap;
-          } else {
-            this.i++;
-            this.j = this.i;
-          }
-        } else {
-          this.gap = Math.floor(gap / 2);
-          this.i = this.gap;
-          this.j = this.i;
-        }
-      } else return;
-    }
-    countingSortSetting(columns) {
-      const heights = columns.map((column) => {
-        return column.height;
-      });
-      this.maxValue = Math.max(...heights);
-      this.count = new Array(Math.floor(this.maxValue)).fill(0);
-      this.secondColumns = new Array(columns.length);
-      this.i = 0;
-      this.countingPhase = "1.count";
-    }
-    countingSort(columns) {
-      const len = columns.length;
-      const i = this.i;
-      switch (this.countingPhase) {
-        case "1.count":
-          this.count[Math.round(columns[i].height)]++;
-          this.i++;
-          if (this.i >= len) {
-            this.i = 1;
-            this.countingPhase = "2.sum";
-          }
-          break;
-        case "2.sum":
-          this.count[i] += this.count[i - 1];
-          this.i++;
-          if (this.i > this.maxValue) {
-            this.i = len - 1;
-            this.countingPhase = "3.build";
-            this.timesEveryFrame = 1;
-          }
-          break;
-        case "3.build":
-          const index = this.count[Math.round(columns[i].height) - 1];
-          this.secondColumns[index] = JSON.parse(JSON.stringify(columns[i]));
-          this.secondColumns[index].y = columns[i].y - canvas.height * 0.4;
-          this.secondColumns[index].width /= 2;
-          this.secondColumns[index].path = new Path(columns[i].x, columns[i].y);
-          this.secondColumns[index].path.NewTarget(columns[index].x, columns[i].y - 400, 60 + Math.round(i / len * 60));
-          this.count[columns[i]]--;
-          this.i--;
-          if (this.i < 0) {
-            this.i = 0;
-            this.countingPhase = "4.output";
-          }
-          break;
-        case "4.output":
-          const a = this.secondColumns[i];
-          const b = columns[i];
-          SortAlgorithm.swapColumn(a, b, 30 + Math.round(i / len * 60));
-          a.height = 0;
-          this.i++;
-          if (this.i >= len) return true;
-          break;
-      }
-    }
-    randomSortSetting() {
-      this.i = 0;
-      this.j = 0;
-      this.timesEveryFrame = 1;
-    }
-    randomSort(columns) {
-      const len = columns.length;
-      const i = this.i;
-      const j = this.j;
-      if (i >= len) return true;
-      if (j >= len) {
-        this.i = this.i * this.i + 1;
-        this.j = i;
-        return false;
-      }
-      const a = columns[j];
-      const b = columns[(j * j + 1) % len];
-      SortAlgorithm.swapColumn(a, b, 60 - this.timesEveryFrame * 2);
-      this.j = this.i + this.j + 1;
-    }
-    instantRandomSortSetting() {
-      this.i = 0;
-      this.j = 0;
-      this.timesEveryFrame = 30;
-    }
-    instantRandomSort(columns) {
-      return this.randomSort(columns);
-    }
-  }
-  class ParticleSystem {
-    constructor(x2 = canvas.width / 2, y2 = canvas.height / 2) {
-      this.sort = new SortAlgorithm();
-      this.x = x2;
-      this.y = y2;
-      this.slow = 0.999;
-      this.friction = 0.997;
-      this.isSorting = false;
-      this.isStoping = false;
-      this.i = 0;
-      this.j = 0;
-      this.sortFunction = function nothingHere() {
-      };
-      this.maxValue = canvas.height * 0.4;
-      const length = Math.floor(x2 - 200);
-      const width = Math.max(Math.floor(x2 * 2 / length), 0.5);
-      this.columns = new Array(length).fill().map((v2, i) => {
-        return this.createColumn(x2 - width * length / 2 + width * i, y2 * 1.8, width, (i + 1) / length * this.maxValue);
-      });
-      this.secondColumns = [];
-      this.walls = new Array(5).fill().map((v2, i) => {
-        return this.createWall("arc", x2, y2 - x2 / 2, canvas.width / 2 / 25 * (1 + i * i), 3, 0 + Math.PI / 16 * (4 - i), Math.PI / 16 * (12 + i), Math.PI / 15 * i, canvas.width / 2 / 25);
-      });
-      const ballLen = Math.min(length * 2, 500);
-      const ballSize = 2 + Math.floor(width / 3);
-      this.balls = new Array(ballLen).fill().map((v2, i) => {
-        const r2 = Math.pow(Math.random(), 0.6) * canvas.width / 4;
-        const theta = Math.random() * 2 * Math.PI;
-        return this.createBall(x2 + r2 * Math.cos(theta), 0.5 * y2 + r2 * Math.sin(theta), ballSize);
-      });
-      this.rects = [
-        { "left": 0, "top": 0, "right": x2 * 2, "bottom": 10 },
-        { "left": 0, "top": y2 * 2 - 10, "right": x2 * 2, "bottom": y2 * 2 },
-        { "left": 0, "top": 0, "right": 10, "bottom": y2 * 2 },
-        { "left": x2 * 2 - 10, "top": 0, "right": x2 * 2, "bottom": y2 * 2 }
-      ];
-      const fontpx = Math.floor(this.x / 15);
-      this.texts = { "log": { "text": "Welcome to Sorting Algorithm animation", "fontpx": fontpx, "x": this.x, "y": this.y * 2 - fontpx * 1 } };
-    }
-    createColumn(x2, y2, width, height) {
-      const path = new Path(x2, y2);
-      const column = { x: x2, y: y2, width, height, path };
-      return column;
-    }
-    createWall(type = "arc", centerX, centerY, length, thick = 5, startAngle = 0, endAngle = 2 * Math.PI, period = 0, swing) {
-      if (!swing) swing = length / 20;
-      const x2 = centerX;
-      const y2 = centerY;
-      const wall = { type, centerX, centerY, x: x2, y: y2, thick, length, startAngle, endAngle, period, swing };
-      return wall;
-    }
-    createBall(x2 = this.x, y2 = this.y, r2 = 3) {
-      const vx = Math.random() * 100 - 50;
-      const vy = Math.random() * 100 - 50;
-      const ax = 0;
-      const ay = 9.8 * 10;
-      const ball = { x: x2, y: y2, r: r2, vx, vy, ax, ay };
-      return ball;
-    }
-    getDist(a, b) {
-      const x2 = a.x - b.x;
-      const y2 = a.y - b.y;
-      const dist = Math.sqrt(x2 * x2 + y2 * y2);
-      return dist;
-    }
-    isCollide(target, wall) {
-      if (wall.type == "arc") {
-        const x2 = target.x - wall.x;
-        const y2 = target.y - wall.y;
-        const dist = Math.sqrt(x2 * x2 + y2 * y2);
-        return dist + target.r >= wall.length - wall.thick && dist < wall.length + wall.thick ? dist : 0;
-      }
-      return 0;
-    }
-    handleBallCollision(ball, anotherBall, dist) {
-      const x2 = (ball.x + anotherBall.x) / 2;
-      const y2 = (ball.y + anotherBall.y) / 2;
-      ball.x = x2 + (ball.x - x2) / (dist / 2) * ball.r;
-      ball.y = y2 + (ball.y - y2) / (dist / 2) * ball.r;
-      anotherBall.x = x2 + (anotherBall.x - x2) / (dist / 2) * anotherBall.r;
-      anotherBall.y = y2 + (anotherBall.y - y2) / (dist / 2) * anotherBall.r;
-      const vx = (ball.vx - anotherBall.vx) / 2;
-      const vy = (ball.vy - anotherBall.vy) / 2;
-      const averageVx = (ball.vx + anotherBall.vx) / 2;
-      const averageVy = (ball.vy + anotherBall.vy) / 2;
-      const angle = Math.atan((ball.y - y2) / (ball.x - x2));
-      const vectorT = -vx * Math.sin(angle) + vy * Math.cos(angle);
-      const vectorN = -1 * (vx * Math.cos(angle) + vy * Math.sin(angle));
-      const relativeX = -vectorT * Math.sin(angle) + vectorN * Math.cos(angle);
-      const relativeY = vectorT * Math.cos(angle) + vectorN * Math.sin(angle);
-      ball.vx = (averageVx + relativeX) * this.friction;
-      ball.vy = (averageVy + relativeY) * this.friction;
-      anotherBall.vx = (averageVx - relativeX) * this.friction;
-      anotherBall.vy = (averageVy - relativeY) * this.friction;
-    }
-    handleWallCollision(ball, wall, dist) {
-      const x2 = wall.x + (ball.x - wall.x) / dist * wall.length;
-      const y2 = wall.y + (ball.y - wall.y) / dist * wall.length;
-      const atan = Math.atan((y2 - wall.y) / (x2 - wall.x));
-      const theta = atan > 0 ? atan : atan + Math.PI;
-      const quadrant = y2 > wall.y ? theta : theta + Math.PI;
-      if (quadrant > wall.endAngle || quadrant < wall.startAngle) return;
-      const isInside = dist <= wall.length ? 1 : -1;
-      ball.x = x2 + (ball.x - x2) / (wall.length - dist) * (ball.r + wall.thick) * isInside;
-      ball.y = y2 + (ball.y - y2) / (wall.length - dist) * (ball.r + wall.thick) * isInside;
-      const angle = Math.atan((ball.y - y2) / (ball.x - x2));
-      const vectorT = -ball.vx * Math.sin(angle) + ball.vy * Math.cos(angle);
-      const vectorN = -1 * (ball.vx * Math.cos(angle) + ball.vy * Math.sin(angle));
-      ball.vx = (-vectorT * Math.sin(angle) + vectorN * Math.cos(angle)) * this.friction;
-      ball.vy = (vectorT * Math.cos(angle) + vectorN * Math.sin(angle)) * this.friction;
-    }
-    handleColumnCollision(ball, column) {
-      const columnTop = column.path.pointY - column.height;
-      const columnBottom = column.path.pointY;
-      const columnLeft = column.path.pointX - column.width / 2;
-      const columnRight = column.path.pointX + column.width / 2;
-      if (ball.x + ball.r > columnLeft && ball.x - ball.r < columnRight && ball.y + ball.r > columnTop && ball.y - ball.r < columnBottom) {
-        const overlapX = Math.min(ball.x + ball.r - columnLeft, columnRight - ball.x + ball.r);
-        const overlapY = Math.min(ball.y + ball.r - columnTop, columnBottom - ball.y + ball.r);
-        if (overlapX < overlapY) {
-          ball.vx = -ball.vx * this.friction;
-          if (ball.x < column.path.pointX) {
-            ball.x = columnLeft - ball.r;
-          } else {
-            ball.x = columnRight + ball.r;
-          }
-        } else {
-          ball.vy = -ball.vy * this.friction;
-          if (ball.y < column.path.pointY) {
-            ball.y = columnTop - ball.r;
-          } else {
-            ball.y = columnBottom + ball.r;
-          }
-        }
-      }
-    }
-    handleRectCollision(ball, rect) {
-      if (ball.x + ball.r > rect.left && ball.x - ball.r < rect.right && ball.y + ball.r > rect.top && ball.y - ball.r < rect.bottom) {
-        const overlapX = Math.min(ball.x + ball.r - rect.left, rect.right - ball.x + ball.r);
-        const overlapY = Math.min(ball.y + ball.r - rect.top, rect.bottom - ball.y + ball.r);
-        if (overlapX < overlapY) {
-          ball.vx = -ball.vx * this.friction;
-          if (ball.x < (rect.left + rect.right) / 2) {
-            ball.x = rect.left - ball.r;
-          } else {
-            ball.x = rect.right + ball.r;
-          }
-        } else {
-          ball.vy = -ball.vy * this.friction;
-          if (ball.y < (rect.top + rect.bottom) / 2) {
-            ball.y = rect.top - ball.r;
-          } else {
-            ball.y = rect.bottom + ball.r;
-          }
-        }
-      }
-    }
-    static swapColumn(a, b, frame2) {
-      [a.path.pointX, b.path.pointX] = [b.path.pointX, a.path.pointX];
-      [a.path.pointY, b.path.pointY] = [b.path.pointY, a.path.pointY];
-      a.path.NewTarget(a.x, a.y, frame2);
-      b.path.NewTarget(b.x, b.y, frame2);
-      [a.height, b.height] = [b.height, a.height];
-    }
-    update() {
-      const log = document.getElementById("sortLog").childNodes[0];
-      this.texts.log.text = log.innerText;
-      this.columns.forEach((column) => {
-        if (column.path != void 0) {
-          if (column.path.__proto__.constructor.name == "Path") {
-            column.path.NextFrame();
-          }
-        }
-      });
-      this.sort.secondColumns.forEach((column, index) => {
-        if (column.path == void 0) return;
-        const funcitonName = column.path.__proto__.constructor.name;
-        if (funcitonName != "Path") return console.warn("the path of columns[ " + index + " ] was never constructed by Path");
-        column.path.NextFrame();
-      });
-      this.walls.forEach((wall) => {
-        wall.period += 0.25 * 2 * Math.PI / 60;
-        wall.x = wall.centerX + wall.swing * Math.cos(wall.period);
-        wall.y = wall.centerY + wall.swing * Math.sin(wall.period);
-      });
-      this.balls.forEach((ball) => {
-        ball.x = ball.x + ball.vx / 60;
-        ball.y = ball.y + ball.vy / 60;
-        ball.vx = (ball.vx + ball.ax / 60) * this.slow;
-        ball.vy = (ball.vy + ball.ay / 60) * this.slow;
-        this.balls.forEach((anotherBall, index2) => {
-          if (ball == anotherBall) return;
-          const dist = this.getDist(ball, anotherBall);
-          if (dist < ball.r + anotherBall.r) {
-            this.handleBallCollision(ball, anotherBall, dist);
-          }
-        });
-        this.walls.forEach((wall) => {
-          const dist = this.isCollide(ball, wall);
-          if (dist > 0) {
-            this.handleWallCollision(ball, wall, dist);
-          }
-        });
-        this.columns.forEach((column) => {
-          this.handleColumnCollision(ball, column);
-        });
-        this.sort.secondColumns.forEach((column) => {
-          this.handleColumnCollision(ball, column);
-        });
-        this.rects.forEach((rect) => {
-          this.handleRectCollision(ball, rect);
-        });
-      });
-    }
-    draw() {
-      this.walls.forEach((wall) => {
-        ctx.beginPath();
-        ctx.arc(wall.x, wall.y, wall.length, wall.startAngle, wall.endAngle, false);
-        ctx.strokeStyle = "rgba(40, 60, 80, 1)";
-        ctx.lineWidth = wall.thick * 2;
-        ctx.stroke();
-      });
-      function drawColumn(column) {
-        ctx.beginPath();
-        ctx.moveTo(column.path.pointX, column.path.pointY);
-        ctx.lineTo(column.path.pointX, column.path.pointY - column.height);
-        const c = column.height / canvas.height * 2;
-        const r2 = 246 + c * (195 - 246);
-        const g = 211 + c * (160 - 211);
-        const b = 101 + c * (133 - 101);
-        ctx.strokeStyle = "rgba(" + r2 + "," + g + "," + b + ",1)";
-        ctx.lineWidth = column.width;
-        ctx.stroke();
-      }
-      this.columns.forEach((column) => {
-        drawColumn(column);
-      });
-      if (this.sort.secondColumns)
-        this.sort.secondColumns.forEach((column) => {
-          drawColumn(column);
-        });
-      this.balls.forEach((ball) => {
-        ctx.beginPath();
-        ctx.arc(ball.x, ball.y, ball.r, 0, 2 * Math.PI, false);
-        ctx.fillStyle = "#FFFFFF";
-        ctx.fill();
-      });
-      Object.keys(this.texts).forEach((key) => {
-        const text = this.texts[key];
-        ctx.beginPath();
-        ctx.fillStyle = "#FFFFFF";
-        ctx.font = text.fontpx + "px IBM Plex Sans";
-        ctx.fillText(text.text, text.x, text.y);
-      });
-    }
-  }
-  const system = new ParticleSystem();
-  const buttons = document.getElementById("sortAlgorithm").getElementsByTagName("button");
-  Object.keys(buttons).forEach((key) => {
-    const button = buttons[key];
-    button.addEventListener("click", function() {
-      const name = system.sort.sortFunction.name;
-      if (button.id == "cancelSort") {
-        system.sort.isSorting = false;
-        system.sort.send(name + " is interrupted!");
-        return;
-      }
-      if (button.id == "stepByStep") {
-        system.sort.isSorting = true;
-        system.sort.isStoping = true;
-        system.sort.send(name + " is proceeding step by step. Click again!");
-        return;
-      }
-      if (!system.sort[button.id]) return;
-      system.sort.start(button.id, system.columns);
-    }, false);
-  });
-  document.getElementById("pathConfig").addEventListener("click", function() {
-    const linear = this.childNodes[1].value;
-    const easein = this.childNodes[3].value;
-    const easeout = this.childNodes[5].value;
-    PathConfig.setLeap(linear, easein, easeout);
-  });
-  {
-    let clearBoard3 = function() {
-      ctx.fillStyle = canvas_background;
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-    };
-    var clearBoard2 = clearBoard3;
-    manager.addAnimationCallback(function renderS3() {
-      clearBoard3();
-      system.sort.update(system.columns);
-      system.update();
-      system.draw();
-      frame.updateValue(clock.getDelta());
-      frame.getFPS();
-    });
-  }
-  class Averager {
-    constructor(length) {
-      this.length = length;
-      this.value = new Array(length).fill(0.0167);
-      this.index = 0;
-      this.average = 0.0167;
-      this.fps = 60;
-    }
-    updateValue(value) {
-      this.value[this.index] = value;
-      this.index = ++this.index >= this.length ? 0 : this.index;
-    }
-    getAverage() {
-      this.average = 1 / this.length * this.value.reduce((sum, value) => {
-        return sum + value;
-      });
-      return this.average;
-    }
-    getFPS() {
-      this.fps = 1 / this.getAverage();
-      return this.fps;
-    }
-  }
-  const frame = new Averager(60);
-});
-//# sourceMappingURL=index-BMijQuhH.js.map
+//# sourceMappingURL=index-DXc6-9gc.js.map
