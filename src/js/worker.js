@@ -7,12 +7,21 @@ self.onmessage = function handleMessageFromMain(msg) {
 	let w = msg.data.w;
 	let h = msg.data.h;
     switch(msg.data.name){
-        case "createOffscreenCanvas":
-            board = new OffscreenCanvas(w, h); // 你看不見我
-            board_ctx = board.getContext('2d');
+        case "transferControlToOffscreen":
+			board = msg.data.canvas;
+			board_ctx = board.getContext('2d');
+			painter.setPixel(board.width, board.height);
 			loadPaticleSystem();
             simulatior();
 			main();
+
+			break;
+        // case "createOffscreenCanvas":
+        //     board = new OffscreenCanvas(w, h); // 你看不見我
+        //     board_ctx = board.getContext('2d');
+		// 	loadPaticleSystem();
+        //     simulatior();
+		// 	main();
 		case "setOffscreen":
             board.width = w;
             board.height = h;
@@ -134,17 +143,18 @@ function createPainter(){
 
 // 繪圖系統-main
 function main() {
-	// clearBoard();
+	board.width = board.width;
+	board_ctx.translate(board.width * 0.25, 0);
 	// console.log(painter.works);
 	painter.works.forEach(obj => {painter.draw(obj);});
 	painter.works = [];
-	const bitmap = board.transferToImageBitmap();
-	self.postMessage({"name": "drawImage", "bitmap": bitmap});
+	// const bitmap = board.transferToImageBitmap();
+	// self.postMessage({"name": "drawImage", "bitmap": bitmap});
 	requestID.painter = requestAnimationFrame(main);
 }
 
 function clearBoard() {
-	board_ctx.fillStyle = 'rgba(255,255,255,0)';
+	board_ctx.fillStyle = 'black';
 	board_ctx.fillRect(0, 0, board.width, board.height);
 }
 

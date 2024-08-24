@@ -10,31 +10,36 @@ const createLokaVolterra = function(){
 		this.canvas = canvas;
 		this.ctx = this.canvas.getContext("2d");
 		this.bitmap = bitmap;
-		const bitmapCtx = this.bitmap.getContext("bitmaprenderer");
+		// const bitmapCtx = this.bitmap.getContext("bitmaprenderer");
 
-		// worker介面
-		myWorker.addEventListener("message", function handleMessageFromWorker(msg) {
-			switch(msg.data.name){
-				case "drawImage":
-					bitmapCtx.transferFromImageBitmap(msg.data.bitmap);
-				break;
-				case "error":
-					// console.log(msg.data);
-				break;
-				default:
-				console.log("invalid message received!");
-			}
-		});
+		const offscreen = bitmap.transferControlToOffscreen();
 		myWorker.postMessage({
-			"name": "createOffscreenCanvas",
-			"w": bitmap.width,
-			"h": bitmap.height
-		});
+			"name": "transferControlToOffscreen",
+			"canvas": offscreen,
+		}, [offscreen]);
+		// worker介面
+		// myWorker.addEventListener("message", function handleMessageFromWorker(msg) {
+		// 	switch(msg.data.name){
+		// 		case "drawImage":
+		// 			bitmapCtx.transferFromImageBitmap(msg.data.bitmap);
+		// 		break;
+		// 		case "error":
+		// 			// console.log(msg.data);
+		// 		break;
+		// 		default:
+		// 		console.log("invalid message received!");
+		// 	}
+		// });
+		// myWorker.postMessage({
+		// 	"name": "createOffscreenCanvas",
+		// 	"w": bitmap.width,
+		// 	"h": bitmap.height
+		// });
 		window.addEventListener("resize", function(){
 			myWorker.postMessage({
 				"name": "setOffscreen",
-				"w": bitmap.width,
-				"h": bitmap.height
+				"w": canvas.width,
+				"h": canvas.height
 			});
 		}, false);
 	}

@@ -7,20 +7,19 @@ import CookieTable from './CookieTable.jsx';
 import downloadMedia from '../js/downloadMedia.js';
 import manager from '../js/animateManager.js';
 import { Path, PathConfig } from "../js/path.js";
-// import {updateS1, renderS1} from '../js/lokaVolterra.js';
 
 function Playground({margin}){
-    
+    const breakpoint = 992 - margin * 2;
     const [width, height] = useWindowSize(margin);
-    const [ratio, setRatio] = useState(width > 992 ? 1 : 2);
+    const [ratio, setRatio] = useState((width > breakpoint) ? 1 : 2);
     const [max, setMax] = useState(getMax(width, height));
     useEffect(()=>{
-        setRatio(width > 992 ? 1 : 2)
+        setRatio((width > breakpoint) ? 1 : 2)
         setMax(getMax(width, height));
     }, [width]);
 
     function getMax(w, h){
-        if(w > 992) return (w < h ? w : h);
+        if(w > breakpoint) return (w < h ? w : h);
         else return (w*2 < h ? w : h/2);
     }
 
@@ -79,10 +78,10 @@ function Playground({margin}){
             style={{"width": max + "px",
                      "height": window.innerWidth<992 ? max*2 : max + "px",
                      "margin": margin +"px auto"}}>
-            <CanvasSectionS3 section={sections[2]} canvas={canvas.S3} ratio={ratio} max={max} status={status} handleClick={handleRecord} manager={manager} myMouse={myMouse}/>
-
             <CanvasSectionS1 section={sections[0]} canvas={canvas.S1} ratio={ratio} max={max} status={status} handleClick={handleRecord} manager={manager} myMouse={myMouse}/>
             <CanvasSectionS2 section={sections[1]} canvas={canvas.S2} audio={audio} ratio={ratio} max={max} status={status} handleClick={handleRecord} manager={manager} myMouse={myMouse}/>
+            <CanvasSectionS3 section={sections[2]} canvas={canvas.S3} ratio={ratio} max={max} status={status} handleClick={handleRecord} manager={manager} myMouse={myMouse}/>
+
             <CookieTable></CookieTable>
         </div>
     )
