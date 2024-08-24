@@ -8,12 +8,14 @@
     let w = msg.data.w;
     let h = msg.data.h;
     switch (msg.data.name) {
-      case "createOffscreenCanvas":
-        board = new OffscreenCanvas(w, h);
+      case "transferControlToOffscreen":
+        board = msg.data.canvas;
         board_ctx = board.getContext("2d");
+        painter.setPixel(board.width, board.height);
         loadPaticleSystem();
         simulatior();
         main();
+        break;
       case "setOffscreen":
         board.width = w;
         board.height = h;
@@ -133,12 +135,12 @@
     };
   }
   function main() {
+    board.width = board.width;
+    board_ctx.translate(board.width * 0.25, 0);
     painter.works.forEach((obj) => {
       painter.draw(obj);
     });
     painter.works = [];
-    const bitmap = board.transferToImageBitmap();
-    self.postMessage({ "name": "drawImage", "bitmap": bitmap });
     requestID.painter = requestAnimationFrame(main);
   }
   let transitionRadian = 0;
@@ -389,4 +391,4 @@
     painter.works.push(circle, crescent1, crescent2, crescent3, text1, text2, text3);
   }
 })();
-//# sourceMappingURL=worker-z9YZT4ad.js.map
+//# sourceMappingURL=worker-ZI55oAdN.js.map

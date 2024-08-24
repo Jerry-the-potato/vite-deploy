@@ -7053,7 +7053,7 @@ function useWindowSize(margin) {
 }
 function WorkerWrapper(options) {
   return new Worker(
-    "/vite-deploy/assets/worker-z9YZT4ad.js",
+    "/vite-deploy/assets/worker-ZI55oAdN.js",
     {
       name: options == null ? void 0 : options.name
     }
@@ -7444,28 +7444,16 @@ const createLokaVolterra = function() {
     this.canvas = canvas;
     this.ctx = this.canvas.getContext("2d");
     this.bitmap = bitmap;
-    const bitmapCtx = this.bitmap.getContext("bitmaprenderer");
-    myWorker.addEventListener("message", function handleMessageFromWorker(msg) {
-      switch (msg.data.name) {
-        case "drawImage":
-          bitmapCtx.transferFromImageBitmap(msg.data.bitmap);
-          break;
-        case "error":
-          break;
-        default:
-          console.log("invalid message received!");
-      }
-    });
+    const offscreen = bitmap.transferControlToOffscreen();
     myWorker.postMessage({
-      "name": "createOffscreenCanvas",
-      "w": bitmap.width,
-      "h": bitmap.height
-    });
+      "name": "transferControlToOffscreen",
+      "canvas": offscreen
+    }, [offscreen]);
     window.addEventListener("resize", function() {
       myWorker.postMessage({
         "name": "setOffscreen",
-        "w": bitmap.width,
-        "h": bitmap.height
+        "w": canvas.width,
+        "h": canvas.height
       });
     }, false);
   };
@@ -14300,15 +14288,16 @@ const managerMaker = function() {
 };
 const manager$1 = new managerMaker();
 function Playground({ margin }) {
+  const breakpoint = 992 - margin * 2;
   const [width, height] = useWindowSize(margin);
-  const [ratio, setRatio] = reactExports.useState(width > 992 ? 1 : 2);
+  const [ratio, setRatio] = reactExports.useState(width > breakpoint ? 1 : 2);
   const [max, setMax] = reactExports.useState(getMax(width, height));
   reactExports.useEffect(() => {
-    setRatio(width > 992 ? 1 : 2);
+    setRatio(width > breakpoint ? 1 : 2);
     setMax(getMax(width, height));
   }, [width]);
   function getMax(w2, h) {
-    if (w2 > 992) return w2 < h ? w2 : h;
+    if (w2 > breakpoint) return w2 < h ? w2 : h;
     else return w2 * 2 < h ? w2 : h / 2;
   }
   const sections = [reactExports.useRef(), reactExports.useRef(), reactExports.useRef()];
@@ -14372,9 +14361,9 @@ function Playground({ margin }) {
         "margin": margin + "px auto"
       },
       children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(CanvasSectionS3, { section: sections[2], canvas: canvas.S3, ratio, max, status, handleClick: handleRecord, manager: manager$1, myMouse }),
         /* @__PURE__ */ jsxRuntimeExports.jsx(CanvasSectionS1, { section: sections[0], canvas: canvas.S1, ratio, max, status, handleClick: handleRecord, manager: manager$1, myMouse }),
         /* @__PURE__ */ jsxRuntimeExports.jsx(SectionS2, { section: sections[1], canvas: canvas.S2, audio, ratio, max, status, handleClick: handleRecord, manager: manager$1, myMouse }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(CanvasSectionS3, { section: sections[2], canvas: canvas.S3, ratio, max, status, handleClick: handleRecord, manager: manager$1, myMouse }),
         /* @__PURE__ */ jsxRuntimeExports.jsx(CookieTable, {})
       ]
     }
@@ -35686,4 +35675,4 @@ window.addEventListener("load", function() {
     LP.add(frame, "fps", 0, 120, 0.1).listen().name("FPS");
   }
 });
-//# sourceMappingURL=index-DXc6-9gc.js.map
+//# sourceMappingURL=index-C9Lc7tZq.js.map
