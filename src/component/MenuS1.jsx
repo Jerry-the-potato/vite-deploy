@@ -1,24 +1,8 @@
 import { useState, useEffect, useRef } from "react";
-import Input from "./Input";
+import SlideMenuBtn from "./SlideMenuBtn";
 
 export default function MenuS1({manager, lokaVolterra}){
     const menu = useRef();
-    
-    function handleSlideMenu(e){
-        const m = menu.current;
-        const b = e.target;
-		const rectMenu = m.getBoundingClientRect();
-		const rectButton = b.getBoundingClientRect();
-		const height = rectButton.y - rectMenu.y;
-		if(b.innerText == "△"){
-			m.style.top = "-" + height + "px";
-			b.innerText = "▽";
-		}
-		else{
-			m.style.top = "1%";
-			b.innerText = "△";
-		}
-	}
     const state = {
         "useMouse": useState(0),
         "isTransform": useState(0),
@@ -61,12 +45,12 @@ export default function MenuS1({manager, lokaVolterra}){
     return <div ref={menu} className="gamemenu">
                 <header id="header"><h3>Lotka Volterra 實驗場 + Web Woker</h3></header>
                 <div className="parameter">
-                    <label>Alpha<input onChange={handleCanvasControl} type="number" id="alpha" value={state.alpha[0]}></input></label>
-                    <label>Beta<input onChange={handleCanvasControl} type="number" id="beta" value={state.beta[0]}></input></label>
-                    <label>Gamma<input onChange={handleCanvasControl} type="number" id="gamma" value={state.gamma[0]}></input></label>
-                    <label>Delta<input onChange={handleCanvasControl} type="number" id="delta" value={state.delta[0]}></input></label>
-                    <label>Vector Size<input onChange={handleCanvasControl} type="number" id="dlength" value={state.dlength[0]}></input></label>
-                    <label>Transform Speed<input onChange={handleCanvasControl} type="number" id="speed" value={state.speed[0]}></input></label>
+                    <label>Alpha</label><input onChange={handleCanvasControl} type="number" id="alpha" value={state.alpha[0]}></input>
+                    <label>Beta</label><input onChange={handleCanvasControl} type="number" id="beta" value={state.beta[0]}></input>
+                    <label>Gamma</label><input onChange={handleCanvasControl} type="number" id="gamma" value={state.gamma[0]}></input>
+                    <label>Delta</label><input onChange={handleCanvasControl} type="number" id="delta" value={state.delta[0]}></input>
+                    <label>Vector Size</label><input onChange={handleCanvasControl} type="number" id="dlength" value={state.dlength[0]}></input>
+                    <label>Transform Speed</label><input onChange={handleCanvasControl} type="number" id="speed" value={state.speed[0]}></input>
                 </div>
                 <div className="controlpanel">
                     <label>★</label>
@@ -76,6 +60,6 @@ export default function MenuS1({manager, lokaVolterra}){
                     <button onClick={handlePauseWorker} id="pauseWorker">{isWorker ? "停止(右)" : "開始(右)"}</button>
                 </div>
                 <div id="dialogbox"><p id="dialog">∫此微分方程用於描述捕食者和獵物的此消彼長，沿著中心點呈現漩渦紋理</p></div>
-                <button onClick={handleSlideMenu} className="slideMenu">△</button>
+                <SlideMenuBtn menu={menu}></SlideMenuBtn>
             </div>
 }

@@ -1,57 +1,46 @@
-import { useEffect, useRef } from "react";
-import Input from "./Input";
-function MenuS3(){
+import { useEffect, useRef, useState } from "react";
+import physic from "../js/physic";
+import SlideMenuBtn from "./SlideMenuBtn";
+const CanvasSectionS3 = ({section, canvas, manager, ratio, max, status, handleClick}) => {
     const menu = useRef();
-    
-    function handleClick(e){
-        const m = menu.current;
-        const b = e.target;
-		const rectMenu = m.getBoundingClientRect();
-		const rectButton = b.getBoundingClientRect();
-		const height = rectButton.y - rectMenu.y;
-		if(b.innerText == "△"){
-			m.style.top = "-" + height + "px";
-			b.innerText = "▽";
-		}
-		else{
-			m.style.top = "1%";
-			b.innerText = "△";
-		}
-	}
-    return <div ref={menu} className="gamemenu">
-                <header id=""><h3>粒子系統</h3></header>
-                <div id="pathConfig" className="parameter">
-                    <Input text="linear :" type="number" id="linear" value="0"/>
-                    <Input text="easein :" type="number" id="easein" value="-2"/>
-                    <Input text="easeout :" type="number" id="easeout" value="2"/>
-                </div>
-                <div id="sortAlgorithm" className="controlpanel">
-                    <label>★</label>
-                    <button id="bubbleSort">泡沫排序</button>
-                    <button id="selectionSort">選擇排序</button>
-                    <button id="insertionSort">插入排序</button>
-                    <button id="quickSort">快速排序</button>
-                    <button id="mergeSort">合併排序</button>
-                    <button id="heapSort">堆排序</button>
-                    <button id="shellSort">希爾排序</button>
-                    <button id="countingSort">計數排序</button>
-                    {/* <Button text="基數排序" id="radixSort"/>
-                    <Button text="桶排序" id="bucketSort"/> */}
-                    <button id="cancelSort">取消</button>
-                    <button id="stepByStep">一步一步來</button>
-                    <button id="randomSort">打亂</button>
-                    <button id="instantRandomSort">立刻打亂</button>
-                </div>
-                <div id="sortLog"><p id="">碰撞模擬和重力引擎</p></div>
-                <button onClick={handleClick} className="slideMenu">△</button>
-            </div>
-}
-const CanvasSectionS3 = ({section, canvas, ratio, max, status, handleClick}) => {
+    const log = useRef();
+    const controlpanel = useRef();
+    useEffect(()=>{
+        physic.setCanvas(canvas.current, log.current);
+        manager.registerAnimationCallback("updateS3", physic.update);
+        manager.registerAnimationCallback("renderS3", physic.render);
+    }, []);
     return (
         <section ref={section} className="section" id="S3">
             <canvas id="canvasS3" ref={canvas} width={max * ratio} height={window.innerWidth < 992 ? ratio * max * 2 : ratio * max}></canvas>
             <button onClick={handleClick} value="S3" className="record">{status}</button>
-            <MenuS3 />
+            <div ref={menu} className="gamemenu">
+                <header id=""><h3>粒子系統</h3></header>
+                <div id="pathConfig" className="parameter">
+                    <label>linear :</label><input onChange={physic.setPath} type="number" id="leapLinear" defaultValue="0"></input>
+                    <label>easein :</label><input onChange={physic.setPath} type="number" id="leapEasein" defaultValue="-2"></input>
+                    <label>easeout :</label><input onChange={physic.setPath} type="number" id="leapEaseout" defaultValue="2"></input>
+                </div>
+                <div ref={controlpanel} className="controlpanel">
+                    <label>★</label>
+                    <button onClick={physic.start} id="bubbleSort">泡沫排序</button>
+                    <button onClick={physic.start} id="selectionSort">選擇排序</button>
+                    <button onClick={physic.start} id="insertionSort">插入排序</button>
+                    <button onClick={physic.start} id="quickSort">快速排序</button>
+                    <button onClick={physic.start} id="mergeSort">合併排序</button>
+                    <button onClick={physic.start} id="heapSort">堆排序</button>
+                    <button onClick={physic.start} id="shellSort">希爾排序</button>
+                    <button onClick={physic.start} id="countingSort">計數排序</button>
+                    {/* <Button text="基數排序" id="radixSort"/>
+                    <Button text="桶排序" id="bucketSort"/> */}
+                    <button onClick={physic.start} id="randomSort">打亂</button>
+                    <button onClick={physic.start} id="instantRandomSort">立刻打亂</button>
+                    <button onClick={physic.cancel} id="cancelSort">取消</button>
+                    <button onClick={physic.stepByStep} id="stepByStep">一步一步來</button>
+                </div>
+                <div ref={log} id="sortLog"><p id="">碰撞模擬和重力引擎</p></div>
+                <SlideMenuBtn menu={menu}></SlideMenuBtn>
+            </div>
         </section>
     );
 };

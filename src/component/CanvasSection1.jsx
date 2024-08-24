@@ -8,7 +8,7 @@ const CanvasSectionS1 = ({ section, manager, myMouse, canvas, ratio, max, status
         lokaVolterra.setCanvas(canvas.current, bitmap.current);
         manager.addAnimationCallback(lokaVolterra.renderS1);
         manager.addAnimationCallback(lokaVolterra.updateS1);
-        lokaVolterra.algorithm.mouse = myMouse;
+        lokaVolterra.algorithm.myMouse = myMouse;
     }, [])
     return (
         <section ref={section} className="section" id="S1">

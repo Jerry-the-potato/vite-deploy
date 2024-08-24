@@ -11,10 +11,9 @@ import { Path, PathConfig } from "../js/path.js";
 
 function Playground({margin}){
     
-    const [width, height] = useWindowSize();
+    const [width, height] = useWindowSize(margin);
     const [ratio, setRatio] = useState(width > 992 ? 1 : 2);
     const [max, setMax] = useState(getMax(width, height));
-    
     useEffect(()=>{
         setRatio(width > 992 ? 1 : 2)
         setMax(getMax(width, height));
@@ -33,8 +32,6 @@ function Playground({margin}){
         })
         manager.addIntersectionObserver();
         manager.addSubjectElements(elements)
-        PathConfig.resetPath();
-        PathConfig.resetLeap();
         manager.addAnimationCallback(myMouse.NextFrame)
         console.log(manager);
     }, [])
@@ -42,8 +39,8 @@ function Playground({margin}){
     function handleMouseMove(e){
         const rect = e.target.getBoundingClientRect();
         if(true){
-            const a = ((e.pageX - rect.x)) / (rect.width);
-            const b = ((e.pageY - rect.y)) / (rect.height);
+            const a = ((e.pageX - rect.x))// / (rect.width);
+            const b = ((e.pageY - rect.y))// / (rect.height);
             const frames = 30;
             myMouse.NewTarget(a, b, frames);
         }
@@ -82,10 +79,10 @@ function Playground({margin}){
             style={{"width": max + "px",
                      "height": window.innerWidth<992 ? max*2 : max + "px",
                      "margin": margin +"px auto"}}>
+            <CanvasSectionS3 section={sections[2]} canvas={canvas.S3} ratio={ratio} max={max} status={status} handleClick={handleRecord} manager={manager} myMouse={myMouse}/>
 
             <CanvasSectionS1 section={sections[0]} canvas={canvas.S1} ratio={ratio} max={max} status={status} handleClick={handleRecord} manager={manager} myMouse={myMouse}/>
             <CanvasSectionS2 section={sections[1]} canvas={canvas.S2} audio={audio} ratio={ratio} max={max} status={status} handleClick={handleRecord} manager={manager} myMouse={myMouse}/>
-            <CanvasSectionS3 section={sections[2]} canvas={canvas.S3} ratio={ratio} max={max} status={status} handleClick={handleRecord} manager={manager} myMouse={myMouse}/>
             <CookieTable></CookieTable>
         </div>
     )

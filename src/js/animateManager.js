@@ -28,7 +28,6 @@ const managerMaker = function(){
             if(typeof request.method === "undefined") return console.warn("invalid requestMethod");
             request.ID = requestAnimationFrame(request.method);
         })
-        
     }
     this.cancelAnimationByName = (name) => {
         cancelAnimationFrame(this.request[name].ID);
@@ -45,7 +44,6 @@ const managerMaker = function(){
             callback();
             this.request[name].ID = requestAnimationFrame(animate.bind(this));
         }.bind(this)
-
         // let valid = false;
         // for(const ID of this.validId){
         //     if(name.includes(ID)){
@@ -53,6 +51,15 @@ const managerMaker = function(){
         //         break;
         //     }
         // }
+        const valid = this.validId.some(ID => name.includes(ID));
+        if(!valid) console.warn("naming issue: " + name + " should include one of following letters: " + this.validId);
+    }
+    this.registerAnimationCallback = (name, callback) => {
+        this.request[name] = this.request[name] || {};
+        this.request[name].method = function animate(){
+            callback();
+            this.request[name].ID = requestAnimationFrame(animate.bind(this));
+        }.bind(this)
         const valid = this.validId.some(ID => name.includes(ID));
         if(!valid) console.warn("naming issue: " + name + " should include one of following letters: " + this.validId);
     }

@@ -23,7 +23,7 @@ export default function lokaVolterraAlgorithm(){
 	this.dlength = 0.01;
 
 	this.speed = 1;
-    this.mouse = {};
+    this.myMouse = {};
     this.useMouse = false;
 	this.isTransform = true;
 
@@ -161,8 +161,8 @@ export default function lokaVolterraAlgorithm(){
 			const y = point.y;
 			const ex = x / width;
 			const ey = y / height;
-			const dx = this.equation1(ex, ey) * width;
-			const dy = this.equation2(ex, ey) * height;
+			const dx = this.equation1(ex, ey, height) * width;
+			const dy = this.equation2(ex, ey, width) * height;
 			
 			const blue = y/width * 255;
 			const green = x/width * 255;
@@ -192,16 +192,17 @@ export default function lokaVolterraAlgorithm(){
 		}
 	}
 	
-	this.equation1 = (x, y) => {
+	this.equation1 = (x, y, height) => {
 		if(this.useMouse){
-			const ratio = (this.mouse.pointY > 0.2) ? this.mouse.pointY : 0.2;
+			const ratio = (this.myMouse.pointY / height > 0.2) ? this.myMouse.pointY / height : 0.2;
+			// console.log(ratio);
 			return this.alpha * x - (1 / ratio * this.alpha * x * y);
 		}
 		return this.alpha * x - (this.beta * x * y);
 	}
-	this.equation2 = (x, y) => {
+	this.equation2 = (x, y, width) => {
 		if(this.useMouse){
-			const ratio = (this.mouse.pointX > 0.2) ? this.mouse.pointX : 0.2;
+			const ratio = (this.myMouse.pointX / width > 0.2) ? this.myMouse.pointX / width : 0.2;
 			return (1 / ratio * this.gamma * x * y) -  this.gamma * y;
 		}
 		return (this.delta * x * y) -  this.gamma * y;
