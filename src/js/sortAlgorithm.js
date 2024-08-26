@@ -506,7 +506,7 @@ export class SortAlgorithm{
                 if (j >= gap && columns[j - gap].height > columns[j].height) {
                     const a = columns[j];
                     const b = columns[j - gap];
-                    ParticleSystem.swapColumn(a, b, 60);
+                    SortAlgorithm.swapColumn(a, b, 60);
                     this.j-= gap;
                 }
                 else{

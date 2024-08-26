@@ -1,38 +1,42 @@
 const managerMaker = function(){
     this.validId = ["S1", "S2", "S3"];
     this.lastId = "";
-    this.lastRequests = [];
+    this.lastRequestName = [];
     this.request = {};
-    this.getRequestsById = (id) => {
+    this.getRequestById = (id) => {
         if(typeof isSomethingHappended !== "undefined") return null;
         // some magic here and BOOM!!
         // ... may be more conplicated
         const req = [];
         for(let key in this.request){
-            if(key.includes(id)) req.push(this.request[key])
+            if(key.includes(id)) req.push(key);
         }
         return req;
     }
     this.updateRequestAnimation = (id) => {
-        const newRequests = this.getRequestsById(id);
-        if(newRequests === null) return;
+        const names = this.getRequestById(id);
+        if(names === null) return;
         
         this.lastId = id;
-        this.lastRequests.forEach(request => {
-            cancelAnimationFrame(request.ID);
+        this.lastRequestName.forEach(name => {
+            cancelAnimationFrame(this.request[name].ID);
         })
-        this.lastRequests = newRequests;
+        this.lastRequestName = names;
         
-        newRequests.forEach(request => {
-            if(typeof request === "undefined") return console.warn("invalid request");
-            if(typeof request.method === "undefined") return console.warn("invalid requestMethod");
-            request.ID = requestAnimationFrame(request.method);
+        names.forEach(name => {
+            if(typeof this.request[name] === "undefined") return console.warn("invalid request");
+            if(typeof this.request[name].method === "undefined") return console.warn("invalid requestMethod");
+            if(this.request[name].isPause) return;
+            this.request[name].ID = requestAnimationFrame(this.request[name].method);
         })
     }
-    this.cancelAnimationByName = (name) => {
+    this.pauseAnimationByName = (name) => {
         cancelAnimationFrame(this.request[name].ID);
+        this.request[name].isPause = true;
     }
-    this.requestAnimationByName = (name) => {
+    this.resumeAnimationByName = (name) => {
+        this.request[name].isPause = false;
+        cancelAnimationFrame(this.request[name].ID);
         this.request[name].ID = requestAnimationFrame(this.request[name].method);
     }
     this.addAnimationCallback = (callback) => {
@@ -44,13 +48,6 @@ const managerMaker = function(){
             callback();
             this.request[name].ID = requestAnimationFrame(animate.bind(this));
         }.bind(this)
-        // let valid = false;
-        // for(const ID of this.validId){
-        //     if(name.includes(ID)){
-        //         valid = true;
-        //         break;
-        //     }
-        // }
         const valid = this.validId.some(ID => name.includes(ID));
         if(!valid) console.warn("naming issue: " + name + " should include one of following letters: " + this.validId);
     }

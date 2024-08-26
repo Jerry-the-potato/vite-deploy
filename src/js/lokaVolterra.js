@@ -47,10 +47,10 @@ const createLokaVolterra = function(){
 		myWorker.postMessage({"name": isPause ? "requestAnimation" : "cancelAnimation"});
 	}
 	// 用了bind之後 function.name 會變成 bound renderS1，要特別注意
-	this.renderS1 = function renderS1(){
+	this.render = function(){
 		this.algorithm.render(this.ctx);
 	}.bind(this)
-	this.updateS1 = function updateS1(){
+	this.update = function(){
 		this.algorithm.update(this.ctx, this.canvas.width, this.canvas.height);
 	}.bind(this)
 	return this;

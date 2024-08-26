@@ -33,7 +33,7 @@ export default function MenuS1({manager, lokaVolterra}){
     const [isMain, setIsMain] = useState(true);
     const [isWorker, setIsWorker] = useState(true);
     function handlePauseMain(){
-        const name = (!isMain ? "request" : "cancel") + "AnimationByName";
+        const name = (!isMain ? "resume" : "pause") + "AnimationByName";
         manager[name]("renderS1");
         manager[name]("updateS1");
         setIsMain(!isMain);
