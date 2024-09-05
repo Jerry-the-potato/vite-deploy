@@ -1,18 +1,27 @@
 import { useEffect, useRef, useState } from "react";
 import physic from "../js/physic";
+import manager from '../js/animateManager';
 import SlideMenuBtn from "./SlideMenuBtn";
-const CanvasSectionS3 = ({section, canvas, manager, ratio, max, status, handleClick}) => {
+const CanvasSectionS3 = ({ canvas, ratio, max, status, handleClick}) => {
     const menu = useRef();
     const log = useRef();
-    const controlpanel = useRef();
+    const section = useRef();
+    const [uniqueID] = useState("SortAlgorithm");
     useEffect(()=>{
         physic.setCanvas(canvas.current, log.current);
-        manager.registerAnimationCallback("updateS3", physic.update);
-        manager.registerAnimationCallback("renderS3", physic.render);
+        manager.addSubjectElement(section.current);
+        manager.registerAnimationCallback("update" + uniqueID, physic.update);
+        manager.registerAnimationCallback("render" + uniqueID, physic.render);
+        return () => {
+            physic.cleanup();
+            manager.removeSubjectID(uniqueID);
+            manager.unregisterAnimationCallback("update" + uniqueID);
+            manager.unregisterAnimationCallback("render" + uniqueID);
+        }
     }, []);
     return (
-        <section ref={section} className="section" id="S3">
-            <canvas id="canvasS3" ref={canvas} width={max * ratio} height={window.innerWidth < 992 ? ratio * max * 2 : ratio * max}></canvas>
+        <section ref={section} className="section" id={uniqueID}>
+            <canvas ref={canvas} width={max * ratio} height={ratio * max * ratio}></canvas>
             <button onClick={handleClick} value="S3" className="record">{status}</button>
             <div ref={menu} className="gamemenu">
                 <header id=""><h3>粒子系統</h3></header>
@@ -21,7 +30,7 @@ const CanvasSectionS3 = ({section, canvas, manager, ratio, max, status, handleCl
                     <label>easein :</label><input onChange={physic.setPath} type="number" id="leapEasein" defaultValue="-2"></input>
                     <label>easeout :</label><input onChange={physic.setPath} type="number" id="leapEaseout" defaultValue="2"></input>
                 </div>
-                <div ref={controlpanel} className="controlpanel">
+                <div className="controlpanel">
                     <label>★</label>
                     <button onClick={physic.start} id="bubbleSort">泡沫排序</button>
                     <button onClick={physic.start} id="selectionSort">選擇排序</button>

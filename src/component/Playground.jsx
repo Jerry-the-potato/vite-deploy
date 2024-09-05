@@ -3,12 +3,16 @@ import useWindowSize from '../customHook/useWindowSize.js';
 import CanvasSectionS1 from './CanvasSection1.jsx';
 import CanvasSectionS2 from './CanvasSection2.jsx';
 import CanvasSectionS3 from './CanvasSection3.jsx';
+import CanvasSectionS4 from './CanvasSection4.jsx';
 import CookieTable from './CookieTable.jsx';
 import downloadMedia from '../js/downloadMedia.js';
 import manager from '../js/animateManager.js';
+import myMouse from '../js/myMouse.js';
 import { Path, PathConfig } from "../js/path.js";
 
 function Playground({margin}){
+    const [isOpen, setIsOpen] = useState(true);
+
     const breakpoint = 992 - margin * 2;
     const [width, height] = useWindowSize(margin);
     const [ratio, setRatio] = useState((width > breakpoint) ? 1 : 2);
@@ -23,26 +27,12 @@ function Playground({margin}){
         else return (w*2 < h ? w : h/2);
     }
 
-    const sections = [useRef(), useRef(), useRef()];
-    const [myMouse] = useState(new Path());
-    useEffect(()=>{
-        const elements = sections.map((obj) => {
-            if(obj.current) return obj.current;
-        })
-        manager.addIntersectionObserver();
-        manager.addSubjectElements(elements)
-        manager.addAnimationCallback(myMouse.NextFrame)
-        console.log(manager);
-    }, [])
-
     function handleMouseMove(e){
         const rect = e.target.getBoundingClientRect();
-        if(true){
-            const a = ((e.pageX - rect.x))// / (rect.width);
-            const b = ((e.pageY - rect.y))// / (rect.height);
-            const frames = 30;
-            myMouse.NewTarget(a, b, frames);
-        }
+        const a = ((e.pageX - rect.x))// / (rect.width);
+        const b = ((e.pageY - rect.y))// / (rect.height);
+        const frames = 30;
+        myMouse.NewTarget(a, b, frames);
     }
 
     const audio = useRef();
@@ -74,16 +64,19 @@ function Playground({margin}){
     }
 
     return (
-        <div id="playground" onMouseMove={handleMouseMove} 
-            style={{"width": max + "px",
-                     "height": window.innerWidth<992 ? max*2 : max + "px",
-                     "margin": margin +"px auto"}}>
-            <CanvasSectionS1 section={sections[0]} canvas={canvas.S1} ratio={ratio} max={max} status={status} handleClick={handleRecord} manager={manager} myMouse={myMouse}/>
-            <CanvasSectionS2 section={sections[1]} canvas={canvas.S2} audio={audio} ratio={ratio} max={max} status={status} handleClick={handleRecord} manager={manager} myMouse={myMouse}/>
-            <CanvasSectionS3 section={sections[2]} canvas={canvas.S3} ratio={ratio} max={max} status={status} handleClick={handleRecord} manager={manager} myMouse={myMouse}/>
-
-            <CookieTable></CookieTable>
-        </div>
+        <>
+            {/* <button onClick={() => {setIsOpen(!isOpen)}}>{isOpen ? "卸載組件" : "載入組件"}</button> */}
+            <div id="playground" onMouseMove={handleMouseMove} 
+                style={{"width": max + "px",
+                        "height": window.innerWidth<992 ? max*2 : max + "px",
+                        "margin": margin +"px auto"}}>
+                <CanvasSectionS4 ratio={ratio} max={max}/>
+                {isOpen && (<CanvasSectionS1 canvas={canvas.S1} ratio={ratio} max={max} status={status} handleClick={handleRecord} manager={manager} myMouse={myMouse}/>)}
+                {isOpen && <CanvasSectionS2 canvas={canvas.S2} audio={audio} ratio={ratio} max={max} status={status} handleClick={handleRecord} manager={manager} myMouse={myMouse}/>}
+                {isOpen && <CanvasSectionS3 canvas={canvas.S3} ratio={ratio} max={max} status={status} handleClick={handleRecord} manager={manager} myMouse={myMouse}/>}
+                <CookieTable></CookieTable>
+            </div>
+        </>
     )
 }
 

@@ -5,14 +5,14 @@ export default function SlideMenuBtn({menu}){
         const rectMenu = m.getBoundingClientRect();
         const rectButton = b.getBoundingClientRect();
         const height = rectButton.y - rectMenu.y;
-        if(b.innerText == "△"){
+        if(b.innerText == "收起△"){
             m.style.top = "-" + height + "px";
-            b.innerText = "▽";
+            b.innerText = "展開▽";
         }
         else{
             m.style.top = "1%";
-            b.innerText = "△";
+            b.innerText = "收起△";
         }
     }
-    return <button onClick={handleClick} className="slideMenu">△</button>
+    return <button onClick={handleClick} className="slideMenu">收起△</button>
 }

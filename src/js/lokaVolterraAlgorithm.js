@@ -1,5 +1,5 @@
 import createPainter from "./createPainter";
-
+import myMouse from "./myMouse";
 function clearBoard(ctx) {
 	// let color = "rgba(0,0,0, " + document.getElementById("speed").value * 0.025 + ")";
 	ctx.fillStyle = 'black';
@@ -13,9 +13,6 @@ function clearBoard(ctx) {
 export default function lokaVolterraAlgorithm(){
 	const painter = new createPainter();
 	
-	this.transitionRadian = 0;
-	this.trasitionOmega = Math.PI / 10000;
-
 	this.alpha = 5;
 	this.beta = 10;
 	this.gamma = 5;
@@ -23,8 +20,7 @@ export default function lokaVolterraAlgorithm(){
 	this.dlength = 0.01;
 
 	this.speed = 1;
-    this.myMouse = {};
-    this.useMouse = false;
+    this.useMouse = true;
 	this.isTransform = true;
 
     this.updateData = (data) => {
@@ -37,21 +33,10 @@ export default function lokaVolterraAlgorithm(){
         this.dlength = data.dlength * 0.001;
         this.speed = data.speed;
     }
-	this.render = (ctx) => {
-		clearBoard(ctx);
-		ctx.save();
-		ctx.translate(-ctx.canvas.width * 0.25, 0);
-		painter.works.forEach(obj => {painter.draw(obj);});
-		painter.works = [];
-		ctx.restore();
-	}
-	this.update = (ctx, width, height) => {
-		this.transitionRadian += this.trasitionOmega * this.speed;
-		this.motion(width, height);
-		this.addTexture(width, height, ctx);
-		this.updateFps(width, height, ctx);
-	}
 	this.reset = (width, height) => {
+		this.transitionRadian = 0;
+		this.trasitionOmega = Math.PI / 10000;
+
 		const len = 2000;
 		this.data = [];
 		for (let i = 0; i < len; i++) {
@@ -82,6 +67,20 @@ export default function lokaVolterraAlgorithm(){
 		function getRandomFloat(min, max) {
 			return Math.random() * (max*100 - min*100 + 1)/100 + min;
 		}
+	}
+	this.render = (ctx) => {
+		clearBoard(ctx);
+		ctx.save();
+		ctx.translate(-ctx.canvas.width * 0.25, 0);
+		painter.works.forEach(obj => {painter.draw(obj);});
+		painter.works = [];
+		ctx.restore();
+	}
+	this.update = (ctx, width, height) => {
+		this.transitionRadian += this.trasitionOmega * this.speed;
+		this.motion(width, height);
+		this.addTexture(width, height, ctx);
+		this.updateFps(width, height, ctx);
 	}
 
 	this.motion = (width, height) => {
@@ -194,7 +193,7 @@ export default function lokaVolterraAlgorithm(){
 	
 	this.equation1 = (x, y, height) => {
 		if(this.useMouse){
-			const ratio = (this.myMouse.pointY / height > 0.2) ? this.myMouse.pointY / height : 0.2;
+			const ratio = (myMouse.pointY / height > 0.2) ? myMouse.pointY / height : 0.2;
 			// console.log(ratio);
 			return this.alpha * x - (1 / ratio * this.alpha * x * y);
 		}
@@ -202,7 +201,7 @@ export default function lokaVolterraAlgorithm(){
 	}
 	this.equation2 = (x, y, width) => {
 		if(this.useMouse){
-			const ratio = (this.myMouse.pointX / width > 0.2) ? this.myMouse.pointX / width : 0.2;
+			const ratio = (myMouse.pointX / width > 0.2) ? myMouse.pointX / width : 0.2;
 			return (1 / ratio * this.gamma * x * y) -  this.gamma * y;
 		}
 		return (this.delta * x * y) -  this.gamma * y;

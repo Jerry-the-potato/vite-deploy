@@ -1,15 +1,25 @@
 const managerMaker = function(){
-    this.validId = ["S1", "S2", "S3"];
+    this.subject = [];
+    this.globalKey = "dev";
     this.lastId = "";
     this.lastRequestName = [];
     this.request = {};
+    // 過度包裝反而不好用，而且命名後難以追蹤、註銷動畫
+    // this.setupAnimation = (subjectElement, callbacks) => {
+    //     this.addSubjectElement(subjectElement);
+    //     const ID = subjectElement.id;
+    //     callbacks.forEach((callback) => {
+    //         const name = callback.name || "#" + Object.keys(this.request).length;
+    //         this.registerAnimationCallback(ID + "_" + name, callback);
+    //     });
+    // }
     this.getRequestById = (id) => {
         if(typeof isSomethingHappended !== "undefined") return null;
         // some magic here and BOOM!!
         // ... may be more conplicated
         const req = [];
         for(let key in this.request){
-            if(key.includes(id)) req.push(key);
+            if(key.includes(id) || key.includes(this.globalKey)) req.push(key);
         }
         return req;
     }
@@ -19,6 +29,7 @@ const managerMaker = function(){
         
         this.lastId = id;
         this.lastRequestName.forEach(name => {
+            if(!this.request[name]) return;
             cancelAnimationFrame(this.request[name].ID);
         })
         this.lastRequestName = names;
@@ -48,8 +59,8 @@ const managerMaker = function(){
             callback();
             this.request[name].ID = requestAnimationFrame(animate.bind(this));
         }.bind(this)
-        const valid = this.validId.some(ID => name.includes(ID));
-        if(!valid) console.warn("naming issue: " + name + " should include one of following letters: " + this.validId);
+        const isValid = Object.keys(this.subject).some(ID => name.includes(ID));
+        if(!isValid) console.warn("naming issue: " + name + " should include one of following letters: " + this.subject);
     }
     this.registerAnimationCallback = (name, callback) => {
         this.request[name] = this.request[name] || {};
@@ -57,24 +68,36 @@ const managerMaker = function(){
             callback();
             this.request[name].ID = requestAnimationFrame(animate.bind(this));
         }.bind(this)
-        const valid = this.validId.some(ID => name.includes(ID));
-        if(!valid) console.warn("naming issue: " + name + " should include one of following letters: " + this.validId);
+        const isValid = Object.keys(this.subject).some(ID => name.includes(ID));
+        if(!isValid) console.warn("naming issue: " + name + " should include one of following letters: " + this.subject);
     }
-    this.addIntersectionObserver = () => {
-        this.io = new IntersectionObserver((entries) => {
-            entries.forEach((entry) => {
-                // 實測大約0.01 ~ 0.05
-                // console.log(entry.target.id + ": " + entry.intersectionRatio);
-                if(entry.intersectionRatio === 0) return;
-                manager.updateRequestAnimation(entry.target.id);
-            });
-        });
+    this.unregisterAnimationCallback = (name) => {
+        cancelAnimationFrame(this.request[name].ID);
+        this.request[name].method = null;
+        delete this.request[name];
     }
-    this.addSubjectElements = (elements) => {
-        elements.forEach((el) => {
-            this.io.unobserve(el) // avoid observing one element mutiple time
-            this.io.observe(el);
+    this.io = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+            // 實測大約0.01 ~ 0.05
+            // console.log(entry.target.id + ": " + entry.intersectionRatio);
+            if(entry.intersectionRatio === 0) return;
+            this.updateRequestAnimation(entry.target.id);
         });
+    });
+    this.addSubjectElement = (element) => {
+        // elements.forEach((el) => {
+        //     this.validId.push(el.id);
+        //     this.io.unobserve(el) // avoid observing one element mutiple time
+        //     this.io.observe(el);
+        // });
+        this.subject[element.id] = element;
+        this.io.unobserve(element) // avoid observing one element mutiple time
+        this.io.observe(element);
+    }
+    this.removeSubjectID = (id) => {
+        const element = this.subject[id];
+        this.io.unobserve(element);
+        delete this.subject[id];
     }
     return this;
 }

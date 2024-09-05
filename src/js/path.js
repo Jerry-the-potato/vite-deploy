@@ -8,7 +8,7 @@ class PathConfig{
     static leapEaseout = 2;
     
     static resetPath(linear = 1, easein = 0, easeout = 0){
-        if(linear + easein + easeout != 1) console.warn("sum of parameter is recommend to be 1");
+        if(linear + easein + easeout != 1) console.warn("PathConfig.resetPath: sum of parameter is recommend to be 1");
         PathConfig.linear = linear;
         PathConfig.easein = easein;
         PathConfig.easeout = easeout;
@@ -47,6 +47,8 @@ class Path extends PathConfig{
         this.originY = this.pointY;
         this.timer = frames;
         this.period = frames;
+        cancelAnimationFrame(this.ID);
+        this.ID = requestAnimationFrame(this.NextFrame);
     };
     ResetTo = function(x = x, y = y){
         this.pointX = x;
@@ -60,27 +62,27 @@ class Path extends PathConfig{
     getLeap(){
         return super.getLeap();
     }
-    NextFrame = function validInS1_S2_S3(){
-        if(this.timer > 0){
-            this.timer--;
-            const dX = this.targetX - this.originX;
-            const dY = this.targetY - this.originY;
-            const t = this.timer;
-            const p = this.period;
-            const linear = 1/p;
-            const easeout = Math.pow((t+1)/p, 2) - Math.pow((t)/p, 2);
-            const easein = Math.pow(1 - (t-1)/p, 2) - Math.pow(1 - t/p, 2);
-            const [a, b, c] = this.getPath();
-            const [d, e, f] = this.getLeap();
-            this.pointX+= (a * linear + b * easein + c * easeout) * dX;
-            this.pointY+= (a * linear + b * easein + c * easeout) * dY
-                + (d * linear + e * easein + f * easeout) * ((-dX/5 + 10 * -dX/Math.abs(dX==0 ? 1 : dX)));
-        }
-        else if(this.timer == 0){
-            this.timer--;
+    NextFrame = function(){
+        if(this.timer <= 0){
             this.pointX = this.targetX;
             this.pointY = this.targetY;
+            return;
         }
+
+        this.timer--;
+        const dX = this.targetX - this.originX;
+        const dY = this.targetY - this.originY;
+        const t = this.timer;
+        const p = this.period;
+        const linear = 1/p;
+        const easeout = Math.pow((t+1)/p, 2) - Math.pow((t)/p, 2);
+        const easein = Math.pow(1 - (t-1)/p, 2) - Math.pow(1 - t/p, 2);
+        const [a, b, c] = this.getPath();
+        const [d, e, f] = this.getLeap();
+        this.pointX+= (a * linear + b * easein + c * easeout) * dX;
+        this.pointY+= (a * linear + b * easein + c * easeout) * dY
+            + (d * linear + e * easein + f * easeout) * ((-dX/5 + 10 * -dX/Math.abs(dX==0 ? 1 : dX)));
+        this.ID = requestAnimationFrame(this.NextFrame);  
     }.bind(this);
 }
 

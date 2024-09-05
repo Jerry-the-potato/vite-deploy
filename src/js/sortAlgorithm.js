@@ -11,6 +11,7 @@ export class SortAlgorithmIterable{
         this.log = log;
     }
     start(name, columns){
+        this.secondColumns = []; // 清空上次排序
         this.sortFunction = this[name + "Maker"](columns);
         this.timesEveryFrame = Math.ceil(columns.length/25);
         this.isSorting = true;
@@ -81,6 +82,7 @@ export class SortAlgorithm{
         this.log = log;
     }
     start(name, columns){
+        this.secondColumns = []; // 清空上次排序
         this.send(name + " is processing");
         this.sortFunction = this[name];
         this.timesEveryFrame = Math.ceil(columns.length/25);
