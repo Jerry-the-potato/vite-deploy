@@ -29,8 +29,8 @@ html{
   font-size: 16px;
 }
 body{
-touch-action: none;
-margin: 0;
+  touch-action: none;
+  margin: 0;
   font-family: 'Noto Sans TC', 'IBM Plex Sans', sans-serif;
   --main-color:     #456;
   --darker-color:   #222;
@@ -45,6 +45,16 @@ canvas{
   height: 100%;
   /* filter: blur(2px) contrast(5.5); */
   /* filter: blur(1px); */
+}
+
+/* 初始狀態為 grab */
+canvas.cursor-grab {
+  cursor: grab;
+}
+
+/* 拖曳狀態為 grabbing */
+canvas.cursor-grabbing {
+  cursor: grabbing;
 }
 
 /* 頁首設定 */
@@ -174,9 +184,9 @@ div#playground section h4{
           color: var(--soft-color);
       }
       .gamemenu .parameter input{
-          width: 2.5em;
+          width: 3em;
           font-size: 1em;
-          margin: 0 0.8em 0 0.5em;
+          margin: 0 0.5em 0 0.5em;
           padding: 0 0 0 0.5em;
           border: none;
           border-radius: 0.5em;
@@ -197,6 +207,9 @@ div#playground section h4{
       }
       .gamemenu .controlpanel button:hover, .gamemenu .parameter input:hover{
           opacity: 1;
+      }
+      .gamemenu .controlpanel button:disabled{
+          opacity: 0.3;
       }
 
 

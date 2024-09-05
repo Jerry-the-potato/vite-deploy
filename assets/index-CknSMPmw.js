@@ -7156,22 +7156,100 @@ function createPainter() {
     }
   };
 }
+const _PathConfig = class _PathConfig {
+  static resetPath(linear = 1, easein = 0, easeout = 0) {
+    if (linear + easein + easeout != 1) console.warn("PathConfig.resetPath: sum of parameter is recommend to be 1");
+    _PathConfig.linear = linear;
+    _PathConfig.easein = easein;
+    _PathConfig.easeout = easeout;
+  }
+  static resetLeap(linear = 0, easein = 0, easeout = 0) {
+    _PathConfig.leapLinear = linear;
+    _PathConfig.leapEasein = easein;
+    _PathConfig.leapEaseout = easeout;
+  }
+  getPath() {
+    return [_PathConfig.linear, _PathConfig.easein, _PathConfig.easeout];
+  }
+  getLeap() {
+    return [_PathConfig.leapLinear, _PathConfig.leapEasein, _PathConfig.leapEaseout];
+  }
+};
+__publicField(_PathConfig, "linear", -1);
+__publicField(_PathConfig, "easein", 0);
+__publicField(_PathConfig, "easeout", 2);
+__publicField(_PathConfig, "leapLinear", 0);
+__publicField(_PathConfig, "leapEasein", -2);
+__publicField(_PathConfig, "leapEaseout", 2);
+let PathConfig = _PathConfig;
+class Path extends PathConfig {
+  constructor(x2 = 0, y2 = 0) {
+    super();
+    __publicField(this, "NewTarget", function(targetX, targetY, frames) {
+      this.targetX = targetX;
+      this.targetY = targetY;
+      this.originX = this.pointX;
+      this.originY = this.pointY;
+      this.timer = frames;
+      this.period = frames;
+      cancelAnimationFrame(this.ID);
+      this.ID = requestAnimationFrame(this.NextFrame);
+    });
+    __publicField(this, "ResetTo", function(x2 = x2, y2 = y2) {
+      this.pointX = x2;
+      this.pointY = y2;
+      this.timer = 0;
+    });
+    __publicField(this, "NextFrame", (function() {
+      if (this.timer <= 0) {
+        this.pointX = this.targetX;
+        this.pointY = this.targetY;
+        return;
+      }
+      this.timer--;
+      const dX = this.targetX - this.originX;
+      const dY = this.targetY - this.originY;
+      const t2 = this.timer;
+      const p2 = this.period;
+      const linear = 1 / p2;
+      const easeout = Math.pow((t2 + 1) / p2, 2) - Math.pow(t2 / p2, 2);
+      const easein = Math.pow(1 - (t2 - 1) / p2, 2) - Math.pow(1 - t2 / p2, 2);
+      const [a, b, c] = this.getPath();
+      const [d, e, f2] = this.getLeap();
+      this.pointX += (a * linear + b * easein + c * easeout) * dX;
+      this.pointY += (a * linear + b * easein + c * easeout) * dY + (d * linear + e * easein + f2 * easeout) * (-dX / 5 + 10 * -dX / Math.abs(dX == 0 ? 1 : dX));
+      this.ID = requestAnimationFrame(this.NextFrame);
+    }).bind(this));
+    this.pointX = x2;
+    this.pointY = y2;
+    this.originX = x2;
+    this.originY = y2;
+    this.targetX = x2;
+    this.targetY = y2;
+    this.period = 90;
+    this.timer = 0;
+  }
+  getPath() {
+    return super.getPath();
+  }
+  getLeap() {
+    return super.getLeap();
+  }
+}
+const myMouse = new Path();
 function clearBoard(ctx) {
   ctx.fillStyle = "black";
   ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 }
 function lokaVolterraAlgorithm() {
   const painter = new createPainter();
-  this.transitionRadian = 0;
-  this.trasitionOmega = Math.PI / 1e4;
   this.alpha = 5;
   this.beta = 10;
   this.gamma = 5;
   this.delta = 10;
   this.dlength = 0.01;
   this.speed = 1;
-  this.myMouse = {};
-  this.useMouse = false;
+  this.useMouse = true;
   this.isTransform = true;
   this.updateData = (data) => {
     this.useMouse = data.useMouse;
@@ -7183,23 +7261,9 @@ function lokaVolterraAlgorithm() {
     this.dlength = data.dlength * 1e-3;
     this.speed = data.speed;
   };
-  this.render = (ctx) => {
-    clearBoard(ctx);
-    ctx.save();
-    ctx.translate(-ctx.canvas.width * 0.25, 0);
-    painter.works.forEach((obj) => {
-      painter.draw(obj);
-    });
-    painter.works = [];
-    ctx.restore();
-  };
-  this.update = (ctx, width, height) => {
-    this.transitionRadian += this.trasitionOmega * this.speed;
-    this.motion(width, height);
-    this.addTexture(width, height, ctx);
-    this.updateFps(width, height, ctx);
-  };
   this.reset = (width, height) => {
+    this.transitionRadian = 0;
+    this.trasitionOmega = Math.PI / 1e4;
     const len = 2e3;
     this.data = [];
     for (let i = 0; i < len; i++) {
@@ -7229,6 +7293,22 @@ function lokaVolterraAlgorithm() {
     function getRandomFloat(min, max) {
       return Math.random() * (max * 100 - min * 100 + 1) / 100 + min;
     }
+  };
+  this.render = (ctx) => {
+    clearBoard(ctx);
+    ctx.save();
+    ctx.translate(-ctx.canvas.width * 0.25, 0);
+    painter.works.forEach((obj) => {
+      painter.draw(obj);
+    });
+    painter.works = [];
+    ctx.restore();
+  };
+  this.update = (ctx, width, height) => {
+    this.transitionRadian += this.trasitionOmega * this.speed;
+    this.motion(width, height);
+    this.addTexture(width, height, ctx);
+    this.updateFps(width, height, ctx);
   };
   this.motion = (width, height) => {
     const list = this.data;
@@ -7332,14 +7412,14 @@ function lokaVolterraAlgorithm() {
   };
   this.equation1 = (x2, y2, height) => {
     if (this.useMouse) {
-      const ratio = this.myMouse.pointY / height > 0.2 ? this.myMouse.pointY / height : 0.2;
+      const ratio = myMouse.pointY / height > 0.2 ? myMouse.pointY / height : 0.2;
       return this.alpha * x2 - 1 / ratio * this.alpha * x2 * y2;
     }
     return this.alpha * x2 - this.beta * x2 * y2;
   };
   this.equation2 = (x2, y2, width) => {
     if (this.useMouse) {
-      const ratio = this.myMouse.pointX / width > 0.2 ? this.myMouse.pointX / width : 0.2;
+      const ratio = myMouse.pointX / width > 0.2 ? myMouse.pointX / width : 0.2;
       return 1 / ratio * this.gamma * x2 * y2 - this.gamma * y2;
     }
     return this.delta * x2 * y2 - this.gamma * y2;
@@ -7438,38 +7518,130 @@ function lokaVolterraAlgorithm() {
   return this;
 }
 const createLokaVolterra = function() {
-  const myWorker = new WorkerWrapper();
-  this.algorithm = new lokaVolterraAlgorithm();
   this.setCanvas = (canvas, bitmap) => {
+    this.algorithm = new lokaVolterraAlgorithm();
+    this.myWorker = new WorkerWrapper();
     this.algorithm.reset(canvas.width, canvas.height);
     this.canvas = canvas;
     this.ctx = this.canvas.getContext("2d");
     this.bitmap = bitmap;
-    const offscreen = bitmap.transferControlToOffscreen();
-    myWorker.postMessage({
+    this.offscreen = bitmap.transferControlToOffscreen();
+    this.myWorker.postMessage({
       "name": "transferControlToOffscreen",
-      "canvas": offscreen
-    }, [offscreen]);
-    window.addEventListener("resize", function() {
-      myWorker.postMessage({
-        "name": "setOffscreen",
-        "w": canvas.width,
-        "h": canvas.height
-      });
-    }, false);
+      "canvas": this.offscreen
+    }, [this.offscreen]);
+  };
+  this.cleanup = () => {
+    this.algorithm = null;
+    this.canvas = null;
+    this.ctx = null;
+    this.bitmap = null;
+    this.offscreen = null;
+    this.myWorker.terminate();
+    this.myWorker = null;
+  };
+  this.resize = () => {
+    this.myWorker.postMessage({
+      "name": "setOffscreen",
+      "w": this.canvas.width,
+      "h": this.canvas.height
+    });
   };
   this.pauseWorker = (isPause) => {
-    myWorker.postMessage({ "name": isPause ? "requestAnimation" : "cancelAnimation" });
+    this.myWorker.postMessage({ "name": isPause ? "requestAnimation" : "cancelAnimation" });
   };
-  this.render = (function() {
+  this.render = () => {
     this.algorithm.render(this.ctx);
-  }).bind(this);
-  this.update = (function() {
+  };
+  this.update = () => {
     this.algorithm.update(this.ctx, this.canvas.width, this.canvas.height);
-  }).bind(this);
+  };
   return this;
 };
 const lokaVolterra = new createLokaVolterra();
+const managerMaker = function() {
+  this.subject = [];
+  this.globalKey = "dev";
+  this.lastId = "";
+  this.lastRequestName = [];
+  this.request = {};
+  this.getRequestById = (id2) => {
+    if (typeof isSomethingHappended !== "undefined") return null;
+    const req = [];
+    for (let key in this.request) {
+      if (key.includes(id2) || key.includes(this.globalKey)) req.push(key);
+    }
+    return req;
+  };
+  this.updateRequestAnimation = (id2) => {
+    const names = this.getRequestById(id2);
+    if (names === null) return;
+    this.lastId = id2;
+    this.lastRequestName.forEach((name2) => {
+      if (!this.request[name2]) return;
+      cancelAnimationFrame(this.request[name2].ID);
+    });
+    this.lastRequestName = names;
+    names.forEach((name2) => {
+      if (typeof this.request[name2] === "undefined") return console.warn("invalid request");
+      if (typeof this.request[name2].method === "undefined") return console.warn("invalid requestMethod");
+      if (this.request[name2].isPause) return;
+      this.request[name2].ID = requestAnimationFrame(this.request[name2].method);
+    });
+  };
+  this.pauseAnimationByName = (name2) => {
+    cancelAnimationFrame(this.request[name2].ID);
+    this.request[name2].isPause = true;
+  };
+  this.resumeAnimationByName = (name2) => {
+    this.request[name2].isPause = false;
+    cancelAnimationFrame(this.request[name2].ID);
+    this.request[name2].ID = requestAnimationFrame(this.request[name2].method);
+  };
+  this.addAnimationCallback = (callback) => {
+    const string = callback.name || "#" + Math.random();
+    const name2 = string.match(" ") ? string.split(" ")[1] : string;
+    this.request[name2] = this.request[name2] || {};
+    this.request[name2].method = (function animate() {
+      callback();
+      this.request[name2].ID = requestAnimationFrame(animate.bind(this));
+    }).bind(this);
+    const isValid = Object.keys(this.subject).some((ID) => name2.includes(ID));
+    if (!isValid) console.warn("naming issue: " + name2 + " should include one of following letters: " + this.subject);
+  };
+  this.registerAnimationCallback = (name2, callback) => {
+    this.request[name2] = this.request[name2] || {};
+    this.request[name2].method = (function animate() {
+      callback();
+      this.request[name2].ID = requestAnimationFrame(animate.bind(this));
+    }).bind(this);
+    const isValid = Object.keys(this.subject).some((ID) => name2.includes(ID));
+    if (!isValid) console.warn("naming issue: " + name2 + " should include one of following letters: " + this.subject);
+  };
+  this.unregisterAnimationCallback = (name2) => {
+    cancelAnimationFrame(this.request[name2].ID);
+    this.request[name2].method = null;
+    delete this.request[name2];
+  };
+  this.io = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (entry.intersectionRatio === 0) return;
+      this.updateRequestAnimation(entry.target.id);
+    });
+  });
+  this.addSubjectElement = (element) => {
+    this.subject[element.id] = element;
+    this.io.unobserve(element);
+    this.io.observe(element);
+  };
+  this.removeSubjectID = (id2) => {
+    const element = this.subject[id2];
+    this.io.unobserve(element);
+    delete this.subject[id2];
+  };
+  return this;
+};
+const manager = new managerMaker();
 function SlideMenuBtn({ menu }) {
   function handleClick(e) {
     const m2 = menu.current;
@@ -7477,17 +7649,34 @@ function SlideMenuBtn({ menu }) {
     const rectMenu = m2.getBoundingClientRect();
     const rectButton = b.getBoundingClientRect();
     const height = rectButton.y - rectMenu.y;
-    if (b.innerText == "△") {
+    if (b.innerText == "收起△") {
       m2.style.top = "-" + height + "px";
-      b.innerText = "▽";
+      b.innerText = "展開▽";
     } else {
       m2.style.top = "1%";
-      b.innerText = "△";
+      b.innerText = "收起△";
     }
   }
-  return /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: handleClick, className: "slideMenu", children: "△" });
+  return /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: handleClick, className: "slideMenu", children: "收起△" });
 }
-function MenuS1({ manager: manager2, lokaVolterra: lokaVolterra2 }) {
+const CanvasSectionS1 = ({ canvas, ratio, max, status, handleClick }) => {
+  const bitmap = reactExports.useRef();
+  const section = reactExports.useRef();
+  const [uniqueID] = reactExports.useState("LokaVolterra");
+  reactExports.useEffect(() => {
+    window.addEventListener("resize", lokaVolterra.resize, false);
+    lokaVolterra.setCanvas(canvas.current, bitmap.current);
+    manager.addSubjectElement(section.current);
+    manager.registerAnimationCallback("update" + uniqueID, lokaVolterra.update);
+    manager.registerAnimationCallback("render" + uniqueID, lokaVolterra.render);
+    return () => {
+      window.removeEventListener("resize", lokaVolterra.resize);
+      lokaVolterra.cleanup();
+      manager.removeSubjectID(uniqueID);
+      manager.unregisterAnimationCallback("update" + uniqueID);
+      manager.unregisterAnimationCallback("render" + uniqueID);
+    };
+  }, []);
   const menu = reactExports.useRef();
   const state = {
     "useMouse": reactExports.useState(0),
@@ -7514,60 +7703,50 @@ function MenuS1({ manager: manager2, lokaVolterra: lokaVolterra2 }) {
     Object.keys(state).forEach((key) => {
       data[key] = state[key][0];
     });
-    lokaVolterra2.algorithm.updateData(data);
+    lokaVolterra.algorithm.updateData(data);
   }, [state]);
   const [isMain, setIsMain] = reactExports.useState(true);
   const [isWorker, setIsWorker] = reactExports.useState(true);
   function handlePauseMain() {
     const name2 = (!isMain ? "resume" : "pause") + "AnimationByName";
-    manager2[name2]("renderS1");
-    manager2[name2]("updateS1");
+    manager[name2]("renderS1");
+    manager[name2]("updateS1");
     setIsMain(!isMain);
   }
   function handlePauseWorker() {
-    lokaVolterra2["pauseWorker"](!isWorker);
+    lokaVolterra["pauseWorker"](!isWorker);
     setIsWorker(!isWorker);
   }
-  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { ref: menu, className: "gamemenu", children: [
-    /* @__PURE__ */ jsxRuntimeExports.jsx("header", { id: "header", children: /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { children: "Lotka Volterra 實驗場 + Web Woker" }) }),
-    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "parameter", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx("label", { children: "Alpha" }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx("input", { onChange: handleCanvasControl, type: "number", id: "alpha", value: state.alpha[0] }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx("label", { children: "Beta" }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx("input", { onChange: handleCanvasControl, type: "number", id: "beta", value: state.beta[0] }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx("label", { children: "Gamma" }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx("input", { onChange: handleCanvasControl, type: "number", id: "gamma", value: state.gamma[0] }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx("label", { children: "Delta" }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx("input", { onChange: handleCanvasControl, type: "number", id: "delta", value: state.delta[0] }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx("label", { children: "Vector Size" }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx("input", { onChange: handleCanvasControl, type: "number", id: "dlength", value: state.dlength[0] }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx("label", { children: "Transform Speed" }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx("input", { onChange: handleCanvasControl, type: "number", id: "speed", value: state.speed[0] })
-    ] }),
-    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "controlpanel", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx("label", { children: "★" }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: handleCanvasControl, id: "useMouse", value: state.useMouse[0] ? 0 : 1, children: state.useMouse[0] ? "取消跟隨" : "跟隨滑鼠" }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: handleCanvasControl, id: "isTransform", value: state.isTransform[0] ? 0 : 1, children: state.isTransform[0] == "1" ? "取消縮放" : "加入縮放" }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: handlePauseMain, id: "pauseMain", children: isMain ? "停止(左)" : "開始(左)" }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: handlePauseWorker, id: "pauseWorker", children: isWorker ? "停止(右)" : "開始(右)" })
-    ] }),
-    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { id: "dialogbox", children: /* @__PURE__ */ jsxRuntimeExports.jsx("p", { id: "dialog", children: "∫此微分方程用於描述捕食者和獵物的此消彼長，沿著中心點呈現漩渦紋理" }) }),
-    /* @__PURE__ */ jsxRuntimeExports.jsx(SlideMenuBtn, { menu })
-  ] });
-}
-const CanvasSectionS1 = ({ section, manager: manager2, myMouse, canvas, ratio, max, status, handleClick }) => {
-  const bitmap = reactExports.useRef();
-  reactExports.useEffect(() => {
-    lokaVolterra.setCanvas(canvas.current, bitmap.current);
-    manager2.registerAnimationCallback("renderS1", lokaVolterra.render);
-    manager2.registerAnimationCallback("updateS1", lokaVolterra.update);
-    lokaVolterra.algorithm.myMouse = myMouse;
-  }, []);
-  return /* @__PURE__ */ jsxRuntimeExports.jsxs("section", { ref: section, className: "section", id: "S1", children: [
-    /* @__PURE__ */ jsxRuntimeExports.jsx("canvas", { id: "canvasS1", ref: canvas, width: max * ratio, height: window.innerWidth < 992 ? ratio * max * 2 : ratio * max }),
-    /* @__PURE__ */ jsxRuntimeExports.jsx("canvas", { id: "bitmap", ref: bitmap, width: max * ratio, height: window.innerWidth < 992 ? ratio * max * 2 : ratio * max }),
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs("section", { ref: section, className: "section", id: uniqueID, children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsx("canvas", { value: Math.random(), ref: canvas, width: max * ratio, height: ratio * max * ratio }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx("canvas", { ref: bitmap, width: max * ratio, height: ratio * max * ratio }),
     /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: handleClick, value: "S1", className: "record", children: status }),
-    /* @__PURE__ */ jsxRuntimeExports.jsx(MenuS1, { manager: manager2, lokaVolterra })
+    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { ref: menu, className: "gamemenu", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx("header", { id: "header", children: /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { children: "Lotka Volterra 實驗場 + Web Woker" }) }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "parameter", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("label", { children: "Alpha" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("input", { onChange: handleCanvasControl, type: "number", id: "alpha", value: state.alpha[0] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("label", { children: "Beta" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("input", { onChange: handleCanvasControl, type: "number", id: "beta", value: state.beta[0] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("label", { children: "Gamma" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("input", { onChange: handleCanvasControl, type: "number", id: "gamma", value: state.gamma[0] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("label", { children: "Delta" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("input", { onChange: handleCanvasControl, type: "number", id: "delta", value: state.delta[0] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("label", { children: "Vector Size" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("input", { onChange: handleCanvasControl, type: "number", id: "dlength", value: state.dlength[0] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("label", { children: "Transform Speed" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("input", { onChange: handleCanvasControl, type: "number", id: "speed", value: state.speed[0] })
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "controlpanel", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("label", { children: "★" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: handleCanvasControl, id: "useMouse", value: state.useMouse[0] ? 0 : 1, children: state.useMouse[0] ? "取消跟隨" : "跟隨滑鼠" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: handleCanvasControl, id: "isTransform", value: state.isTransform[0] ? 0 : 1, children: state.isTransform[0] == "1" ? "取消縮放" : "加入縮放" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: handlePauseMain, id: "pauseMain", children: isMain ? "停止(左)" : "開始(左)" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: handlePauseWorker, id: "pauseWorker", children: isWorker ? "停止(右)" : "開始(右)" })
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { id: "dialogbox", children: /* @__PURE__ */ jsxRuntimeExports.jsx("p", { id: "dialog", children: "∫此微分方程用於描述捕食者和獵物的此消彼長，沿著中心點呈現漩渦紋理" }) }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(SlideMenuBtn, { menu })
+    ] })
   ] });
 };
 const audioUrl = "/vite-deploy/assets/Lovely%20Piano%20Song-D2Oyr38W.mp3";
@@ -26312,13 +26491,13 @@ class Averager {
 const createMusicAnalyser = function() {
   new Averager(60);
   this.firstTime = true;
-  this.buff = new BufferFactory();
   this.getAnalyser = (e) => {
     const audio = e.target;
     if (this.firstTime) this.analyser = createAnalyser(audio);
     this.firstTime = false;
   };
   this.setCanvas = (canvas) => {
+    this.buff = new BufferFactory();
     this.canvas = canvas;
     this.scene = new Scene();
     this.camera = new PerspectiveCamera(75, canvas.width / canvas.height, 0.1, 1e3);
@@ -26332,6 +26511,45 @@ const createMusicAnalyser = function() {
     this.scene.add(this.group1);
     this.group1.add(makeBall(radius, 30, 15, radius / 500), makeParticleMaterial(10));
     this.group1.add(this.buff.mesh);
+  };
+  this.cleanup = () => {
+    this.firstTime = true;
+    if (this.scene) {
+      this.scene.traverse((object) => {
+        if (object instanceof Mesh) {
+          if (object.geometry) {
+            object.geometry.dispose();
+          }
+          if (object.material) {
+            if (Array.isArray(object.material)) {
+              object.material.forEach((material) => material.dispose());
+            } else {
+              object.material.dispose();
+            }
+          }
+        }
+      });
+      while (this.scene.children.length > 0) {
+        const child = this.scene.children[0];
+        this.scene.remove(child);
+        if (child.geometry) child.geometry.dispose();
+        if (Array.isArray(child.material)) {
+          child.material.forEach((material) => material.dispose());
+        } else if (child.material) {
+          child.material.dispose();
+        }
+      }
+    }
+    if (this.renderer) {
+      this.renderer.dispose();
+    }
+    this.buff = null;
+    this.canvas = null;
+    this.scene = null;
+    this.camera = null;
+    this.renderer = null;
+    this.axis = null;
+    this.analyser = null;
   };
   this.resize = () => {
     const [w2, h] = [this.canvas.width, this.canvas.height];
@@ -26355,97 +26573,29 @@ const createMusicAnalyser = function() {
   return this;
 };
 const musicAnalyser = new createMusicAnalyser();
-const SectionS2 = ({ section, audio, manager: manager2, canvas, ratio, max, status, handleClick }) => {
+const SectionS2 = ({ audio, canvas, ratio, max, status, handleClick }) => {
+  const section = reactExports.useRef();
+  const [uniqueID] = reactExports.useState("MusicAnalyser");
   reactExports.useEffect(() => {
-    musicAnalyser.setCanvas(canvas.current);
-    manager2.registerAnimationCallback("updateS2", musicAnalyser.update);
-    manager2.registerAnimationCallback("renderS2", musicAnalyser.render);
     window.addEventListener("resize", musicAnalyser.resize, false);
+    musicAnalyser.setCanvas(canvas.current);
+    manager.addSubjectElement(section.current);
+    manager.registerAnimationCallback("update" + uniqueID, musicAnalyser.update);
+    manager.registerAnimationCallback("render" + uniqueID, musicAnalyser.render);
+    return () => {
+      window.removeEventListener("resize", musicAnalyser.resize);
+      musicAnalyser.cleanup();
+      manager.removeSubjectID(uniqueID);
+      manager.unregisterAnimationCallback("update" + uniqueID);
+      manager.unregisterAnimationCallback("render" + uniqueID);
+    };
   }, []);
-  return /* @__PURE__ */ jsxRuntimeExports.jsxs("section", { ref: section, className: "section", id: "S2", children: [
-    /* @__PURE__ */ jsxRuntimeExports.jsx("canvas", { id: "canvasS2", ref: canvas, width: max * ratio, height: window.innerWidth < 992 ? ratio * max * 2 : ratio * max }),
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs("section", { ref: section, className: "section", id: uniqueID, children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsx("canvas", { ref: canvas, width: max * ratio, height: ratio * max * ratio }),
     /* @__PURE__ */ jsxRuntimeExports.jsx("audio", { onPlay: musicAnalyser.getAnalyser, ref: audio, controls: true, id: "myAudio", style: { "position": "absolute", "left": "10px", "bottom": "10px" }, children: /* @__PURE__ */ jsxRuntimeExports.jsx("source", { src: audioUrl }) }),
     /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: handleClick, value: "S2", className: "record", children: status })
   ] });
 };
-const _PathConfig = class _PathConfig {
-  static resetPath(linear = 1, easein = 0, easeout = 0) {
-    if (linear + easein + easeout != 1) console.warn("sum of parameter is recommend to be 1");
-    _PathConfig.linear = linear;
-    _PathConfig.easein = easein;
-    _PathConfig.easeout = easeout;
-  }
-  static resetLeap(linear = 0, easein = 0, easeout = 0) {
-    _PathConfig.leapLinear = linear;
-    _PathConfig.leapEasein = easein;
-    _PathConfig.leapEaseout = easeout;
-  }
-  getPath() {
-    return [_PathConfig.linear, _PathConfig.easein, _PathConfig.easeout];
-  }
-  getLeap() {
-    return [_PathConfig.leapLinear, _PathConfig.leapEasein, _PathConfig.leapEaseout];
-  }
-};
-__publicField(_PathConfig, "linear", -1);
-__publicField(_PathConfig, "easein", 0);
-__publicField(_PathConfig, "easeout", 2);
-__publicField(_PathConfig, "leapLinear", 0);
-__publicField(_PathConfig, "leapEasein", -2);
-__publicField(_PathConfig, "leapEaseout", 2);
-let PathConfig = _PathConfig;
-class Path extends PathConfig {
-  constructor(x2 = 0, y2 = 0) {
-    super();
-    __publicField(this, "NewTarget", function(targetX, targetY, frames) {
-      this.targetX = targetX;
-      this.targetY = targetY;
-      this.originX = this.pointX;
-      this.originY = this.pointY;
-      this.timer = frames;
-      this.period = frames;
-    });
-    __publicField(this, "ResetTo", function(x2 = x2, y2 = y2) {
-      this.pointX = x2;
-      this.pointY = y2;
-      this.timer = 0;
-    });
-    __publicField(this, "NextFrame", (function validInS1_S2_S3() {
-      if (this.timer > 0) {
-        this.timer--;
-        const dX = this.targetX - this.originX;
-        const dY = this.targetY - this.originY;
-        const t2 = this.timer;
-        const p2 = this.period;
-        const linear = 1 / p2;
-        const easeout = Math.pow((t2 + 1) / p2, 2) - Math.pow(t2 / p2, 2);
-        const easein = Math.pow(1 - (t2 - 1) / p2, 2) - Math.pow(1 - t2 / p2, 2);
-        const [a, b, c] = this.getPath();
-        const [d, e, f2] = this.getLeap();
-        this.pointX += (a * linear + b * easein + c * easeout) * dX;
-        this.pointY += (a * linear + b * easein + c * easeout) * dY + (d * linear + e * easein + f2 * easeout) * (-dX / 5 + 10 * -dX / Math.abs(dX == 0 ? 1 : dX));
-      } else if (this.timer == 0) {
-        this.timer--;
-        this.pointX = this.targetX;
-        this.pointY = this.targetY;
-      }
-    }).bind(this));
-    this.pointX = x2;
-    this.pointY = y2;
-    this.originX = x2;
-    this.originY = y2;
-    this.targetX = x2;
-    this.targetY = y2;
-    this.period = 90;
-    this.timer = 0;
-  }
-  getPath() {
-    return super.getPath();
-  }
-  getLeap() {
-    return super.getLeap();
-  }
-}
 class SortAlgorithm {
   constructor() {
     this.secondColumns = [];
@@ -26458,6 +26608,7 @@ class SortAlgorithm {
     this.log = log;
   }
   start(name2, columns) {
+    this.secondColumns = [];
     this.send(name2 + " is processing");
     this.sortFunction = this[name2];
     this.timesEveryFrame = Math.ceil(columns.length / 25);
@@ -27214,6 +27365,10 @@ const createPhysic = function() {
     this.ctx.lineCap = "butt";
     this.ctx.textAlign = "center";
   };
+  this.cleanup = () => {
+    this.system = null;
+    this.ctx = null;
+  };
   this.update = () => {
     this.system.update();
   };
@@ -27244,17 +27399,25 @@ const createPhysic = function() {
   return this;
 };
 const physic = new createPhysic();
-const CanvasSectionS3 = ({ section, canvas, manager: manager2, ratio, max, status, handleClick }) => {
+const CanvasSectionS3 = ({ canvas, ratio, max, status, handleClick }) => {
   const menu = reactExports.useRef();
   const log2 = reactExports.useRef();
-  const controlpanel = reactExports.useRef();
+  const section = reactExports.useRef();
+  const [uniqueID] = reactExports.useState("SortAlgorithm");
   reactExports.useEffect(() => {
     physic.setCanvas(canvas.current, log2.current);
-    manager2.registerAnimationCallback("updateS3", physic.update);
-    manager2.registerAnimationCallback("renderS3", physic.render);
+    manager.addSubjectElement(section.current);
+    manager.registerAnimationCallback("update" + uniqueID, physic.update);
+    manager.registerAnimationCallback("render" + uniqueID, physic.render);
+    return () => {
+      physic.cleanup();
+      manager.removeSubjectID(uniqueID);
+      manager.unregisterAnimationCallback("update" + uniqueID);
+      manager.unregisterAnimationCallback("render" + uniqueID);
+    };
   }, []);
-  return /* @__PURE__ */ jsxRuntimeExports.jsxs("section", { ref: section, className: "section", id: "S3", children: [
-    /* @__PURE__ */ jsxRuntimeExports.jsx("canvas", { id: "canvasS3", ref: canvas, width: max * ratio, height: window.innerWidth < 992 ? ratio * max * 2 : ratio * max }),
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs("section", { ref: section, className: "section", id: uniqueID, children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsx("canvas", { ref: canvas, width: max * ratio, height: ratio * max * ratio }),
     /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: handleClick, value: "S3", className: "record", children: status }),
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { ref: menu, className: "gamemenu", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsx("header", { id: "", children: /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { children: "粒子系統" }) }),
@@ -27266,7 +27429,7 @@ const CanvasSectionS3 = ({ section, canvas, manager: manager2, ratio, max, statu
         /* @__PURE__ */ jsxRuntimeExports.jsx("label", { children: "easeout :" }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("input", { onChange: physic.setPath, type: "number", id: "leapEaseout", defaultValue: "2" })
       ] }),
-      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { ref: controlpanel, className: "controlpanel", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "controlpanel", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx("label", { children: "★" }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: physic.start, id: "bubbleSort", children: "泡沫排序" }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: physic.start, id: "selectionSort", children: "選擇排序" }),
@@ -27285,6 +27448,368 @@ const CanvasSectionS3 = ({ section, canvas, manager: manager2, ratio, max, statu
       /* @__PURE__ */ jsxRuntimeExports.jsx(SlideMenuBtn, { menu })
     ] })
   ] });
+};
+const vertexShaderSource = "attribute vec2 a_position;\nuniform mediump vec2 u_resolution;\nuniform mediump float u_radius;\n\nvoid main() {\n    gl_PointSize = u_radius; \n    vec2 zeroToOne = a_position / u_resolution;\n    vec2 clipSpace = zeroToOne * 2.0 - 1.0;\n    gl_Position = vec4(clipSpace * vec2(1, -1), 0, 1);\n}";
+const fragmentShaderSourceRect = "precision mediump float;\nuniform vec4 u_color;\nuniform vec2 u_resolution;\n\nvoid main() {\n    gl_FragColor = u_color * vec4(gl_FragCoord.xy / u_resolution, 1.0, 0.0);\n}";
+const fragmentShaderSourceCircle = "precision mediump float;\nuniform vec2 u_resolution;\nuniform vec2 u_center;\nuniform float u_radius;\nuniform vec4 u_color;\n\nvoid main() {\n    vec2 st = gl_FragCoord.xy / u_resolution;\n    vec2 aspectRatio = vec2(u_resolution.x / u_resolution.y, 1.0);\n\n    float dist = distance(st * aspectRatio, u_center * aspectRatio);\n    if (dist < u_radius) {\n        gl_FragColor = u_color;\n    } else {\n        discard;\n    }\n}";
+const fragmentShaderSourcePoint = "precision mediump float;\nuniform vec2 u_resolution;\nuniform float u_radius;\n\nvoid main() {\n    vec2 coord = gl_PointCoord - vec2(0.5);  // 計算當前像素相對於點中心的座標\n    float dist = length(coord);  // 計算當前像素與點中心的距離\n    float edge = min(2.0 / u_radius, 0.2);\n    float radius = 0.5; // 在點相對空間中，gl_PointSize默認範圍[0, 1]\n    float alpha = smoothstep(radius - edge, radius + edge * 0.1, dist);  // 使用 smoothstep 來處理反鋸齒\n    \n    if (dist > radius) {\n        discard;  // 如果超過半徑，丟棄該片段\n    }\n    // gl_FragColor = vec4(1.0, 1.0, 0.0, 1.0);\n    gl_FragColor = vec4(vec3(1.0, gl_FragCoord.xy / u_resolution), 1.0 - alpha);  // 顏色為紅色，帶有反鋸齒效果的透明度\n}";
+const fragmentShaderSourceJuila = "precision highp float;\n\nuniform mediump vec2 u_resolution; // 畫布的解析度\nuniform vec2 u_offset;\nuniform float u_zoom;\nuniform vec2 u_c; // 常數c的值 \n\nvec2 complexMul(vec2 a, vec2 b) {\n    return vec2(a.x * b.x - a.y * b.y, a.x * b.y + a.y * b.x);\n}\n\nvoid main() {\n    vec2 z = (gl_FragCoord.xy - u_resolution * 0.5) / u_zoom + u_offset;\n    const int maxIterations = 100;\n    for(int i = 0; i < maxIterations; i++) {\n        z = complexMul(z, z) + u_c + u_offset;\n        if(dot(z, z) > 4.0){\n            float color = 0.1 + 0.7 * float(i) / float(maxIterations);\n            gl_FragColor = vec4(vec3(color), 1.0);\n            break;\n        }\n    }\n}";
+const fragmentShaderSourceManderbrot = "precision highp float;\n\nuniform mediump vec2 u_resolution;\nuniform vec2 u_offset;\nuniform float u_zoom;\n\nstruct DoubleVec2 {\n    float high;\n    float low;\n};\n\nfloat decimalPlaces = 30.0;\nfloat scale = pow(10.0, decimalPlaces);\nfloat scaleReverse = pow(10.0, -decimalPlaces);\nfloat scaleSqrt = pow(10.0, decimalPlaces / 2.0);\n\nfloat getHigh(float value){\n    float scaledValue = value * scale;\n    float truncatedValue = floor(scaledValue);\n    float result = truncatedValue * scaleReverse;\n    return result;\n    // return value;\n}\n\n// 雙精度加法\nDoubleVec2 dadd(DoubleVec2 a, DoubleVec2 b) {\n    // 使用高位和低位加法\n    float sumHigh = getHigh(a.high + b.high);\n    float sumLow = a.low + b.low;\n\n    // 計算進位\n    float carry = floor(sumLow) * scaleReverse;\n\n    // 分配尾數\n    DoubleVec2 result;\n    result.high = sumHigh + 0.0;\n    result.low = sumLow - floor(sumLow);\n\n    if(floor(sumLow) > 1.0) result.high = 0.0;\n\n    return result;\n}\n\n//雙精度減法\nDoubleVec2 dminus(DoubleVec2 a, DoubleVec2 b) {\n    float sumHigh = getHigh(a.high - b.high);\n    float sumLow = a.low - b.low;\n    \n    // 分配尾數\n    DoubleVec2 result;\n    result.high = sumHigh + 0.0;\n    result.low = sumLow - floor(sumLow);\n\n    return result;\n}\n\nfloat fmul(float a, float b){\n    float left = (a * scaleSqrt - floor(a * scaleSqrt)) ;\n    float right = (b * scaleSqrt - floor(b * scaleSqrt)) ;\n    return left * right;\n}\n\n// 雙精度乘法\nDoubleVec2 dmul(DoubleVec2 a, DoubleVec2 b) {\n\n    // 0, 1, 2 表示單位，有多少次 2^(24)\n    // 其中 high 是 0，low 是 1，因此2會進位到1，1會進位到0\n    float hh0 = a.high * b.high; // 標準乘法\n    float hh1 = fmul(a.high, b.high); // 溢出小數\n    float hl1 = a.high * b.low + a.low * b.high; // 高位進位\n    float ll2 = a.low * b.low; // 低位進位\n\n    // 單位: n0 = n1 * scaleReverse; n1 = n2 * scaleReverse;\n    float high0 = hh0;\n    float low1 = hh1 + hl1 + floor(ll2) * scaleReverse;\n    // 返回結果\n    DoubleVec2 result;\n    result.high = getHigh(high0 + floor(low1) * scaleReverse);\n    result.low = low1 - floor(low1);\n\n    return result;\n}\n\n\nfloat getExponent(float num){\n    float exponent = floor(log(abs(num)) / log(10.0));\n    return pow(10.0, exponent);\n}\n\n// 雙精度除單精度\nDoubleVec2 ddiv(DoubleVec2 a, float b) {\n\n    float e = getExponent(b);\n    float hh0 = a.high / b;\n    float hh1 = (a.high) / floor(b / e) / e;\n    float hl1 = a.low / b;\n\n    float high0 = hh0;\n    float low1 = hh1 + hl1;\n\n    DoubleVec2 result;\n    result.high = getHigh(high0 + floor(low1) * scaleReverse);\n    result.low = low1 - floor(low1);\n\n    // if(low1 > 0.8) result.high = 0.0;\n    // if(floor(a.high / 100.0) * 100.0 == a.high) result.high = 0.0;\n\n    // if(hh0 / scaleReverse == hh1){\n    //     result.low = hh1;\n    // }\n    // else{\n    //     // result.low = hh1;\n    // }\n\n\n\n    return result;\n}\n\n// 將單精度浮點數轉換為倍精度結構\nDoubleVec2 floatToDoubleVec2(float f) {\n    DoubleVec2 result;\n    result.high = f;\n    result.low = 0.0;\n    return result;\n}\n\n// 將 DoubleVec2 結構轉換為單一浮點數\nfloat DoubleVec2ToFloat(DoubleVec2 d) {\n    return d.high;\n}\n\n// 161789956.22774595\n// 161789956.22774595\n// 546041102.2686427\n// 31958509.872147348\n\n// 2623956791.0043197\n// 802316031.8259898\n// 75031682.7451647\n\nvoid main(){\n\n    const bool isDouble = true;\n    const bool isDouble2 = false;\n    if(isDouble2){\n        \n        DoubleVec2 cX = floatToDoubleVec2(gl_FragCoord.x - u_resolution.x * 0.5 + u_offset.x);\n        DoubleVec2 cY = floatToDoubleVec2(gl_FragCoord.y - u_resolution.y * 0.5 + u_offset.y);\n        cX = ddiv(cX, u_zoom);\n        cY = ddiv(cY, u_zoom);\n        // if(u_offset.x > floor(u_offset.x)) return;\n\n        // if(cX.low == 0.0 && cY.low == 0.0) return;\n        // if(gl_FragCoord.x < 500.0) return;\n        // if(pow(10.0, -44.) == 0.0) return;\n        \n        DoubleVec2 zX = floatToDoubleVec2(0.0);\n        DoubleVec2 zY = floatToDoubleVec2(0.0);\n\n        for (float i = 0.0; i < 100.0; i++) {\n\n            // z = z^2 + c\n            DoubleVec2 zX2 = dmul(zX, zX);\n            DoubleVec2 zY2 = dmul(zY, zY);\n            DoubleVec2 zXY = dmul(zX, zY);\n\n            zX = dadd(dminus(zX2, zY2), cX);\n            zY = dadd(dadd(zXY, zXY), cY);\n\n            // if(zX.low == 0.0 && zY.low == 0.0) return;\n\n            // 使用倍精度計算長度\n            DoubleVec2 len2 = dadd(dmul(zX, zX), dmul(zY, zY));\n            if (DoubleVec2ToFloat(len2) > 4.0) {\n                float color = i / 100.0;\n                gl_FragColor = vec4(color * 0.9, color * 0.8, color * 0.25, 1.0);\n                break;\n            }\n        }\n        return;\n    }\n\n    vec2 c = (gl_FragCoord.xy - u_resolution * 0.5) / u_zoom + u_offset;\n    // vec2 c = (gl_FragCoord.xy - u_resolution * 0.5  + u_offset) / u_zoom;\n    vec2 z = vec2(0.0, 0.0);\n    \n    for (float i = 0.0; i < 100.0; i++) {\n\n        z = vec2(z.x * z.x - z.y * z.y, 2.0 * z.x * z.y) + c;\n        if (length(z) > 2.0){\n            float color = i / 100.0;\n            gl_FragColor = vec4(color, color * 0.5, color * 0.25, 1.0);\n            break;\n        }\n    }\n}\n";
+function createShader(gl2, type, source) {
+  const shader = gl2.createShader(type);
+  gl2.shaderSource(shader, source);
+  gl2.compileShader(shader);
+  const isSuccess = gl2.getShaderParameter(shader, gl2.COMPILE_STATUS);
+  if (isSuccess) {
+    return shader;
+  }
+  console.warn("source: " + source);
+  console.error(gl2.getShaderInfoLog(shader));
+  gl2.deleteShader(shader);
+}
+function createProgram(gl2, vertexShader, fragmentShader) {
+  const program = gl2.createProgram();
+  gl2.attachShader(program, vertexShader);
+  gl2.attachShader(program, fragmentShader);
+  gl2.linkProgram(program);
+  const success = gl2.getProgramParameter(program, gl2.LINK_STATUS);
+  if (success) {
+    return program;
+  }
+  console.error(gl2.getProgramInfoLog(program));
+  gl2.deleteProgram(program);
+}
+const createGLSL = function() {
+  const frame = new Averager(60);
+  this.timestamp = Date.now();
+  this.complex = new Path(0, 0);
+  this.zoom = new Path(250, 0);
+  this.offset = new Path(0, 0);
+  this.setCanvas = (canvas) => {
+    const gl2 = canvas.getContext("webgl2", { antialias: true });
+    this.gl = gl2;
+    this.positionBuffer = gl2.createBuffer();
+    gl2.bindBuffer(gl2.ARRAY_BUFFER, this.positionBuffer);
+    const vertexShader = createShader(gl2, gl2.VERTEX_SHADER, vertexShaderSource);
+    const fragmentShaderRect = createShader(gl2, gl2.FRAGMENT_SHADER, fragmentShaderSourceRect);
+    const fragmentShaderCircle = createShader(gl2, gl2.FRAGMENT_SHADER, fragmentShaderSourceCircle);
+    const fragmentShaderPoint = createShader(gl2, gl2.FRAGMENT_SHADER, fragmentShaderSourcePoint);
+    const fragmentShaderJuila = createShader(gl2, gl2.FRAGMENT_SHADER, fragmentShaderSourceJuila);
+    const fragmentShaderManderbrot = createShader(gl2, gl2.FRAGMENT_SHADER, fragmentShaderSourceManderbrot);
+    this.programRect = createProgram(gl2, vertexShader, fragmentShaderRect);
+    this.programCircle = createProgram(gl2, vertexShader, fragmentShaderCircle);
+    this.programPoint = createProgram(gl2, vertexShader, fragmentShaderPoint);
+    this.programJulia = createProgram(gl2, vertexShader, fragmentShaderJuila);
+    this.programManderbrot = createProgram(gl2, vertexShader, fragmentShaderManderbrot);
+    this.programName = "Manderbrot";
+    this.points = new Array(1e3).fill({}).map(() => {
+      const theta = Math.random() * 2 * Math.PI;
+      const r2 = Math.max(Math.random(), Math.random()) * this.gl.canvas.width / 2;
+      const x2 = this.gl.canvas.width / 2 + r2 * Math.cos(theta);
+      const y2 = this.gl.canvas.height / 2 + r2 * Math.sin(theta);
+      return { "x": x2, "y": y2 };
+    });
+  };
+  this.updateData = (data) => {
+    PathConfig.resetLeap(0, 0, 0);
+    PathConfig.resetPath(0.2, 0, 0.8);
+    this.useMouse = data.useMouse;
+    const frames = 30;
+    this.complex.NewTarget(data.real / 50, data.imaginary / 50, 60);
+    this.zoom.NewTarget(data.zoom, 0, frames);
+    this.offset.NewTarget(data.offsetX / 50 * data.zoom, data.offsetY / 50 * data.zoom, frames);
+    this.programName = this["program" + data.name] ? data.name : "Manderbrot";
+  };
+  this.fillJulia = (real, imaginary, zoom, offsetX, offsetY) => {
+    const program = this["program" + this.programName];
+    this.gl.useProgram(program);
+    const positionAttributeLocation = this.gl.getAttribLocation(program, "a_position");
+    this.gl.enableVertexAttribArray(positionAttributeLocation);
+    this.gl.vertexAttribPointer(positionAttributeLocation, 2, this.gl.FLOAT, false, 0, 0);
+    this.gl.uniform2f(this.gl.getUniformLocation(program, "u_resolution"), this.gl.canvas.width, this.gl.canvas.height);
+    this.gl.uniform2f(this.gl.getUniformLocation(program, "u_c"), real, imaginary);
+    this.gl.uniform1f(this.gl.getUniformLocation(program, "u_zoom"), zoom);
+    this.gl.uniform2f(this.gl.getUniformLocation(program, "u_offset"), offsetX, offsetY);
+    this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.positionBuffer);
+    this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array([
+      0,
+      0,
+      this.gl.canvas.width,
+      0,
+      0,
+      this.gl.canvas.height,
+      this.gl.canvas.width,
+      0,
+      0,
+      this.gl.canvas.height,
+      this.gl.canvas.width,
+      this.gl.canvas.height
+    ]), this.gl.STATIC_DRAW);
+    this.gl.drawArrays(this.gl.TRIANGLES, 0, 6);
+  };
+  this.fillPoint = (points, radius) => {
+    this.gl.useProgram(this.programPoint);
+    this.gl.enable(this.gl.BLEND);
+    this.gl.blendFunc(this.gl.SRC_ALPHA, this.gl.ONE_MINUS_SRC_ALPHA);
+    const positionAttributeLocation = this.gl.getAttribLocation(this.programPoint, "a_position");
+    const resolutionUniformLocation = this.gl.getUniformLocation(this.programPoint, "u_resolution");
+    this.gl.uniform2f(resolutionUniformLocation, this.gl.canvas.width, this.gl.canvas.height);
+    const radiusUniformLocation = this.gl.getUniformLocation(this.programPoint, "u_radius");
+    this.gl.uniform1f(radiusUniformLocation, radius);
+    const srcData = new Float32Array(points.length * 2);
+    points.forEach((point, index) => {
+      srcData[index * 2] = point.x;
+      srcData[index * 2 + 1] = point.y;
+    });
+    this.gl.bufferData(this.gl.ARRAY_BUFFER, srcData, this.gl.STATIC_DRAW);
+    this.gl.enableVertexAttribArray(positionAttributeLocation);
+    this.gl.vertexAttribPointer(positionAttributeLocation, 2, this.gl.FLOAT, false, 0, 0);
+    this.gl.drawArrays(this.gl.POINTS, 0, points.length);
+  };
+  this.fillRect = (x2, y2, width, height, color) => {
+    this.gl.useProgram(this.programRect);
+    const positionAttributeLocation = this.gl.getAttribLocation(this.programRect, "a_position");
+    const resolutionUniformLocation = this.gl.getUniformLocation(this.programRect, "u_resolution");
+    const colorUniformLocation = this.gl.getUniformLocation(this.programRect, "u_color");
+    this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.positionBuffer);
+    setRectangle(this.gl, x2, y2, width, height);
+    this.gl.enableVertexAttribArray(positionAttributeLocation);
+    const size = 2;
+    const type = this.gl.FLOAT;
+    const normalize2 = true;
+    const stride = 8;
+    const offset = 0;
+    this.gl.vertexAttribPointer(positionAttributeLocation, size, type, normalize2, stride, offset);
+    this.gl.uniform2f(resolutionUniformLocation, this.gl.canvas.width, this.gl.canvas.height);
+    this.gl.uniform4f(colorUniformLocation, color[0], color[1], color[2], color[3]);
+    this.gl.drawArrays(this.gl.TRIANGLES, 0, 6);
+    function setRectangle(gl2, x3, y3, width2, height2) {
+      const x1 = x3;
+      const y1 = y3;
+      const x22 = x3 + width2;
+      const y22 = y3 + height2;
+      gl2.bufferData(gl2.ARRAY_BUFFER, new Float32Array([
+        x1,
+        y1,
+        x22,
+        y1,
+        x1,
+        y22,
+        x1,
+        y22,
+        x22,
+        y1,
+        x22,
+        y22
+      ]), gl2.STATIC_DRAW);
+    }
+  };
+  this.fillCircle = () => {
+    this.gl.useProgram(this.programCircle);
+    const positionAttributeLocation = this.gl.getAttribLocation(this.programCircle, "a_position");
+    const resolutionUniformLocation = this.gl.getUniformLocation(this.programCircle, "u_resolution");
+    const colorUniformLocation = this.gl.getUniformLocation(this.programCircle, "u_color");
+    const centerUniformLocation = this.gl.getUniformLocation(this.programCircle, "u_center");
+    const radiusUniformLocation = this.gl.getUniformLocation(this.programCircle, "u_radius");
+    this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.positionBuffer);
+    this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array([
+      0,
+      0,
+      this.gl.canvas.width,
+      0,
+      0,
+      this.gl.canvas.height,
+      this.gl.canvas.width,
+      0,
+      0,
+      this.gl.canvas.height,
+      this.gl.canvas.width,
+      this.gl.canvas.height
+    ]), this.gl.STATIC_DRAW);
+    this.gl.enableVertexAttribArray(positionAttributeLocation);
+    this.gl.vertexAttribPointer(positionAttributeLocation, 2, this.gl.FLOAT, false, 0, 0);
+    this.gl.uniform2f(resolutionUniformLocation, this.gl.canvas.width, this.gl.canvas.height);
+    this.gl.uniform2f(centerUniformLocation, 0.5, 0.5);
+    this.gl.uniform1f(radiusUniformLocation, 0.2);
+    this.gl.uniform4f(colorUniformLocation, Math.random(), Math.random(), Math.random(), 1);
+    this.gl.drawArrays(this.gl.TRIANGLES, 0, 6);
+  };
+  this.update = () => {
+  };
+  this.render = () => {
+    this.gl.clearColor(0, 0, 0, 0);
+    this.gl.clear(this.gl.COLOR_BUFFER_BIT);
+    const real = this.useMouse ? (myMouse.pointX - this.gl.canvas.width / 2) / this.zoom.pointX : this.complex.pointX;
+    const imaginary = this.useMouse ? -1 * (myMouse.pointY - this.gl.canvas.height / 2) / this.zoom.pointX : this.complex.pointY;
+    this.fillJulia(real, imaginary, this.zoom.pointX, this.offset.pointX / this.zoom.pointX, this.offset.pointY / this.zoom.pointX);
+    frame.updateValue(Date.now() - this.timestamp);
+    this.timestamp = Date.now();
+  };
+  this.dispose = () => {
+    if (this.gl) {
+      this.gl.getExtension("WEBGL_lose_context").loseContext();
+      this.gl = null;
+    }
+    if (this.canvas) {
+      this.canvas = null;
+    }
+  };
+  return this;
+};
+const myGLSL = new createGLSL();
+const CanvasSectionS4 = ({ ratio, max }) => {
+  const canvas = reactExports.useRef();
+  const section = reactExports.useRef();
+  const [uniqueID] = reactExports.useState("JuliaSet");
+  reactExports.useEffect(() => {
+    manager.addSubjectElement(section.current);
+    manager.registerAnimationCallback("update" + uniqueID, myGLSL.update);
+    manager.registerAnimationCallback("render" + uniqueID, myGLSL.render);
+    myGLSL.setCanvas(canvas.current);
+    return () => {
+      myGLSL.dispose();
+      manager.unregisterAnimationCallback("update" + uniqueID);
+      manager.unregisterAnimationCallback("render" + uniqueID);
+    };
+  }, []);
+  const [name2, setName] = reactExports.useState("Julia");
+  const state = {
+    "name": [name2, setName],
+    "useMouse": reactExports.useState(1),
+    "real": reactExports.useState(0),
+    "imaginary": reactExports.useState(0),
+    "zoom": reactExports.useState(250),
+    "offsetX": reactExports.useState(0),
+    "offsetY": reactExports.useState(0)
+  };
+  function setAllState() {
+    state.real[1](0);
+    state.imaginary[1](0);
+    state.zoom[1](250);
+    state.offsetX[1](0);
+    state.offsetY[1](0);
+  }
+  const menu = reactExports.useRef();
+  function setState(key, value) {
+    const setFunction = state[key][1];
+    setFunction(value);
+  }
+  function addState(key, value) {
+    const setFunction = state[key][1];
+    const currentValue = state[key][0];
+    setFunction(currentValue + value);
+    return currentValue * value;
+  }
+  function mulState(key, value) {
+    const setFunction = state[key][1];
+    const currentValue = state[key][0];
+    setFunction(currentValue * value);
+    return currentValue * value;
+  }
+  function handleWebGLControl(e) {
+    const ID = e.target.id;
+    const value = e.target.value;
+    if (!state[ID]) {
+      console.warn("invalid key(ID): " + ID + ", check whether it is in object state");
+      return;
+    }
+    setState(ID, value * 1);
+  }
+  function handleWheel(e) {
+    const zoom = e.deltaY > 0 ? 0.5 : 1.5;
+    const offsetX = (canvas.current.width / 2 - myMouse.targetX) / state.zoom[0] * 50;
+    const offsetY = -(canvas.current.height / 2 - myMouse.targetY) / state.zoom[0] * 50;
+    mulState("zoom", zoom);
+    setState("offsetX", state.offsetX[0] + offsetX / zoom - offsetX);
+    setState("offsetY", state.offsetY[0] + offsetY / zoom - offsetY);
+  }
+  const [isMouseDown, setIsMouseDown] = reactExports.useState(false);
+  const [preMouse, setPreMouse] = reactExports.useState([0, 0]);
+  function handleMouseDown() {
+    setIsMouseDown(true);
+    setPreMouse([myMouse.targetX, myMouse.targetY]);
+    canvas.current.classList.remove("cursor-grab");
+    canvas.current.classList.add("cursor-grabbing");
+  }
+  function handleMouseUp() {
+    setIsMouseDown(false);
+    canvas.current.classList.remove("cursor-grabbing");
+    canvas.current.classList.add("cursor-grab");
+  }
+  function handleMouseMove(e) {
+    if (!state.useMouse[0]) return;
+    if (isMouseDown) {
+      setPreMouse([myMouse.targetX, myMouse.targetY]);
+      const offsetX = (myMouse.targetX - preMouse[0]) / state.zoom[0] * 50;
+      const offsetY = (myMouse.targetY - preMouse[1]) / state.zoom[0] * 50;
+      addState("offsetX", -offsetX);
+      addState("offsetY", offsetY);
+    }
+    setState("real", Math.floor((myMouse.targetX - canvas.current.width / 2) / state.zoom[0] * 100));
+    setState("imaginary", -1 * Math.floor((myMouse.targetY - canvas.current.height / 2) / state.zoom[0] * 100));
+  }
+  reactExports.useState(10);
+  reactExports.useEffect(() => {
+    const data = {};
+    Object.keys(state).forEach((key) => {
+      data[key] = state[key][0];
+    });
+    myGLSL.updateData(data);
+  }, [state]);
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs(
+    "section",
+    {
+      ref: section,
+      className: "section",
+      id: uniqueID,
+      onMouseDown: handleMouseDown,
+      onMouseUp: handleMouseUp,
+      onMouseMove: handleMouseMove,
+      onWheel: handleWheel,
+      children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("canvas", { ref: canvas, className: "cursor-grab", id: "canvasS4", width: max * ratio, height: ratio * max * ratio }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { ref: menu, className: "gamemenu", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("header", { id: "header", children: /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { children: name2 + "Set" }) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "parameter", children: [
+            state.name[0] == "Julia" && /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("label", { children: [
+                "公式: Z = Z ^ 2 + C，其中:C = 1/100 * ",
+                /* @__PURE__ */ jsxRuntimeExports.jsx("input", { onChange: handleWebGLControl, type: "number", id: "real", value: state.real[0] }),
+                "+"
+              ] }),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("label", { children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx("input", { onChange: handleWebGLControl, type: "number", id: "imaginary", value: state.imaginary[0] }),
+                "i"
+              ] })
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("label", { children: " " }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("label", { children: [
+              "zoom: ",
+              /* @__PURE__ */ jsxRuntimeExports.jsx("input", { onChange: handleWebGLControl, type: "number", id: "zoom", step: "10", value: state.zoom[0] })
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("label", { children: [
+              "offset: [",
+              /* @__PURE__ */ jsxRuntimeExports.jsx("input", { onChange: handleWebGLControl, type: "number", id: "offsetX", value: state.offsetX[0] }),
+              ","
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("label", { children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("input", { onChange: handleWebGLControl, type: "number", id: "offsetY", value: state.offsetY[0] }),
+              "]"
+            ] })
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "controlpanel", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("label", { children: "★" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: handleWebGLControl, id: "useMouse", value: state.useMouse[0] ? 0 : 1, children: state.useMouse[0] ? "也可以使用面板" : "還是用滑鼠好了" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: () => setName("Julia"), disabled: name2 == "Julia" ? true : false, children: "查看Julia" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: () => setName("Manderbrot"), disabled: name2 == "Manderbrot" ? true : false, children: "查看Manderbrot" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: setAllState, children: "畫面置中" })
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { id: "dialogbox", children: /* @__PURE__ */ jsxRuntimeExports.jsx("p", { id: "dialog", children: "滑鼠可以拖曳畫面、控制滾輪局部放大" }) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(SlideMenuBtn, { menu })
+        ] })
+      ]
+    }
+  );
 };
 var lodash = { exports: {} };
 /**
@@ -32985,81 +33510,8 @@ function downloadMedia(data) {
     document.body.removeChild(a);
   }, 0);
 }
-const managerMaker = function() {
-  this.validId = ["S1", "S2", "S3"];
-  this.lastId = "";
-  this.lastRequestName = [];
-  this.request = {};
-  this.getRequestById = (id2) => {
-    if (typeof isSomethingHappended !== "undefined") return null;
-    const req = [];
-    for (let key in this.request) {
-      if (key.includes(id2)) req.push(key);
-    }
-    return req;
-  };
-  this.updateRequestAnimation = (id2) => {
-    const names = this.getRequestById(id2);
-    if (names === null) return;
-    this.lastId = id2;
-    this.lastRequestName.forEach((name2) => {
-      cancelAnimationFrame(this.request[name2].ID);
-    });
-    this.lastRequestName = names;
-    names.forEach((name2) => {
-      if (typeof this.request[name2] === "undefined") return console.warn("invalid request");
-      if (typeof this.request[name2].method === "undefined") return console.warn("invalid requestMethod");
-      if (this.request[name2].isPause) return;
-      this.request[name2].ID = requestAnimationFrame(this.request[name2].method);
-    });
-  };
-  this.pauseAnimationByName = (name2) => {
-    cancelAnimationFrame(this.request[name2].ID);
-    this.request[name2].isPause = true;
-  };
-  this.resumeAnimationByName = (name2) => {
-    this.request[name2].isPause = false;
-    cancelAnimationFrame(this.request[name2].ID);
-    this.request[name2].ID = requestAnimationFrame(this.request[name2].method);
-  };
-  this.addAnimationCallback = (callback) => {
-    const string = callback.name || "#" + Math.random();
-    const name2 = string.match(" ") ? string.split(" ")[1] : string;
-    this.request[name2] = this.request[name2] || {};
-    this.request[name2].method = (function animate() {
-      callback();
-      this.request[name2].ID = requestAnimationFrame(animate.bind(this));
-    }).bind(this);
-    const valid = this.validId.some((ID) => name2.includes(ID));
-    if (!valid) console.warn("naming issue: " + name2 + " should include one of following letters: " + this.validId);
-  };
-  this.registerAnimationCallback = (name2, callback) => {
-    this.request[name2] = this.request[name2] || {};
-    this.request[name2].method = (function animate() {
-      callback();
-      this.request[name2].ID = requestAnimationFrame(animate.bind(this));
-    }).bind(this);
-    const valid = this.validId.some((ID) => name2.includes(ID));
-    if (!valid) console.warn("naming issue: " + name2 + " should include one of following letters: " + this.validId);
-  };
-  this.addIntersectionObserver = () => {
-    this.io = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        if (entry.intersectionRatio === 0) return;
-        manager.updateRequestAnimation(entry.target.id);
-      });
-    });
-  };
-  this.addSubjectElements = (elements) => {
-    elements.forEach((el2) => {
-      this.io.unobserve(el2);
-      this.io.observe(el2);
-    });
-  };
-  return this;
-};
-const manager = new managerMaker();
 function Playground({ margin }) {
+  const [isOpen, setIsOpen] = reactExports.useState(true);
   const breakpoint = 992 - margin * 2;
   const [width, height] = useWindowSize(margin);
   const [ratio, setRatio] = reactExports.useState(width > breakpoint ? 1 : 2);
@@ -33072,25 +33524,12 @@ function Playground({ margin }) {
     if (w2 > breakpoint) return w2 < h ? w2 : h;
     else return w2 * 2 < h ? w2 : h / 2;
   }
-  const sections = [reactExports.useRef(), reactExports.useRef(), reactExports.useRef()];
-  const [myMouse] = reactExports.useState(new Path());
-  reactExports.useEffect(() => {
-    const elements = sections.map((obj) => {
-      if (obj.current) return obj.current;
-    });
-    manager.addIntersectionObserver();
-    manager.addSubjectElements(elements);
-    manager.addAnimationCallback(myMouse.NextFrame);
-    console.log(manager);
-  }, []);
   function handleMouseMove(e) {
     const rect = e.target.getBoundingClientRect();
-    {
-      const a = e.pageX - rect.x;
-      const b = e.pageY - rect.y;
-      const frames = 30;
-      myMouse.NewTarget(a, b, frames);
-    }
+    const a = e.pageX - rect.x;
+    const b = e.pageY - rect.y;
+    const frames = 30;
+    myMouse.NewTarget(a, b, frames);
   }
   const audio = reactExports.useRef();
   const canvas = { "S1": reactExports.useRef(), "S2": reactExports.useRef(), "S3": reactExports.useRef() };
@@ -33122,7 +33561,7 @@ function Playground({ margin }) {
     media.recorder.start(1e3);
     setStatus("Stop");
   }
-  return /* @__PURE__ */ jsxRuntimeExports.jsxs(
+  return /* @__PURE__ */ jsxRuntimeExports.jsx(jsxRuntimeExports.Fragment, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
     "div",
     {
       id: "playground",
@@ -33133,13 +33572,14 @@ function Playground({ margin }) {
         "margin": margin + "px auto"
       },
       children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(CanvasSectionS1, { section: sections[0], canvas: canvas.S1, ratio, max, status, handleClick: handleRecord, manager, myMouse }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(SectionS2, { section: sections[1], canvas: canvas.S2, audio, ratio, max, status, handleClick: handleRecord, manager, myMouse }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(CanvasSectionS3, { section: sections[2], canvas: canvas.S3, ratio, max, status, handleClick: handleRecord, manager, myMouse }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(CanvasSectionS4, { ratio, max }),
+        isOpen && /* @__PURE__ */ jsxRuntimeExports.jsx(CanvasSectionS1, { canvas: canvas.S1, ratio, max, status, handleClick: handleRecord, manager, myMouse }),
+        isOpen && /* @__PURE__ */ jsxRuntimeExports.jsx(SectionS2, { canvas: canvas.S2, audio, ratio, max, status, handleClick: handleRecord, manager, myMouse }),
+        isOpen && /* @__PURE__ */ jsxRuntimeExports.jsx(CanvasSectionS3, { canvas: canvas.S3, ratio, max, status, handleClick: handleRecord, manager, myMouse }),
         /* @__PURE__ */ jsxRuntimeExports.jsx(CookieTable, {})
       ]
     }
-  );
+  ) });
 }
 function App() {
   return /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
@@ -33150,4 +33590,4 @@ function App() {
 const domNode = document.getElementById("root");
 const root = createRoot(domNode);
 root.render(/* @__PURE__ */ jsxRuntimeExports.jsx(App, {}));
-//# sourceMappingURL=index-c6NRDpsU.js.map
+//# sourceMappingURL=index-CknSMPmw.js.map
