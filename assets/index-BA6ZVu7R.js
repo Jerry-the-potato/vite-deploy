@@ -27426,6 +27426,10 @@ const CanvasSectionS3 = ({ canvas, ratio, max, status, handleClick }) => {
         /* @__PURE__ */ jsxRuntimeExports.jsx("input", { onChange: physic.setPath, type: "number", id: "leapLinear", defaultValue: "0" }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("label", { children: "easein :" }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("input", { onChange: physic.setPath, type: "number", id: "leapEasein", defaultValue: "-2" }),
+        ratio > 1 && /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("label", { children: " " }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("label", { children: " " })
+        ] }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("label", { children: "easeout :" }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("input", { onChange: physic.setPath, type: "number", id: "leapEaseout", defaultValue: "2" })
       ] }),
@@ -27719,7 +27723,7 @@ function RecordBtn({ canvas, audio }) {
   }
   return /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: handleClick, children: status });
 }
-const MESSAGE_MOUSE_READY = "滑鼠可以操作畫面（左鍵、滾輪）：";
+const MESSAGE_MOUSE_READY = "滑鼠可以操作畫面：";
 const MESSAGE_MOUSE_LOCKED = "滑鼠已鎖定！點擊上方按鈕以解鎖";
 const MESSAGE_DRAGGING = "開始拖曳移動畫面";
 const MESSAGE_ZOOMING = "滾輪放大縮小";
@@ -27777,8 +27781,8 @@ const CanvasSectionS4 = ({ ratio, max }) => {
   const preMouse = reactExports.useRef([0, 0]);
   const logRef = reactExports.useRef();
   function handleMouseDown(e) {
-    setIsWheel(false);
     if (e.target.tagName == "BUTTON" || e.target.tagName == "INPUT") return;
+    setIsWheel(false);
     setIsMouseDown(true);
     preMouse.current = [myMouse.targetX, myMouse.targetY];
     canvas.current.classList.remove("cursor-grab");
@@ -27789,7 +27793,7 @@ const CanvasSectionS4 = ({ ratio, max }) => {
     canvas.current.classList.remove("cursor-grabbing");
     canvas.current.classList.add("cursor-grab");
   }
-  function handleMouseMove() {
+  function handleMouseMove(e) {
     if (!useMouse) return;
     if (isMouseDown) {
       const addOffsetX = (myMouse.targetX - preMouse.current[0]) / zoom * 50;
@@ -27808,12 +27812,17 @@ const CanvasSectionS4 = ({ ratio, max }) => {
     return Math.sqrt(dx * dx + dy * dy);
   }
   function handleTouchStart(e) {
-    handleMouseDown(e);
+    preMouse.current = [myMouse.targetX, myMouse.targetY];
+    setIsMouseDown(true);
     if (e.touches.length === 2) {
+      setIsWheel(true);
       initialDistance.current = getDistance(e.touches[0], e.touches[1]);
+    } else {
+      setIsWheel(false);
     }
   }
   function handleTouchMove(e) {
+    if (e.target.tagName == "BUTTON" || e.target.tagName == "INPUT") return;
     if (e.touches.length === 2) {
       const newDistance = getDistance(e.touches[0], e.touches[1]);
       const zoomIn = newDistance / initialDistance.current;
@@ -27837,9 +27846,11 @@ const CanvasSectionS4 = ({ ratio, max }) => {
     }
   }
   function handleTouchEnd(e) {
-    handleMouseUp();
     if (e.touches.length < 2) {
+      setIsWheel(false);
       initialDistance.current = 0;
+    } else if (e.touches.length < 1) {
+      setIsMouseDown(false);
     }
   }
   const step = reactExports.useMemo(() => {
@@ -27868,30 +27879,21 @@ const CanvasSectionS4 = ({ ratio, max }) => {
           /* @__PURE__ */ jsxRuntimeExports.jsx("header", { id: "header", children: /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { children: isJulia ? "JuliaSet" : "Manderbrot" }) }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "parameter", children: [
             isJulia && /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsxs("label", { children: [
-                "公式: Z = Z ^ 2 + C，其中:C = 1/100 * ",
-                /* @__PURE__ */ jsxRuntimeExports.jsx("input", { onChange: (e) => setReal(e.target.value * 1), type: "number", id: "real", value: Math.floor(real) }),
-                "+"
-              ] }),
-              /* @__PURE__ */ jsxRuntimeExports.jsxs("label", { children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx("input", { onChange: (e) => setImaginary(e.target.value * 1), type: "number", id: "imaginary", value: Math.floor(imaginary) }),
-                "i"
-              ] })
+              /* @__PURE__ */ jsxRuntimeExports.jsx("label", { children: "Cx" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("input", { onChange: (e) => setReal(e.target.value * 1), type: "number", id: "real", value: Math.floor(real) }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("label", { children: "Cy" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("input", { onChange: (e) => setImaginary(e.target.value * 1), type: "number", id: "imaginary", value: Math.floor(imaginary) })
             ] }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("label", { children: " " }),
-            /* @__PURE__ */ jsxRuntimeExports.jsxs("label", { children: [
-              "zoom: ",
-              /* @__PURE__ */ jsxRuntimeExports.jsx("input", { onChange: (e) => setZoom(e.target.value * 1), type: "number", id: "zoom", step, value: Math.floor(zoom) })
+            /* @__PURE__ */ jsxRuntimeExports.jsx("label", { children: "zoom" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("input", { onChange: (e) => setZoom(e.target.value * 1), type: "number", id: "zoom", step, value: Math.floor(zoom) }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("label", { children: "offsetX" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("input", { onChange: (e) => setOffsetX(e.target.value * 1), type: "number", step: 10 / step, id: "offsetX", value: getPreciseOffset(offsetX) }),
+            ratio > 1 && /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("label", { children: " " }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("label", { children: " " })
             ] }),
-            /* @__PURE__ */ jsxRuntimeExports.jsxs("label", { children: [
-              "offset: [",
-              /* @__PURE__ */ jsxRuntimeExports.jsx("input", { onChange: (e) => setOffsetX(e.target.value * 1), type: "number", step: 10 / step, id: "offsetX", value: getPreciseOffset(offsetX) }),
-              ","
-            ] }),
-            /* @__PURE__ */ jsxRuntimeExports.jsxs("label", { children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx("input", { onChange: (e) => setOffsetY(e.target.value * 1), type: "number", id: "offsetY", step: 10 / step, value: getPreciseOffset(offsetY) }),
-              "]"
-            ] })
+            /* @__PURE__ */ jsxRuntimeExports.jsx("label", { children: "offsetY" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("input", { onChange: (e) => setOffsetY(e.target.value * 1), type: "number", id: "offsetY", step: 10 / step, value: getPreciseOffset(offsetY) })
           ] }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "controlpanel", children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx("label", { children: "★" }),
@@ -27904,7 +27906,7 @@ const CanvasSectionS4 = ({ ratio, max }) => {
               /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: () => myGLSL.setTransform(100), disabled: false, children: "查看BurningShip" })
             ] })
           ] }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { ref: logRef, children: /* @__PURE__ */ jsxRuntimeExports.jsx("p", { id: "dialog", children: useMouse ? MESSAGE_MOUSE_READY + (isMouseDown ? MESSAGE_DRAGGING : isWheel ? MESSAGE_ZOOMING : "") : MESSAGE_MOUSE_LOCKED }) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { ref: logRef, children: /* @__PURE__ */ jsxRuntimeExports.jsx("p", { id: "dialog", children: useMouse ? MESSAGE_MOUSE_READY + (isWheel ? MESSAGE_ZOOMING : isMouseDown ? MESSAGE_DRAGGING : "") : MESSAGE_MOUSE_LOCKED }) }),
           /* @__PURE__ */ jsxRuntimeExports.jsx(SlideMenuBtn, { menu })
         ] })
       ]
@@ -33687,4 +33689,4 @@ function App() {
 const domNode = document.getElementById("root");
 const root = createRoot(domNode);
 root.render(/* @__PURE__ */ jsxRuntimeExports.jsx(App, {}));
-//# sourceMappingURL=index-BGD2t2us.js.map
+//# sourceMappingURL=index-BA6ZVu7R.js.map
