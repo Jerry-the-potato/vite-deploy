@@ -77,13 +77,13 @@ const CanvasSectionS4 = ({ ratio, max }) => {
     }
 
     const [isMouseDown, setIsMouseDown] = useState(false);
-    const [preMouse, setPreMouse] = useState([0, 0]);
+    const preMouse = useRef([0, 0]);
     const logRef = useRef();
     function handleMouseDown(e){
         setIsWheel(false);
         if(e.target.tagName == "BUTTON" || e.target.tagName == "INPUT") return;
         setIsMouseDown(true);
-        setPreMouse([myMouse.targetX, myMouse.targetY]);
+        preMouse.current = [myMouse.targetX, myMouse.targetY];
         canvas.current.classList.remove('cursor-grab');
         canvas.current.classList.add('cursor-grabbing');
     }
@@ -95,9 +95,9 @@ const CanvasSectionS4 = ({ ratio, max }) => {
     function handleMouseMove(){
         if(!useMouse) return;
         if(isMouseDown){
-            setPreMouse([myMouse.targetX, myMouse.targetY]);
-            const addOffsetX = (myMouse.targetX - preMouse[0]) / zoom * 50;
-            const addOffsetY = (myMouse.targetY - preMouse[1]) / zoom * 50;
+            const addOffsetX = (myMouse.targetX - preMouse.current[0]) / zoom * 50;
+            const addOffsetY = (myMouse.targetY - preMouse.current[1]) / zoom * 50;
+            preMouse.current = [myMouse.targetX, myMouse.targetY];
             setOffsetX(offsetX - addOffsetX);
             setOffsetY(offsetY + addOffsetY);
         }
@@ -121,23 +121,23 @@ const CanvasSectionS4 = ({ ratio, max }) => {
         if (e.touches.length === 2) {
             // 兩個手指，判定縮放
             const newDistance = getDistance(e.touches[0], e.touches[1]);
-            const zoom = newDistance / initialDistance.current;
+            const zoomIn = newDistance / initialDistance.current;
 
             // myMouse 儲存的是父層PlayGround的Touchmove事件中的第一個手指頭
             const addOffsetX = (canvas.current.width / 2 - myMouse.targetX) / zoom * 50;
             const addOffsetY = -(canvas.current.height / 2 - myMouse.targetY) / zoom * 50;
-            setZoom(zoom * zommIn);
-            setOffsetX(offsetX + addOffsetX / zommIn - addOffsetX);
-            setOffsetY(offsetY + addOffsetY / zommIn - addOffsetY);
+            setZoom(zoom * zoomIn);
+            setOffsetX(offsetX + addOffsetX / zoomIn - addOffsetX);
+            setOffsetY(offsetY + addOffsetY / zoomIn - addOffsetY);
             // 更新初始距離
             initialDistance.current = newDistance;
             e.preventDefault();  // 防止頁面滾動
         }
         else{
             // 預設為一個手指
-            setPreMouse([myMouse.targetX, myMouse.targetY]);
-            const addOffsetX = (myMouse.targetX - preMouse[0]) / zoom * 50;
-            const addOffsetY = (myMouse.targetY - preMouse[1]) / zoom * 50;
+            const addOffsetX = (myMouse.targetX - preMouse.current[0]) / zoom * 50;
+            const addOffsetY = (myMouse.targetY - preMouse.current[1]) / zoom * 50;
+            preMouse.current = [myMouse.targetX, myMouse.targetY];
             setOffsetX(offsetX - addOffsetX);
             setOffsetY(offsetY + addOffsetY);
             setReal(((myMouse.targetX - canvas.current.width / 2) / zoom * 50));
