@@ -27841,7 +27841,6 @@ const CanvasSectionS4 = ({ ratio, max }) => {
     if (e.touches.length < 2) {
       initialDistance.current = 0;
     }
-    e.preventDefault();
   }
   const step = reactExports.useMemo(() => {
     const decimal = Math.floor(Math.log(zoom) / Math.log(10)) - 1;
@@ -33688,4 +33687,4 @@ function App() {
 const domNode = document.getElementById("root");
 const root = createRoot(domNode);
 root.render(/* @__PURE__ */ jsxRuntimeExports.jsx(App, {}));
-//# sourceMappingURL=index-Daug00_f.js.map
+//# sourceMappingURL=index-BGD2t2us.js.map
