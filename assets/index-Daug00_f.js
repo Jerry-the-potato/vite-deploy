@@ -27817,8 +27817,10 @@ const CanvasSectionS4 = ({ ratio, max }) => {
     if (e.touches.length === 2) {
       const newDistance = getDistance(e.touches[0], e.touches[1]);
       const zoomIn = newDistance / initialDistance.current;
-      const addOffsetX = (canvas.current.width / 2 - myMouse.targetX) / zoom * 50;
-      const addOffsetY = -(canvas.current.height / 2 - myMouse.targetY) / zoom * 50;
+      const centerX = (myMouse.targetX + e.touches[1].clientX) / 2;
+      const centerY = (myMouse.targetY + e.touches[1].clientY) / 2;
+      const addOffsetX = (canvas.current.width / 2 - centerX) / zoom * 50;
+      const addOffsetY = -(canvas.current.height / 2 - centerY) / zoom * 50;
       setZoom(zoom * zoomIn);
       setOffsetX(offsetX + addOffsetX / zoomIn - addOffsetX);
       setOffsetY(offsetY + addOffsetY / zoomIn - addOffsetY);
@@ -33686,4 +33688,4 @@ function App() {
 const domNode = document.getElementById("root");
 const root = createRoot(domNode);
 root.render(/* @__PURE__ */ jsxRuntimeExports.jsx(App, {}));
-//# sourceMappingURL=index-Dcd6MzoL.js.map
+//# sourceMappingURL=index-Daug00_f.js.map
