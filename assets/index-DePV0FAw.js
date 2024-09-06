@@ -27808,6 +27808,7 @@ const CanvasSectionS4 = ({ ratio, max }) => {
     return Math.sqrt(dx * dx + dy * dy);
   }
   function handleTouchStart(e) {
+    e.preventDefault();
     handleMouseDown(e);
     if (e.touches.length === 2) {
       initialDistance.current = getDistance(e.touches[0], e.touches[1]);
@@ -33686,4 +33687,4 @@ function App() {
 const domNode = document.getElementById("root");
 const root = createRoot(domNode);
 root.render(/* @__PURE__ */ jsxRuntimeExports.jsx(App, {}));
-//# sourceMappingURL=index-FHDU-WuA.js.map
+//# sourceMappingURL=index-DePV0FAw.js.map
