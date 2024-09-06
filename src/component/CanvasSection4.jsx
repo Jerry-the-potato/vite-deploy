@@ -124,8 +124,12 @@ const CanvasSectionS4 = ({ ratio, max }) => {
             const zoomIn = newDistance / initialDistance.current;
 
             // myMouse 儲存的是父層PlayGround的Touchmove事件中的第一個手指頭
-            const addOffsetX = (canvas.current.width / 2 - myMouse.targetX) / zoom * 50;
-            const addOffsetY = -(canvas.current.height / 2 - myMouse.targetY) / zoom * 50;
+            // const addOffsetX = (canvas.current.width / 2 - myMouse.targetX) / zoom * 50;
+            // const addOffsetY = -(canvas.current.height / 2 - myMouse.targetY) / zoom * 50;
+            const centerX = (myMouse.targetX + e.touches[1].clientX) / 2;
+            const centerY = (myMouse.targetY + e.touches[1].clientY) / 2;
+            const addOffsetX = (canvas.current.width / 2 - centerX) / zoom * 50;
+            const addOffsetY = -(canvas.current.height / 2 - centerY) / zoom * 50;
             setZoom(zoom * zoomIn);
             setOffsetX(offsetX + addOffsetX / zoomIn - addOffsetX);
             setOffsetY(offsetY + addOffsetY / zoomIn - addOffsetY);
