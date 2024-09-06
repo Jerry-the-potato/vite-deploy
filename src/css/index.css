@@ -139,6 +139,9 @@ div#playground section h4{
 
 /* 遊戲介面架構 */
 .gamemenu{
+  user-select: none;
+  -moz-user-select: none; /* Firefox */
+  -webkit-user-select: none;  /* Chrome , Safari*/
   position: absolute;
   left: 0;
   margin: 0 10px;
@@ -184,7 +187,7 @@ div#playground section h4{
           color: var(--soft-color);
       }
       .gamemenu .parameter input{
-          width: 3em;
+          width: 4em;
           font-size: 1em;
           margin: 0 0.5em 0 0.5em;
           padding: 0 0 0 0.5em;

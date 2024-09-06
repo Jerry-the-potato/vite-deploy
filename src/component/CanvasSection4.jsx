@@ -1,8 +1,14 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import myGLSL from "../js/fractalWebGL.js";
 import manager from "../js/animateManager.js";
 import myMouse from "../js/myMouse.js";
 import SlideMenuBtn from "./SlideMenuBtn.jsx";
+import RecordBtn from "./RecordBtn.jsx";
+
+const MESSAGE_MOUSE_READY = "滑鼠可以操作畫面（左鍵、滾輪）：";
+const MESSAGE_MOUSE_LOCKED = "滑鼠已鎖定！點擊上方按鈕以解鎖";
+const MESSAGE_DRAGGING = "開始拖曳移動畫面";
+const MESSAGE_ZOOMING = "滾輪放大縮小"
 
 const CanvasSectionS4 = ({ ratio, max }) => {
     const canvas = useRef();
@@ -20,120 +26,180 @@ const CanvasSectionS4 = ({ ratio, max }) => {
             manager.unregisterAnimationCallback("render" + uniqueID);
         };
     }, []);
-    const [name, setName] = useState("Julia");
-    const state = {
-        "name": [name, setName],
-        "useMouse": useState(1),
-        "real": useState(0),
-        "imaginary": useState(0),
-        "zoom": useState(250),
-        "offsetX" : useState(0),
-        "offsetY" : useState(0),
-    }
-    function setAllState(){
-        state.real[1](0);
-        state.imaginary[1](0);
-        state.zoom[1](250);
-        state.offsetX[1](0);
-        state.offsetY[1](0);
+    const [isJulia, setIsJulia] = useState(true);
+    const [useMouse, setUseMouse] = useState(1);
+    const [real, setReal] = useState(0);
+    const [imaginary, setImaginary] = useState(0);
+    const [zoom, setZoom] = useState(250);
+    const [offsetX, setOffsetX] = useState(0);
+    const [offsetY, setOffsetY] = useState(0);
+    const [transform, setTransform] = useState(0);
+
+    const frameRef = useRef();
+    useEffect(()=>{
+        const data = {isJulia, useMouse, real, imaginary, zoom, offsetX, offsetY, transform};
+        if (frameRef.current) cancelAnimationFrame(frameRef.current);
+        frameRef.current = requestAnimationFrame(() => {myGLSL.updateData(data)});
+    }, [isJulia, useMouse, real, imaginary, zoom, offsetX, offsetY, transform]);
+
+    // const state = {
+    //     "isJulia": [isJulia, setIsJulia],
+    //     "useMouse": [useMouse, setUseMouse],
+    //     "real": [real, setReal],
+    //     "imaginary": [imaginary, setImaginary],
+    //     "zoom": [zoom, setZoom],
+    //     "offsetX" : [offsetX, setOffsetX],
+    //     "offsetY" : [offsetY, setOffsetY],
+    //     "transform" : [transform, setTransform],
+    // }
+    // Object.keys(state).forEach((key) => {
+    //     data[key] = state[key];
+    // });
+    function resetScreen(){
+        setReal(0);
+        setImaginary(0);
+        setZoom(250);
+        setOffsetX(0);
+        setOffsetY(0);
     }
     const menu = useRef();
-    function setState(key, value){
-        const setFunction = state[key][1];
-        setFunction(value);
-    }
-    function addState(key, value){
-        const setFunction = state[key][1];
-        const currentValue = state[key][0];
-        setFunction(currentValue + value);
-        return currentValue * value;
-    }
-    function mulState(key, value){
-        const setFunction = state[key][1];
-        const currentValue = state[key][0];
-        setFunction(currentValue * value);
-        return currentValue * value;
-    }
-    function handleWebGLControl(e){
-        const ID = e.target.id;
-        const value = e.target.value;
-        if(!state[ID]){
-            console.warn("invalid key(ID): " + ID + ", check whether it is in object state");
-            return;
-        }
-        setState(ID, value * 1);
-    };
+    
+    const [isWheel, setIsWheel] = useState(false);
     function handleWheel(e){
-        const zoom = (e.deltaY > 0) ? 0.5 : 1.5;
-        const offsetX = (canvas.current.width / 2 - myMouse.targetX) / state.zoom[0] * 50;
-        const offsetY = -(canvas.current.height / 2 - myMouse.targetY) / state.zoom[0] * 50;
-        const nextZoom = mulState("zoom", zoom);
-        setState("offsetX", state.offsetX[0] + offsetX / zoom - offsetX);
-        setState("offsetY", state.offsetY[0] + offsetY / zoom - offsetY);
+        setIsWheel(true);
+        if(!useMouse) return;
+        const zommIn = (e.deltaY > 0) ? 0.5 : 1.5;
+        const addOffsetX = (canvas.current.width / 2 - myMouse.targetX) / zoom * 50;
+        const addOffsetY = -(canvas.current.height / 2 - myMouse.targetY) / zoom * 50;
+        setZoom(zoom * zommIn);
+        setOffsetX(offsetX + addOffsetX / zommIn - addOffsetX);
+        setOffsetY(offsetY + addOffsetY / zommIn - addOffsetY);
     }
 
     const [isMouseDown, setIsMouseDown] = useState(false);
     const [preMouse, setPreMouse] = useState([0, 0]);
-    function handleMouseDown(){
+    const logRef = useRef();
+    function handleMouseDown(e){
+        setIsWheel(false);
+        if(e.target.tagName == "BUTTON" || e.target.tagName == "INPUT") return;
         setIsMouseDown(true);
         setPreMouse([myMouse.targetX, myMouse.targetY]);
         canvas.current.classList.remove('cursor-grab');
         canvas.current.classList.add('cursor-grabbing');
-
     }
     function handleMouseUp(){
         setIsMouseDown(false);
         canvas.current.classList.remove('cursor-grabbing');
         canvas.current.classList.add('cursor-grab');
     }
-    function handleMouseMove(e){
-        if(!state.useMouse[0]) return;
+    function handleMouseMove(){
+        if(!useMouse) return;
         if(isMouseDown){
             setPreMouse([myMouse.targetX, myMouse.targetY]);
-            const offsetX = (myMouse.targetX - preMouse[0]) / state.zoom[0] * 50;
-            const offsetY = (myMouse.targetY - preMouse[1]) / state.zoom[0] * 50;
-            addState("offsetX", -offsetX);
-            addState("offsetY", offsetY);
-
+            const addOffsetX = (myMouse.targetX - preMouse[0]) / zoom * 50;
+            const addOffsetY = (myMouse.targetY - preMouse[1]) / zoom * 50;
+            setOffsetX(offsetX - addOffsetX);
+            setOffsetY(offsetY + addOffsetY);
         }
-        setState("real", Math.floor((myMouse.targetX - canvas.current.width / 2) / state.zoom[0] * 100));
-        setState("imaginary", -1 * Math.floor((myMouse.targetY - canvas.current.height / 2) / state.zoom[0] * 100));
-
+        setReal(((myMouse.targetX - canvas.current.width / 2) / zoom * 50));
+        setImaginary(-1 * ((myMouse.targetY - canvas.current.height / 2) / zoom * 50));
     }
-    const [zoomStep, setZoomStep] = useState(10);
-    useEffect(()=>{
-        const data = {};
-        Object.keys(state).forEach((key) => {
-            data[key] = state[key][0];
-        });
-        myGLSL.updateData(data);
-    }, [state]);
+
+    const initialDistance = useRef(0);
+    function getDistance(touch1, touch2) {
+        const dx = touch2.clientX - touch1.clientX;
+        const dy = touch2.clientY - touch1.clientY;
+        return Math.sqrt(dx * dx + dy * dy);
+    }  
+    function handleTouchStart(e) {
+        handleMouseDown(e);
+        if (e.touches.length === 2) {
+            initialDistance.current = getDistance(e.touches[0], e.touches[1]);
+        }
+    }
+    function handleTouchMove(e) {
+        if (e.touches.length === 2) {
+            // 兩個手指，判定縮放
+            const newDistance = getDistance(e.touches[0], e.touches[1]);
+            const zoomFactor = newDistance / initialDistance.current;
+
+            setZoom(zoomFactor);
+            // myMouse 儲存的是父層PlayGround的Touchmove事件中的第一個手指頭
+            const addOffsetX = (canvas.current.width / 2 - myMouse.targetX) / zoom * 50;
+            const addOffsetY = -(canvas.current.height / 2 - myMouse.targetY) / zoom * 50;
+            setZoom(zoom * zommIn);
+            setOffsetX(offsetX + addOffsetX / zommIn - addOffsetX);
+            setOffsetY(offsetY + addOffsetY / zommIn - addOffsetY);
+            // 更新初始距離
+            initialDistance.current = newDistance;
+            e.preventDefault();  // 防止頁面滾動
+        }
+        else{
+            // 預設為一個手指
+            setPreMouse([myMouse.targetX, myMouse.targetY]);
+            const addOffsetX = (myMouse.targetX - preMouse[0]) / zoom * 50;
+            const addOffsetY = (myMouse.targetY - preMouse[1]) / zoom * 50;
+            setOffsetX(offsetX - addOffsetX);
+            setOffsetY(offsetY + addOffsetY);
+            setReal(((myMouse.targetX - canvas.current.width / 2) / zoom * 50));
+            setImaginary(-1 * ((myMouse.targetY - canvas.current.height / 2) / zoom * 50));
+        }
+    }
+    function handleTouchEnd(e) {
+        handleMouseUp();
+        if (e.touches.length < 2) {
+            initialDistance.current = 0;
+        }
+        e.preventDefault()
+    }
+
+    const step = useMemo(() => {
+        const decimal = Math.floor(Math.log(zoom) / Math.log(10)) - 1;
+        return Math.pow(10, decimal);
+    }, [zoom]);
+    function getPreciseOffset(offset){
+        return Math.floor(offset * step) / step;
+    }
     return (
         <section ref={section} className="section" id={uniqueID}
-            onMouseDown={handleMouseDown} onMouseUp={handleMouseUp} 
-            onMouseMove={handleMouseMove} onWheel={handleWheel} >
+            onMouseMove={handleMouseMove} onWheel={handleWheel}
+            onMouseUp={handleMouseUp} onMouseDown={handleMouseDown}
+            onTouchstart={handleTouchStart}
+            onTouchMove={handleTouchMove} 
+            onTouchend={handleTouchEnd}>
             <canvas ref={canvas} className="cursor-grab" id="canvasS4" width={max * ratio} height={ratio * max * ratio}></canvas>
             <div ref={menu} className="gamemenu">
-                <header id="header"><h3>{name + "Set"}</h3></header>
+                <header id="header"><h3>{isJulia ? "JuliaSet" : "Manderbrot"}</h3></header>
                 <div className="parameter">
-                    {state.name[0] == "Julia" && <>
-                        <label>公式: Z = Z ^ 2 + C，其中:C = 1/100 * <input onChange={handleWebGLControl} type="number" id="real" value={state.real[0]}></input>+</label>
-                        <label><input onChange={handleWebGLControl} type="number" id="imaginary" value={state.imaginary[0]}></input>i</label>
+                    {isJulia && <>
+                        <label>公式: Z = Z ^ 2 + C，其中:C = 1/100 * <input onChange={(e) => setReal(e.target.value * 1)} type="number" id="real" value={Math.floor(real)}></input>+</label>
+                        <label><input onChange={(e) => setImaginary(e.target.value * 1)} type="number" id="imaginary" value={Math.floor(imaginary)}></input>i</label>
                     </>}
                     <label>&emsp;</label>
                     
-                    <label>zoom: <input onChange={handleWebGLControl} type="number" id="zoom" step="10" value={state.zoom[0]}></input></label>
-                    <label>offset: [<input onChange={handleWebGLControl} type="number" id="offsetX" value={state.offsetX[0]}></input>,</label>
-                    <label><input onChange={handleWebGLControl} type="number" id="offsetY" value={state.offsetY[0]}></input>]</label>
+                    <label>zoom: <input onChange={(e) => setZoom(e.target.value * 1)} type="number" id="zoom" step={step} value={Math.floor(zoom)}></input></label>
+                    <label>offset: [<input onChange={(e) => setOffsetX(e.target.value * 1)} type="number" step={10 / step} id="offsetX" value={getPreciseOffset(offsetX)}></input>,</label>
+                    <label><input onChange={(e) => setOffsetY(e.target.value * 1)} type="number" id="offsetY" step={10 / step} value={getPreciseOffset(offsetY)}></input>]</label>
                 </div>
                 <div className="controlpanel">
                     <label>★</label>
-                    <button onClick={handleWebGLControl} id="useMouse" value={state.useMouse[0] ? 0 : 1}>{state.useMouse[0] ? "也可以使用面板" : "還是用滑鼠好了"}</button>
-                    <button onClick={() => setName("Julia")} disabled={name == "Julia" ? true : false}>查看Julia</button>
-                    <button onClick={() => setName("Manderbrot")} disabled={name == "Manderbrot" ? true : false}>查看Manderbrot</button>
-                    <button onClick={setAllState}>畫面置中</button>
+                    <button onClick={(e) => setUseMouse(!useMouse)} id="useMouse">{useMouse ? "只允許使用面板" : "還是用滑鼠好了"}</button>
+                    <button onClick={resetScreen}>畫面置中</button>
+                    <RecordBtn canvas={canvas.current}/>
+                    <button onClick={() => setIsJulia(!isJulia)}>{isJulia == true ? "觀看更多" : "回到Julia"}</button>
+                    {!isJulia && <>
+                        <button onClick={() => myGLSL.setTransform(0)} disabled={name == "Manderbrot" ? true : false}>查看Manderbrot</button>
+                        <button onClick={() => myGLSL.setTransform(100)} disabled={0 ? true : false}>查看BurningShip</button>
+                    </>}
                 </div>
-                <div id="dialogbox"><p id="dialog">滑鼠可以拖曳畫面、控制滾輪局部放大</p></div>
+                <div ref={logRef}><p id="dialog">
+                    {useMouse
+                        ? MESSAGE_MOUSE_READY + (
+                            (isMouseDown) ? MESSAGE_DRAGGING : 
+                                ((isWheel) ? MESSAGE_ZOOMING : "")
+                        )
+                        : MESSAGE_MOUSE_LOCKED}
+                </p></div>
                 <SlideMenuBtn menu={menu}></SlideMenuBtn>
             </div>
         </section>

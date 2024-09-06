@@ -27,10 +27,18 @@ function Playground({margin}){
         else return (w*2 < h ? w : h/2);
     }
 
+    const divRef = useRef();
     function handleMouseMove(e){
-        const rect = e.target.getBoundingClientRect();
-        const a = ((e.pageX - rect.x))// / (rect.width);
-        const b = ((e.pageY - rect.y))// / (rect.height);
+        const rect = divRef.current.getBoundingClientRect();
+        const a = ((e.pageX - rect.x)) * ratio// / (rect.width);
+        const b = ((e.pageY - rect.y)) * ratio// / (rect.height);
+        const frames = 30;
+        myMouse.NewTarget(a, b, frames);
+    }
+    function handleTouchMove(e){
+        const rect = divRef.current.getBoundingClientRect();
+        const a = ((e.touches[0].clientX - rect.x)) * ratio// / (rect.width);
+        const b = ((e.touches[0].clientY - rect.y)) * ratio// / (rect.height);
         const frames = 30;
         myMouse.NewTarget(a, b, frames);
     }
@@ -66,7 +74,7 @@ function Playground({margin}){
     return (
         <>
             {/* <button onClick={() => {setIsOpen(!isOpen)}}>{isOpen ? "卸載組件" : "載入組件"}</button> */}
-            <div id="playground" onMouseMove={handleMouseMove} 
+            <div id="playground" ref={divRef} onMouseMove={handleMouseMove} onTouchMove={handleTouchMove}
                 style={{"width": max + "px",
                         "height": window.innerWidth<992 ? max*2 : max + "px",
                         "margin": margin +"px auto"}}>

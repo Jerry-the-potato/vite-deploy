@@ -1,9 +1,12 @@
 import vertexShaderSource from '../shader/vertex.glsl?raw'
+import vertexShaderSourceTexture from '../shader/vertex.glsl?raw'
 import fragmentShaderSourceRect from '../shader/fragmentRect.glsl?raw'
 import fragmentShaderSourceCircle from '../shader/fragmentCircle.glsl?raw'
 import fragmentShaderSourcePoint from '../shader/fragmentPoint.glsl?raw'
 import fragmentShaderSourceJuila from '../shader/fragmentJulia.glsl?raw'
 import fragmentShaderSourceManderbrot from '../shader/fragmentManderbrot.glsl?raw'
+import fragmentShaderSourceBurningShip from '../shader/fragmentBurningShip.glsl?raw'
+import fragmentShaderSourceAntiAliasing from '../shader/fragmentAntiAliasing.glsl?raw'
 
 import myMouse from './myMouse'
 
@@ -45,27 +48,11 @@ const createGLSL = function(){
     this.complex = new Path(0, 0);
     this.zoom = new Path(250, 0);
     this.offset = new Path(0, 0);
+    this.transform = new Path(0, 0);
     this.setCanvas = (canvas) => {
-        const gl = canvas.getContext('webgl2', { antialias: true });
-        this.gl = gl;
-
-        this.positionBuffer = gl.createBuffer();
-        gl.bindBuffer(gl.ARRAY_BUFFER, this.positionBuffer);
-
-        const vertexShader = createShader(gl, gl.VERTEX_SHADER, vertexShaderSource);
-        const fragmentShaderRect = createShader(gl, gl.FRAGMENT_SHADER, fragmentShaderSourceRect);
-        const fragmentShaderCircle = createShader(gl, gl.FRAGMENT_SHADER, fragmentShaderSourceCircle);
-        const fragmentShaderPoint = createShader(gl, gl.FRAGMENT_SHADER, fragmentShaderSourcePoint);
-        const fragmentShaderJuila = createShader(gl, gl.FRAGMENT_SHADER, fragmentShaderSourceJuila);
-        const fragmentShaderManderbrot = createShader(gl, gl.FRAGMENT_SHADER, fragmentShaderSourceManderbrot);
-
-        this.programRect = createProgram(gl, vertexShader, fragmentShaderRect);
-        this.programCircle = createProgram(gl, vertexShader, fragmentShaderCircle);
-        this.programPoint = createProgram(gl, vertexShader, fragmentShaderPoint);
-        this.programJulia = createProgram(gl, vertexShader, fragmentShaderJuila);
-        this.programManderbrot = createProgram(gl, vertexShader, fragmentShaderManderbrot);
-        this.programName = "Manderbrot";
-
+        this.gl = canvas.getContext('webgl2');
+        this.createBuffer(this.gl);
+        this.createAllPrograms(this.gl);
         this.points = new Array(1000).fill({}).map(() => {
             const theta = Math.random() * 2 * Math.PI;
             const r = Math.max(Math.random(), Math.random()) * this.gl.canvas.width / 2 ;
@@ -74,22 +61,69 @@ const createGLSL = function(){
             return {'x': x, 'y': y};
         });
 	}
-    
+    this.createAllPrograms = (gl) => {
+        const vertexShader = createShader(gl, gl.VERTEX_SHADER, vertexShaderSource);
+        const vertexShaderTexture = createShader(gl, gl.VERTEX_SHADER, vertexShaderSourceTexture);
+        const fragmentShaderRect = createShader(gl, gl.FRAGMENT_SHADER, fragmentShaderSourceRect);
+        const fragmentShaderCircle = createShader(gl, gl.FRAGMENT_SHADER, fragmentShaderSourceCircle);
+        const fragmentShaderPoint = createShader(gl, gl.FRAGMENT_SHADER, fragmentShaderSourcePoint);
+        const fragmentShaderJuila = createShader(gl, gl.FRAGMENT_SHADER, fragmentShaderSourceJuila);
+        const fragmentShaderManderbrot = createShader(gl, gl.FRAGMENT_SHADER, fragmentShaderSourceManderbrot);
+        const fragmentShaderBurningShip = createShader(gl, gl.FRAGMENT_SHADER, fragmentShaderSourceBurningShip);
+        const fragmentShaderAntiAliasing = createShader(gl, gl.FRAGMENT_SHADER, fragmentShaderSourceAntiAliasing);
 
+        this.programRect = createProgram(gl, vertexShader, fragmentShaderRect);
+        this.programCircle = createProgram(gl, vertexShader, fragmentShaderCircle);
+        this.programPoint = createProgram(gl, vertexShader, fragmentShaderPoint);
+        this.programJulia = createProgram(gl, vertexShader, fragmentShaderJuila);
+        this.programManderbrot = createProgram(gl, vertexShader, fragmentShaderManderbrot);
+        this.programBurningShip = createProgram(gl, vertexShader, fragmentShaderBurningShip);
+        // this.programAntiAliasing = createProgram(gl, vertexShader, fragmentShaderAntiAliasing);
+        // this.programName = "BurningShip";
+        this.isJulia = true;
+    }
+    this.createBuffer = (gl) => {
+        // 頂點著色器使用
+        this.positionBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.positionBuffer);
+        
+        // 片段著色器使用 (texture)
+        // this.framebuffer = gl.createFramebuffer();
+        // gl.bindFramebuffer(gl.FRAMEBUFFER, this.framebuffer);
+
+        // this.texture = gl.createTexture();
+        // gl.bindTexture(gl.TEXTURE_2D, this.texture);
+        // gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.canvas.width, gl.canvas.height, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
+
+        // // 將 texture 附加到 framebuffer
+        // gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, this.texture, 0);
+
+    }
     this.updateData = (data) => {
         PathConfig.resetLeap(0, 0, 0);
-        PathConfig.resetPath(0.2, 0, 0.8);
+        PathConfig.resetPath(0.4, 0, 0.6);
         this.useMouse = data.useMouse;
         const frames = 30;
         this.complex.NewTarget(data.real / 50, data.imaginary / 50, 60);
         // offset 暫時乘以 zoom 以保持動畫流暢性，渲染時會除回去
         this.zoom.NewTarget(data.zoom, 0, frames);
         this.offset.NewTarget(data.offsetX / 50 * data.zoom, data.offsetY / 50 * data.zoom, frames);
-        this.programName = this["program" + data.name] ? data.name : "Manderbrot";
+        // this.programName = this["program" + data.name] ? data.name : "Manderbrot";
+        this.isJulia = data.isJulia;
     }
-    this.fillJulia = (real, imaginary, zoom, offsetX, offsetY) => {
-        const program = this["program" + this.programName];
+    this.setTransform = (to) => {
+        this.transform.NewTarget(to, 0, Math.abs(this.transform.pointX - to));
+    }
+    this.fillJulia = () => {
+        // const program = this["program" + this.programName];
+        const program = (this.isJulia) ? this["programJulia"] : this["programBurningShip"]
         this.gl.useProgram(program);
+
+        const real = this.useMouse ? (myMouse.pointX - this.gl.canvas.width / 2) / this.zoom.pointX : this.complex.pointX;
+        const imaginary = this.useMouse ? -1 * (myMouse.pointY - this.gl.canvas.height / 2) / this.zoom.pointX : this.complex.pointY;
+        const zoom = this.zoom.pointX;
+        const offsetX = this.offset.pointX / zoom;
+        const offsetY = this.offset.pointY / zoom;
 
         const positionAttributeLocation = this.gl.getAttribLocation(program, "a_position");
         this.gl.enableVertexAttribArray(positionAttributeLocation);
@@ -98,7 +132,15 @@ const createGLSL = function(){
         this.gl.uniform2f(this.gl.getUniformLocation(program, "u_c"), real, imaginary);
         this.gl.uniform1f(this.gl.getUniformLocation(program, "u_zoom"), zoom);
         this.gl.uniform2f(this.gl.getUniformLocation(program, "u_offset"), offsetX, offsetY);
+        this.gl.uniform1f(this.gl.getUniformLocation(program, "u_transform"), this.transform.pointX);
 
+        // this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, this.framebuffer);
+        // this.gl.viewport(0, 0, this.gl.canvas.width, this.gl.canvas.height);
+        // this.gl.drawArrays(this.gl.TRIANGLES, 0, 6);
+        // this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, null);
+
+        // this.gl.useProgram(this.programAntiAliasing);
+        // this.gl.uniform1i(this.gl.getUniformLocation(this.programAntiAliasing, 'u_texture'), 0);
         this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.positionBuffer);
         this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array([
             0, 0,
@@ -113,8 +155,8 @@ const createGLSL = function(){
     }
     this.fillPoint = (points, radius) => {
         this.gl.useProgram(this.programPoint);
-        this.gl.enable(this.gl.BLEND);
-        this.gl.blendFunc(this.gl.SRC_ALPHA, this.gl.ONE_MINUS_SRC_ALPHA);
+        // this.gl.enable(this.gl.BLEND);
+        // this.gl.blendFunc(this.gl.SRC_ALPHA, this.gl.ONE_MINUS_SRC_ALPHA);
 
         const positionAttributeLocation = this.gl.getAttribLocation(this.programPoint, "a_position");
         const resolutionUniformLocation = this.gl.getUniformLocation(this.programPoint, "u_resolution");
@@ -199,19 +241,13 @@ const createGLSL = function(){
         this.gl.drawArrays(this.gl.TRIANGLES, 0, 6);
     }
     this.update = () => {
-        
+        if(this.transform < 100) this.transform+= 0.1;
     }
     this.render = () => {
         this.gl.clearColor(0, 0, 0, 0);
         this.gl.clear(this.gl.COLOR_BUFFER_BIT);
-        const real = this.useMouse ? (myMouse.pointX - this.gl.canvas.width / 2) / this.zoom.pointX : this.complex.pointX;
-        const imaginary = this.useMouse ? -1 * (myMouse.pointY - this.gl.canvas.height / 2) / this.zoom.pointX : this.complex.pointY;
+        this.fillJulia();
         
-        this.fillJulia(real, imaginary, this.zoom.pointX, this.offset.pointX / this.zoom.pointX, this.offset.pointY / this.zoom.pointX);
-        // this.fillRect(0, 0, this.gl.canvas.width, this.gl.canvas.height, [Math.random(), Math.random(), Math.random(), 1]);
-        // this.fillCircle();
-        // this.fillPoint(this.points, 8.0);
-
         frame.updateValue(Date.now() - this.timestamp);
         this.timestamp = Date.now();
         // console.log(Math.floor(1000 / frame.getAverage()));

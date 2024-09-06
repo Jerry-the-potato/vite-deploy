@@ -17,6 +17,10 @@ void main() {
         if(dot(z, z) > 4.0){
             float color = 0.1 + 0.7 * float(i) / float(maxIterations);
             gl_FragColor = vec4(vec3(color), 1.0);
+
+            float n1 = (sin(pow(float(i), 0.6) * 50.0 / 100.0) * 0.35) + 0.65;
+            float n2 = (cos(pow(float(i), 0.6) * 50.0 / 100.0) * 0.35) + 0.65;
+            gl_FragColor = vec4(clamp(vec3(n1, 0.85 * n1, 0.55 * n1), 0.0, 1.0), 1.0);
             break;
         }
     }
