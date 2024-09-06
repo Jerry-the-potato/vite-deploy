@@ -112,15 +112,12 @@ const CanvasSectionS4 = ({ ratio, max }) => {
         return Math.sqrt(dx * dx + dy * dy);
     }  
     function handleTouchStart(e) {
-        logRef.current.innerText = "touchStart";
-        e.preventDefault();
         handleMouseDown(e);
         if (e.touches.length === 2) {
             initialDistance.current = getDistance(e.touches[0], e.touches[1]);
         }
     }
     function handleTouchMove(e) {
-        logRef.current.innerText = "touchMove";
         if (e.touches.length === 2) {
             // 兩個手指，判定縮放
             const newDistance = getDistance(e.touches[0], e.touches[1]);
@@ -152,7 +149,7 @@ const CanvasSectionS4 = ({ ratio, max }) => {
         if (e.touches.length < 2) {
             initialDistance.current = 0;
         }
-        e.preventDefault()
+        e.preventDefault();
     }
 
     const step = useMemo(() => {
@@ -166,9 +163,9 @@ const CanvasSectionS4 = ({ ratio, max }) => {
         <section ref={section} className="section" id={uniqueID}
             onMouseMove={handleMouseMove} onWheel={handleWheel}
             onMouseUp={handleMouseUp} onMouseDown={handleMouseDown}
-            onTouchstart={handleTouchStart}
+            onTouchStart={handleTouchStart}
             onTouchMove={handleTouchMove} 
-            onTouchend={handleTouchEnd}>
+            onTouchEnd={handleTouchEnd}>
             <canvas ref={canvas} className="cursor-grab" id="canvasS4" width={max * ratio} height={ratio * max * ratio}></canvas>
             <div ref={menu} className="gamemenu">
                 <header id="header"><h3>{isJulia ? "JuliaSet" : "Manderbrot"}</h3></header>
