@@ -27808,15 +27808,12 @@ const CanvasSectionS4 = ({ ratio, max }) => {
     return Math.sqrt(dx * dx + dy * dy);
   }
   function handleTouchStart(e) {
-    logRef.current.innerText = "touchStart";
-    e.preventDefault();
     handleMouseDown(e);
     if (e.touches.length === 2) {
       initialDistance.current = getDistance(e.touches[0], e.touches[1]);
     }
   }
   function handleTouchMove(e) {
-    logRef.current.innerText = "touchMove";
     if (e.touches.length === 2) {
       const newDistance = getDistance(e.touches[0], e.touches[1]);
       const zoomIn = newDistance / initialDistance.current;
@@ -27861,9 +27858,9 @@ const CanvasSectionS4 = ({ ratio, max }) => {
       onWheel: handleWheel,
       onMouseUp: handleMouseUp,
       onMouseDown: handleMouseDown,
-      onTouchstart: handleTouchStart,
+      onTouchStart: handleTouchStart,
       onTouchMove: handleTouchMove,
-      onTouchend: handleTouchEnd,
+      onTouchEnd: handleTouchEnd,
       children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx("canvas", { ref: canvas, className: "cursor-grab", id: "canvasS4", width: max * ratio, height: ratio * max * ratio }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { ref: menu, className: "gamemenu", children: [
@@ -33689,4 +33686,4 @@ function App() {
 const domNode = document.getElementById("root");
 const root = createRoot(domNode);
 root.render(/* @__PURE__ */ jsxRuntimeExports.jsx(App, {}));
-//# sourceMappingURL=index-oHYV8O4k.js.map
+//# sourceMappingURL=index-Dcd6MzoL.js.map
