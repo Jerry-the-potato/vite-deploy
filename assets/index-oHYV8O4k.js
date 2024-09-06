@@ -27808,6 +27808,7 @@ const CanvasSectionS4 = ({ ratio, max }) => {
     return Math.sqrt(dx * dx + dy * dy);
   }
   function handleTouchStart(e) {
+    logRef.current.innerText = "touchStart";
     e.preventDefault();
     handleMouseDown(e);
     if (e.touches.length === 2) {
@@ -27815,6 +27816,7 @@ const CanvasSectionS4 = ({ ratio, max }) => {
     }
   }
   function handleTouchMove(e) {
+    logRef.current.innerText = "touchMove";
     if (e.touches.length === 2) {
       const newDistance = getDistance(e.touches[0], e.touches[1]);
       const zoomIn = newDistance / initialDistance.current;
@@ -33687,4 +33689,4 @@ function App() {
 const domNode = document.getElementById("root");
 const root = createRoot(domNode);
 root.render(/* @__PURE__ */ jsxRuntimeExports.jsx(App, {}));
-//# sourceMappingURL=index-DePV0FAw.js.map
+//# sourceMappingURL=index-oHYV8O4k.js.map
