@@ -27766,21 +27766,21 @@ const CanvasSectionS4 = ({ ratio, max }) => {
   function handleWheel(e) {
     setIsWheel(true);
     if (!useMouse) return;
-    const zommIn2 = e.deltaY > 0 ? 0.5 : 1.5;
+    const zommIn = e.deltaY > 0 ? 0.5 : 1.5;
     const addOffsetX = (canvas.current.width / 2 - myMouse.targetX) / zoom * 50;
     const addOffsetY = -(canvas.current.height / 2 - myMouse.targetY) / zoom * 50;
-    setZoom(zoom * zommIn2);
-    setOffsetX(offsetX + addOffsetX / zommIn2 - addOffsetX);
-    setOffsetY(offsetY + addOffsetY / zommIn2 - addOffsetY);
+    setZoom(zoom * zommIn);
+    setOffsetX(offsetX + addOffsetX / zommIn - addOffsetX);
+    setOffsetY(offsetY + addOffsetY / zommIn - addOffsetY);
   }
   const [isMouseDown, setIsMouseDown] = reactExports.useState(false);
-  const [preMouse, setPreMouse] = reactExports.useState([0, 0]);
+  const preMouse = reactExports.useRef([0, 0]);
   const logRef = reactExports.useRef();
   function handleMouseDown(e) {
     setIsWheel(false);
     if (e.target.tagName == "BUTTON" || e.target.tagName == "INPUT") return;
     setIsMouseDown(true);
-    setPreMouse([myMouse.targetX, myMouse.targetY]);
+    preMouse.current = [myMouse.targetX, myMouse.targetY];
     canvas.current.classList.remove("cursor-grab");
     canvas.current.classList.add("cursor-grabbing");
   }
@@ -27792,9 +27792,9 @@ const CanvasSectionS4 = ({ ratio, max }) => {
   function handleMouseMove() {
     if (!useMouse) return;
     if (isMouseDown) {
-      setPreMouse([myMouse.targetX, myMouse.targetY]);
-      const addOffsetX = (myMouse.targetX - preMouse[0]) / zoom * 50;
-      const addOffsetY = (myMouse.targetY - preMouse[1]) / zoom * 50;
+      const addOffsetX = (myMouse.targetX - preMouse.current[0]) / zoom * 50;
+      const addOffsetY = (myMouse.targetY - preMouse.current[1]) / zoom * 50;
+      preMouse.current = [myMouse.targetX, myMouse.targetY];
       setOffsetX(offsetX - addOffsetX);
       setOffsetY(offsetY + addOffsetY);
     }
@@ -27816,18 +27816,18 @@ const CanvasSectionS4 = ({ ratio, max }) => {
   function handleTouchMove(e) {
     if (e.touches.length === 2) {
       const newDistance = getDistance(e.touches[0], e.touches[1]);
-      const zoom2 = newDistance / initialDistance.current;
-      const addOffsetX = (canvas.current.width / 2 - myMouse.targetX) / zoom2 * 50;
-      const addOffsetY = -(canvas.current.height / 2 - myMouse.targetY) / zoom2 * 50;
-      setZoom(zoom2 * zommIn);
-      setOffsetX(offsetX + addOffsetX / zommIn - addOffsetX);
-      setOffsetY(offsetY + addOffsetY / zommIn - addOffsetY);
+      const zoomIn = newDistance / initialDistance.current;
+      const addOffsetX = (canvas.current.width / 2 - myMouse.targetX) / zoom * 50;
+      const addOffsetY = -(canvas.current.height / 2 - myMouse.targetY) / zoom * 50;
+      setZoom(zoom * zoomIn);
+      setOffsetX(offsetX + addOffsetX / zoomIn - addOffsetX);
+      setOffsetY(offsetY + addOffsetY / zoomIn - addOffsetY);
       initialDistance.current = newDistance;
       e.preventDefault();
     } else {
-      setPreMouse([myMouse.targetX, myMouse.targetY]);
-      const addOffsetX = (myMouse.targetX - preMouse[0]) / zoom * 50;
-      const addOffsetY = (myMouse.targetY - preMouse[1]) / zoom * 50;
+      const addOffsetX = (myMouse.targetX - preMouse.current[0]) / zoom * 50;
+      const addOffsetY = (myMouse.targetY - preMouse.current[1]) / zoom * 50;
+      preMouse.current = [myMouse.targetX, myMouse.targetY];
       setOffsetX(offsetX - addOffsetX);
       setOffsetY(offsetY + addOffsetY);
       setReal((myMouse.targetX - canvas.current.width / 2) / zoom * 50);
@@ -33686,4 +33686,4 @@ function App() {
 const domNode = document.getElementById("root");
 const root = createRoot(domNode);
 root.render(/* @__PURE__ */ jsxRuntimeExports.jsx(App, {}));
-//# sourceMappingURL=index-CKY338fc.js.map
+//# sourceMappingURL=index-4jPa8miD.js.map
