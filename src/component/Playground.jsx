@@ -74,7 +74,7 @@ function Playground({margin}){
     return (
         <>
             {/* <button onClick={() => {setIsOpen(!isOpen)}}>{isOpen ? "卸載組件" : "載入組件"}</button> */}
-            <div id="playground" ref={divRef} onMouseMove={handleMouseMove} onTouchMove={handleTouchMove} onTouchStart={handleTouchMove}
+            <div id="playground" ref={divRef} onMouseMoveCapture={handleMouseMove} onTouchMoveCapture={handleTouchMove} onTouchStartCapture={handleTouchMove}
                 style={{"width": max + "px",
                         "height": window.innerWidth<992 ? max*2 : max + "px",
                         "margin": margin +"px auto"}}>
