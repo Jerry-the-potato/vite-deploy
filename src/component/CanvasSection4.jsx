@@ -153,7 +153,6 @@ const CanvasSectionS4 = ({ ratio, max }) => {
         if (e.touches.length < 2) {
             initialDistance.current = 0;
         }
-        e.preventDefault();
     }
 
     const step = useMemo(() => {
