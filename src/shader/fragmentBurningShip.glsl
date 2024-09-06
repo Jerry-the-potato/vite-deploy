@@ -17,7 +17,7 @@ void main() {
     c.y *= -1.0; // 翻轉 y 軸
 
     // 反鋸齒 & 隨機取樣
-    const float AA_LEVEL = 4.0;
+    const float AA_LEVEL = 2.0;
     for (float I = 0.; I < AA_LEVEL; I++) {
         
         float dx = u_offset.x - floor(u_offset.x);

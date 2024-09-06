@@ -121,9 +121,8 @@ const CanvasSectionS4 = ({ ratio, max }) => {
         if (e.touches.length === 2) {
             // 兩個手指，判定縮放
             const newDistance = getDistance(e.touches[0], e.touches[1]);
-            const zoomFactor = newDistance / initialDistance.current;
+            const zoom = newDistance / initialDistance.current;
 
-            setZoom(zoomFactor);
             // myMouse 儲存的是父層PlayGround的Touchmove事件中的第一個手指頭
             const addOffsetX = (canvas.current.width / 2 - myMouse.targetX) / zoom * 50;
             const addOffsetY = -(canvas.current.height / 2 - myMouse.targetY) / zoom * 50;
