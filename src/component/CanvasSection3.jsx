@@ -28,6 +28,10 @@ const CanvasSectionS3 = ({ canvas, ratio, max, status, handleClick}) => {
                 <div id="pathConfig" className="parameter">
                     <label>linear :</label><input onChange={physic.setPath} type="number" id="leapLinear" defaultValue="0"></input>
                     <label>easein :</label><input onChange={physic.setPath} type="number" id="leapEasein" defaultValue="-2"></input>
+                    {ratio > 1 && <>
+                        <label>&emsp;</label>
+                        <label>&emsp;</label>
+                    </>}
                     <label>easeout :</label><input onChange={physic.setPath} type="number" id="leapEaseout" defaultValue="2"></input>
                 </div>
                 <div className="controlpanel">

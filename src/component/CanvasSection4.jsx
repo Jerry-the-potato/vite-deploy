@@ -5,7 +5,7 @@ import myMouse from "../js/myMouse.js";
 import SlideMenuBtn from "./SlideMenuBtn.jsx";
 import RecordBtn from "./RecordBtn.jsx";
 
-const MESSAGE_MOUSE_READY = "滑鼠可以操作畫面（左鍵、滾輪）：";
+const MESSAGE_MOUSE_READY = "滑鼠可以操作畫面：";
 const MESSAGE_MOUSE_LOCKED = "滑鼠已鎖定！點擊上方按鈕以解鎖";
 const MESSAGE_DRAGGING = "開始拖曳移動畫面";
 const MESSAGE_ZOOMING = "滾輪放大縮小"
@@ -80,8 +80,8 @@ const CanvasSectionS4 = ({ ratio, max }) => {
     const preMouse = useRef([0, 0]);
     const logRef = useRef();
     function handleMouseDown(e){
-        setIsWheel(false);
         if(e.target.tagName == "BUTTON" || e.target.tagName == "INPUT") return;
+        setIsWheel(false);
         setIsMouseDown(true);
         preMouse.current = [myMouse.targetX, myMouse.targetY];
         canvas.current.classList.remove('cursor-grab');
@@ -92,7 +92,8 @@ const CanvasSectionS4 = ({ ratio, max }) => {
         canvas.current.classList.remove('cursor-grabbing');
         canvas.current.classList.add('cursor-grab');
     }
-    function handleMouseMove(){
+    function handleMouseMove(e){
+        
         if(!useMouse) return;
         if(isMouseDown){
             const addOffsetX = (myMouse.targetX - preMouse.current[0]) / zoom * 50;
@@ -112,12 +113,18 @@ const CanvasSectionS4 = ({ ratio, max }) => {
         return Math.sqrt(dx * dx + dy * dy);
     }  
     function handleTouchStart(e) {
-        handleMouseDown(e);
+        preMouse.current = [myMouse.targetX, myMouse.targetY];
+        setIsMouseDown(true);
         if (e.touches.length === 2) {
+            setIsWheel(true);
             initialDistance.current = getDistance(e.touches[0], e.touches[1]);
+        }
+        else{
+            setIsWheel(false);
         }
     }
     function handleTouchMove(e) {
+        if(e.target.tagName == "BUTTON" || e.target.tagName == "INPUT") return;
         if (e.touches.length === 2) {
             // 兩個手指，判定縮放
             const newDistance = getDistance(e.touches[0], e.touches[1]);
@@ -149,9 +156,12 @@ const CanvasSectionS4 = ({ ratio, max }) => {
         }
     }
     function handleTouchEnd(e) {
-        handleMouseUp();
         if (e.touches.length < 2) {
+            setIsWheel(false);
             initialDistance.current = 0;
+        }
+        else if(e.touches.length < 1){
+            setIsMouseDown(false);
         }
     }
 
@@ -174,14 +184,16 @@ const CanvasSectionS4 = ({ ratio, max }) => {
                 <header id="header"><h3>{isJulia ? "JuliaSet" : "Manderbrot"}</h3></header>
                 <div className="parameter">
                     {isJulia && <>
-                        <label>公式: Z = Z ^ 2 + C，其中:C = 1/100 * <input onChange={(e) => setReal(e.target.value * 1)} type="number" id="real" value={Math.floor(real)}></input>+</label>
-                        <label><input onChange={(e) => setImaginary(e.target.value * 1)} type="number" id="imaginary" value={Math.floor(imaginary)}></input>i</label>
+                        <label>Cx</label><input onChange={(e) => setReal(e.target.value * 1)} type="number" id="real" value={Math.floor(real)}></input>
+                        <label>Cy</label><input onChange={(e) => setImaginary(e.target.value * 1)} type="number" id="imaginary" value={Math.floor(imaginary)}></input>
                     </>}
-                    <label>&emsp;</label>
-                    
-                    <label>zoom: <input onChange={(e) => setZoom(e.target.value * 1)} type="number" id="zoom" step={step} value={Math.floor(zoom)}></input></label>
-                    <label>offset: [<input onChange={(e) => setOffsetX(e.target.value * 1)} type="number" step={10 / step} id="offsetX" value={getPreciseOffset(offsetX)}></input>,</label>
-                    <label><input onChange={(e) => setOffsetY(e.target.value * 1)} type="number" id="offsetY" step={10 / step} value={getPreciseOffset(offsetY)}></input>]</label>
+                    <label>zoom</label><input onChange={(e) => setZoom(e.target.value * 1)} type="number" id="zoom" step={step} value={Math.floor(zoom)}></input>
+                    <label>offsetX</label><input onChange={(e) => setOffsetX(e.target.value * 1)} type="number" step={10 / step} id="offsetX" value={getPreciseOffset(offsetX)}></input>
+                    {ratio > 1 && <>
+                        <label>&emsp;</label>
+                        <label>&emsp;</label>
+                    </>}
+                    <label>offsetY</label><input onChange={(e) => setOffsetY(e.target.value * 1)} type="number" id="offsetY" step={10 / step} value={getPreciseOffset(offsetY)}></input>
                 </div>
                 <div className="controlpanel">
                     <label>★</label>
@@ -197,8 +209,8 @@ const CanvasSectionS4 = ({ ratio, max }) => {
                 <div ref={logRef}><p id="dialog">
                     {useMouse
                         ? MESSAGE_MOUSE_READY + (
-                            (isMouseDown) ? MESSAGE_DRAGGING : 
-                                ((isWheel) ? MESSAGE_ZOOMING : "")
+                            (isWheel) ? MESSAGE_ZOOMING : 
+                                ((isMouseDown) ? MESSAGE_DRAGGING : "")
                         )
                         : MESSAGE_MOUSE_LOCKED}
                 </p></div>

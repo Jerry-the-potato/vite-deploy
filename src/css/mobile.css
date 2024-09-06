@@ -24,31 +24,34 @@
     }
     
     /* 遊戲介面架構 */
-    #game-menu{
-        height: 200px;
+    .gamemenu{
         font-size: 1rem;
     }
-        #game-menu #parameter{
+        .gamemenu .parameter{
             display: flex;
-            height: 6em;
-            width: 15em;
-            flex-direction: column;
+            /* height: 7em; */
+            width: 21em;
+            flex-direction: row;
             flex-wrap: wrap;
             font-size: 1em;
             transition: all 1s ease-in-out;
         }
-            #game-menu #parameter label{
+            .gamemenu .parameter label{
                 flex: 1 0 15%;
-                margin: 0;
+                margin: 0 0.5em 0 0;
             }
-            #game-menu #parameter input{
+            .gamemenu .parameter input{
                 flex: 1 0 10%;
-                margin: 0 2em 0 0;
+                margin: 0 1em 0.5em 0;
+                padding: 0.1em 0 0.1em 0.5em;
             }
-            #game-menu #controlpanel button:focus, #game-menu #parameter input:focus{
+            .gamemenu .controlpanel button{
+                padding: 0.2em 0.5em;
+            }
+            .gamemenu .controlpanel button:focus, .gamemenu .parameter input:focus{
                 opacity: 1;
             }
-    
+        
     /* 表單元件 */
     .tr{
         font-size: 1em;
