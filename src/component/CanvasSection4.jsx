@@ -112,6 +112,7 @@ const CanvasSectionS4 = ({ ratio, max }) => {
         return Math.sqrt(dx * dx + dy * dy);
     }  
     function handleTouchStart(e) {
+        logRef.current.innerText = "touchStart";
         e.preventDefault();
         handleMouseDown(e);
         if (e.touches.length === 2) {
@@ -119,6 +120,7 @@ const CanvasSectionS4 = ({ ratio, max }) => {
         }
     }
     function handleTouchMove(e) {
+        logRef.current.innerText = "touchMove";
         if (e.touches.length === 2) {
             // 兩個手指，判定縮放
             const newDistance = getDistance(e.touches[0], e.touches[1]);
