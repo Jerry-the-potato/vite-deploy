@@ -33659,9 +33659,9 @@ function Playground({ margin }) {
     {
       id: "playground",
       ref: divRef,
-      onMouseMove: handleMouseMove,
-      onTouchMove: handleTouchMove,
-      onTouchStart: handleTouchMove,
+      onMouseMoveCapture: handleMouseMove,
+      onTouchMoveCapture: handleTouchMove,
+      onTouchStartCapture: handleTouchMove,
       style: {
         "width": max + "px",
         "height": window.innerWidth < 992 ? max * 2 : max + "px",
@@ -33686,4 +33686,4 @@ function App() {
 const domNode = document.getElementById("root");
 const root = createRoot(domNode);
 root.render(/* @__PURE__ */ jsxRuntimeExports.jsx(App, {}));
-//# sourceMappingURL=index-4jPa8miD.js.map
+//# sourceMappingURL=index-FHDU-WuA.js.map
