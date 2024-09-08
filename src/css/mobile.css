@@ -18,11 +18,6 @@
         font-size: 20px;
     }
     
-    /* 互動介面架構 */
-    div#game-box{
-        aspect-ratio: 1/2;
-    }
-    
     /* 遊戲介面架構 */
     .gamemenu{
         font-size: 1rem;

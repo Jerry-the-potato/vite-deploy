@@ -8,7 +8,22 @@ function GetHyperLink(){
             const ID = sections[key].id;
             return <a key={ID} className="list" href={"#"+ID} id={"to"+ID}>{ID}</a>
         }));
-    }, [])
+
+        function handleHashChange(){
+            const hash = window.location.hash;
+            if (!hash) return;
+
+            const targetElement = document.querySelector(hash);
+            if (!targetElement) return;
+
+            targetElement.scrollIntoView({ behavior: 'smooth' });
+        };
+        handleHashChange();
+        window.addEventListener('hashchange', handleHashChange);
+        return () => {
+            window.removeEventListener('hashchange', handleHashChange);
+        }
+    }, []);
     return hyperlink;
 }
 

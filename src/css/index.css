@@ -110,8 +110,6 @@ nav a:hover{
 /* 互動介面架構 */
 div#playground{
   position: relative;
-  aspect-ratio: 1/1;
-  margin: 20px auto;
   /* background-color: #000; */
   border-radius: 2rem;
   overflow: hidden;

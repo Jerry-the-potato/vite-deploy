@@ -8,7 +8,6 @@ import CookieTable from './CookieTable.jsx';
 import downloadMedia from '../js/downloadMedia.js';
 import manager from '../js/animateManager.js';
 import myMouse from '../js/myMouse.js';
-import { Path, PathConfig } from "../js/path.js";
 
 function Playground({margin}){
     const [isOpen, setIsOpen] = useState(true);
@@ -76,7 +75,7 @@ function Playground({margin}){
             {/* <button onClick={() => {setIsOpen(!isOpen)}}>{isOpen ? "卸載組件" : "載入組件"}</button> */}
             <div id="playground" ref={divRef} onMouseMoveCapture={handleMouseMove} onTouchMoveCapture={handleTouchMove} onTouchStartCapture={handleTouchMove}
                 style={{"width": max + "px",
-                        "height": window.innerWidth<992 ? max*2 : max + "px",
+                        "height": max * ratio + "px",
                         "margin": margin +"px auto"}}>
                 <CanvasSectionS4 ratio={ratio} max={max}/>
                 {isOpen && (<CanvasSectionS1 canvas={canvas.S1} ratio={ratio} max={max} status={status} handleClick={handleRecord} manager={manager} myMouse={myMouse}/>)}
