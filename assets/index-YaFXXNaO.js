@@ -7030,6 +7030,18 @@ function GetHyperLink() {
       const ID = sections[key].id;
       return /* @__PURE__ */ jsxRuntimeExports.jsx("a", { className: "list", href: "#" + ID, id: "to" + ID, children: ID }, ID);
     }));
+    function handleHashChange() {
+      const hash = window.location.hash;
+      if (!hash) return;
+      const targetElement = document.querySelector(hash);
+      if (!targetElement) return;
+      targetElement.scrollIntoView({ behavior: "smooth" });
+    }
+    handleHashChange();
+    window.addEventListener("hashchange", handleHashChange);
+    return () => {
+      window.removeEventListener("hashchange", handleHashChange);
+    };
   }, []);
   return hyperlink;
 }
@@ -33667,7 +33679,7 @@ function Playground({ margin }) {
       onTouchStartCapture: handleTouchMove,
       style: {
         "width": max + "px",
-        "height": window.innerWidth < 992 ? max * 2 : max + "px",
+        "height": max * ratio + "px",
         "margin": margin + "px auto"
       },
       children: [
@@ -33689,4 +33701,4 @@ function App() {
 const domNode = document.getElementById("root");
 const root = createRoot(domNode);
 root.render(/* @__PURE__ */ jsxRuntimeExports.jsx(App, {}));
-//# sourceMappingURL=index-BA6ZVu7R.js.map
+//# sourceMappingURL=index-YaFXXNaO.js.map
