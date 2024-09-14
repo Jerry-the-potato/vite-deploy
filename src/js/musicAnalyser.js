@@ -3,6 +3,7 @@ import BufferFactory from './bufferFactory';
 import { makeBall, makeParticleMaterial } from './customGeometry';
 import createAnalyser from './createAnalyser';
 import Averager from './averager';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 
 // Three 事件管理員
 const createMusicAnalyser = function(){
@@ -15,21 +16,29 @@ const createMusicAnalyser = function(){
         this.firstTime = false;
     }
     this.setCanvas = (canvas) => {
-        this.buff = new BufferFactory();
         this.canvas = canvas;
         this.scene = new THREE.Scene();
-        this.camera = new THREE.PerspectiveCamera( 75, canvas.width / canvas.height, 0.1, 1000 );
         this.renderer = new THREE.WebGLRenderer({"alpha": true, "canvas": canvas});
-        this.axis = new THREE.AxesHelper(300);
-        this.scene.add(this.axis)
+        this.renderer.setClearColor(0x000000, 0);
+        // 設置鏡頭
+        this.camera = new THREE.PerspectiveCamera( 75, canvas.width / canvas.height, 0.1, 1000 );
+        const radius = 300;
+        this.camera.position.set(radius/4, radius/3, radius/3);
+        // this.camera.rotation.set(0, 0, 0);
 
-        const radius = 200;
-        this.camera.position.set(radius/4,radius/2,radius/2);
-        this.camera.rotation.set(-0.5, 0, 0);
+        // 添加控制和座標軸
+        this.controls = new OrbitControls(this.camera, this.renderer.domElement);
+        this.controls.target.set(radius/4, 0, -radius/3);
+        this.axis = new THREE.AxesHelper(300);
+        this.scene.add(this.axis);
+
+        // 添加群組到場景
         this.group1 = new THREE.Group();
         this.scene.add(this.group1);
-        this.group1.add(makeBall(radius, 30, 15, radius/500), makeParticleMaterial(10));
-        this.group1.add(this.buff.mesh);
+        this.buff = new BufferFactory();
+        this.ball = makeBall(radius, 60, 30, radius/500);
+        // this.ball.rotation.set(-1,0,0);
+        this.group1.add(this.buff.mesh, this.ball);
     }
     this.cleanup = () => {
         this.firstTime = true;
@@ -93,6 +102,7 @@ const createMusicAnalyser = function(){
             const data = [...dataArray].splice(0,128);
             this.buff.transformData(data);
         }
+        this.controls.update();
         this.buff.update();
         // frame.updateValue(clock.getDelta());
         // frame.getFPS();

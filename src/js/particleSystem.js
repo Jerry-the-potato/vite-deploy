@@ -23,7 +23,7 @@ export default class ParticleSystem{
         // this.walls = [this.createWall("arc", x, y, 865/3)]
         const ballLen = Math.min(length*2, 500);
         const ballSize = 2 + Math.floor(width/3);
-        this.balls = new Array(ballLen).fill().map((v,i) => {
+        this.balls = new Array(ballLen).fill().map(() => {
             const r = Math.pow(Math.random(), 0.6) * 865/4;
             const theta = Math.random() * 2 * Math.PI;
             return this.createBall(x + r * Math.cos(theta), 0.5 * y + r * Math.sin(theta), ballSize);
@@ -198,7 +198,7 @@ export default class ParticleSystem{
         this.columns.forEach((column) => {
             if(column.path != undefined){
                 if(column.path.__proto__.constructor.name == "Path"){
-                    column.path.NextFrame();
+                    // column.path.NextFrame();
                 }
             }
         })
@@ -206,7 +206,7 @@ export default class ParticleSystem{
             if(column.path == undefined) return;
             const funcitonName = column.path.__proto__.constructor.name;
             if(funcitonName != "Path") return console.warn("the path of columns[ " + index + " ] was never constructed by Path");
-            column.path.NextFrame();
+            // column.path.NextFrame();
         })
 
         this.walls.forEach((wall) =>{
@@ -220,7 +220,7 @@ export default class ParticleSystem{
             ball.vx = (ball.vx + ball.ax / 60) * this.slow;
             ball.vy = (ball.vy + ball.ay / 60) * this.slow;
             // 檢測與其他球體的碰撞
-            this.balls.forEach((anotherBall, index2) => {
+            this.balls.forEach((anotherBall) => {
                 if (ball == anotherBall) return;
                 const dist = this.getDist(ball, anotherBall);
                 if (dist < ball.r + anotherBall.r) {
@@ -250,7 +250,7 @@ export default class ParticleSystem{
             })
         });
     }
-    getRender(ctx){
+    render(ctx){
         ctx.fillStyle = 'black';
         ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 
@@ -261,6 +261,9 @@ export default class ParticleSystem{
             ctx.lineWidth = wall.thick * 2;
             ctx.stroke();
         });
+        function mix(x, from, to){
+            return from + x * (to - from);
+        }
         function drawColumn(column){
             ctx.beginPath();
             // ctx.moveTo(column.x, column.y);
@@ -271,9 +274,13 @@ export default class ParticleSystem{
             // const r = 100 + c * (202 - 100);
             // const g = 50 + c * (254 - 50);
             // const b = 225 + c * (127 - 225);
-            const r = 246 + c * (195 - 246);
-            const g = 211 + c * (160 - 211);
-            const b = 101 + c * (133 - 101);
+            // const r = 246 + c * (195 - 246);
+            // const g = 211 + c * (160 - 211);
+            // const b = 101 + c * (133 - 101);
+            const t = 1 - column.path.timer / column.path.period * 0.5;
+            const r = mix(t, 255, mix(c, 246, 195));
+            const g = mix(t, 100, mix(c, 211, 160));
+            const b = mix(t, 100, mix(c, 71, 133));
             ctx.strokeStyle = 'rgba(' + r + ',' + g + ',' + b + ',' + 1 + ')';
             ctx.lineWidth = column.width;
             ctx.stroke();

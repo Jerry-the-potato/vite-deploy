@@ -1,21 +1,19 @@
 import {useState} from 'react'
 import downloadMedia from '../js/downloadMedia';
-
+const media = {};
 export default function RecordBtn({canvas, audio}){
-    const [media, setMedia] = useState({});
-
     const [status, setStatus] = useState("開始錄影");
-    function handleClick(e){
+    function handleClick(){
         if(status == "停止錄影"){
             setStatus("開始錄影")
             media.recorder.stop();
             return;
         }
         const chunks = [];
-        media.canvas = canvas;
+        media.canvas = canvas.current;
         media.stream = media.canvas.captureStream(60); // fps
         if(audio){
-            media.audio = audio;
+            media.audio = audio.current;
             media.audio.play();
             media.audioStream = media.audio.captureStream();
             media.stream = new MediaStream([...media.stream.getVideoTracks(), ...media.audioStream.getAudioTracks()]);

@@ -108,7 +108,6 @@ const createGLSL = function(){
         // offset 暫時乘以 zoom 以保持動畫流暢性，渲染時會除回去
         this.zoom.NewTarget(data.zoom, 0, frames);
         this.offset.NewTarget(data.offsetX / 50 * data.zoom, data.offsetY / 50 * data.zoom, frames);
-        // this.programName = this["program" + data.name] ? data.name : "Manderbrot";
         this.isJulia = data.isJulia;
     }
     this.setTransform = (to) => {

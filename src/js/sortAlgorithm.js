@@ -7,8 +7,8 @@ export class SortAlgorithmIterable{
         this.isSorting = false;
         this.log = document.createElement("div");
     }
-    setLog(){
-        this.log = log;
+    setLog(element){
+        this.log = element;
     }
     start(name, columns){
         this.secondColumns = []; // 清空上次排序
@@ -78,8 +78,8 @@ export class SortAlgorithm{
         this.isSorting = false;
         this.log = document.createElement("div");
     }
-    setLog(){
-        this.log = log;
+    setLog(element){
+        this.log = element;
     }
     start(name, columns){
         this.secondColumns = []; // 清空上次排序
@@ -331,7 +331,7 @@ export class SortAlgorithm{
                     this.mergePhase = "1.Copy";
                     this.timesEveryFrame = 1;
                     this.secondColumns = JSON.parse(JSON.stringify(columns.slice(0, columns.length + 1)));
-                    this.secondColumns.forEach((column, index) => {
+                    this.secondColumns.forEach((column) => {
                         column.path = new Path(column.x, column.y);
                         column.path.NewTarget(column.x, column.y - this.height, 20);
                         column.width/=3;
@@ -354,7 +354,7 @@ export class SortAlgorithm{
                 col.forEach((column, index) => {
                     column.height = columns[min + index].height;
                     column.width = columns[min + index].width/2;
-                    column.path.NewTarget(column.x, column.y - this.height, 20);
+                    column.path.NewTarget(column.x, column.y - this.height, 0);
                 })
                 this.mergePhase = "2.Merge";
                 break;
@@ -585,7 +585,7 @@ export class SortAlgorithm{
         this.j = 0;
         this.timesEveryFrame = 1;
     }
-    randomSort(columns){
+    randomSort(columns, frames = 60){
         const len = columns.length;
         const i = this.i;
         const j = this.j;
@@ -597,7 +597,7 @@ export class SortAlgorithm{
         }
         const a = columns[j];
         const b = columns[(j*j+1) % len];
-        SortAlgorithm.swapColumn(a, b, 60 - this.timesEveryFrame * 2);
+        SortAlgorithm.swapColumn(a, b, frames);
         this.j = this.i + this.j + 1;
     }
     instantRandomSortSetting(){
@@ -606,6 +606,6 @@ export class SortAlgorithm{
         this.timesEveryFrame = 30;
     }
     instantRandomSort(columns){
-        return this.randomSort(columns);
+        return this.randomSort(columns, 0);
     }
 }

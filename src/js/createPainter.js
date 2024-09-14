@@ -2,15 +2,13 @@
 export default function createPainter(){
 	this.works = [];
 	this.pixelX = window.innerWidth;
-	this.pixelY = window.innerWidth;
+	this.pixelY = window.innerHeight;
 	this.setPixel = function(w, h){
 		this.pixelX = w;
 		this.pixelY = h;
 	}
 	this.draw = function(obj){ // 透過 painter.draw 呼叫其私有函式
 		let ctx = obj.ctx;
-		let w = this.pixelX;
-		let h = this.pixelY;
 		let x = obj.x;
 		let y = obj.y;
 		let r = obj.r;

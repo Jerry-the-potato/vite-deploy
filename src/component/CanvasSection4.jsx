@@ -10,10 +10,9 @@ const MESSAGE_MOUSE_LOCKED = "滑鼠已鎖定！點擊上方按鈕以解鎖";
 const MESSAGE_DRAGGING = "開始拖曳移動畫面";
 const MESSAGE_ZOOMING = "滾輪放大縮小"
 
-const CanvasSectionS4 = ({ ratio, max }) => {
-    const canvas = useRef();
-    const section = useRef();
-    const [uniqueID] = useState("JuliaSet");
+const CanvasSectionS4 = ({ ratio, min, uniqueID = "JuliaSet"}) => {
+    const canvas = useRef(null);
+    const section = useRef(null);
     useEffect(()=>{
         manager.addSubjectElement(section.current);
         manager.registerAnimationCallback("update" + uniqueID, myGLSL.update);
@@ -33,14 +32,13 @@ const CanvasSectionS4 = ({ ratio, max }) => {
     const [zoom, setZoom] = useState(250);
     const [offsetX, setOffsetX] = useState(0);
     const [offsetY, setOffsetY] = useState(0);
-    const [transform, setTransform] = useState(0);
 
     const frameRef = useRef();
     useEffect(()=>{
-        const data = {isJulia, useMouse, real, imaginary, zoom, offsetX, offsetY, transform};
+        const data = {isJulia, useMouse, real, imaginary, zoom, offsetX, offsetY};
         if (frameRef.current) cancelAnimationFrame(frameRef.current);
         frameRef.current = requestAnimationFrame(() => {myGLSL.updateData(data)});
-    }, [isJulia, useMouse, real, imaginary, zoom, offsetX, offsetY, transform]);
+    }, [isJulia, useMouse, real, imaginary, zoom, offsetX, offsetY]);
 
     // const state = {
     //     "isJulia": [isJulia, setIsJulia],
@@ -62,7 +60,7 @@ const CanvasSectionS4 = ({ ratio, max }) => {
         setOffsetX(0);
         setOffsetY(0);
     }
-    const menu = useRef();
+    const menu = useRef(null);
     
     const [isWheel, setIsWheel] = useState(false);
     function handleWheel(e){
@@ -78,7 +76,7 @@ const CanvasSectionS4 = ({ ratio, max }) => {
 
     const [isMouseDown, setIsMouseDown] = useState(false);
     const preMouse = useRef([0, 0]);
-    const logRef = useRef();
+    const logRef = useRef(null);
     function handleMouseDown(e){
         if(e.target.tagName == "BUTTON" || e.target.tagName == "INPUT") return;
         setIsWheel(false);
@@ -92,7 +90,7 @@ const CanvasSectionS4 = ({ ratio, max }) => {
         canvas.current.classList.remove('cursor-grabbing');
         canvas.current.classList.add('cursor-grab');
     }
-    function handleMouseMove(e){
+    function handleMouseMove(){
         
         if(!useMouse) return;
         if(isMouseDown){
@@ -179,7 +177,7 @@ const CanvasSectionS4 = ({ ratio, max }) => {
             onTouchStart={handleTouchStart}
             onTouchMove={handleTouchMove} 
             onTouchEnd={handleTouchEnd}>
-            <canvas ref={canvas} className="cursor-grab" id="canvasS4" width={max * ratio} height={ratio * max * ratio}></canvas>
+            <canvas ref={canvas} className="cursor-grab" id="canvasS4" width={min * ratio} height={ratio * min * ratio}></canvas>
             <div ref={menu} className="gamemenu">
                 <header id="header"><h3>{isJulia ? "JuliaSet" : "Manderbrot"}</h3></header>
                 <div className="parameter">
@@ -197,12 +195,12 @@ const CanvasSectionS4 = ({ ratio, max }) => {
                 </div>
                 <div className="controlpanel">
                     <label>★</label>
-                    <button onClick={(e) => setUseMouse(!useMouse)} id="useMouse">{useMouse ? "只允許使用面板" : "還是用滑鼠好了"}</button>
+                    <button onClick={() => setUseMouse(!useMouse)} id="useMouse">{useMouse ? "只允許使用面板" : "還是用滑鼠好了"}</button>
                     <button onClick={resetScreen}>畫面置中</button>
-                    <RecordBtn canvas={canvas.current}/>
+                    <RecordBtn canvas={canvas}/>
                     <button onClick={() => setIsJulia(!isJulia)}>{isJulia == true ? "觀看更多" : "回到Julia"}</button>
                     {!isJulia && <>
-                        <button onClick={() => myGLSL.setTransform(0)} disabled={name == "Manderbrot" ? true : false}>查看Manderbrot</button>
+                        <button onClick={() => myGLSL.setTransform(0)} disabled={0 ? true : false}>查看Manderbrot</button>
                         <button onClick={() => myGLSL.setTransform(100)} disabled={0 ? true : false}>查看BurningShip</button>
                     </>}
                 </div>

@@ -8,19 +8,16 @@ export default class BufferFactory{
     #factorys;
     #transitionRadian = 0;
     #trasitionOmega = Math.PI / 300;
-    #timestamp = Date.now();
-    #rotation = new THREE.Vector3(0,0,0);
     constructor(){
         this.#geometry = new THREE.BufferGeometry();
         const attribute = new THREE.BufferAttribute(this.#vertices, 3);
         attribute.setUsage( THREE.DynamicDrawUsage );
         this.#geometry.setAttribute('position', attribute);
         this.#geometry.setAttribute('color', attribute);
-        window.fac = this.#factorys;
         this.#material = new THREE.MeshBasicMaterial({
             vertexColors: true,
         });
-        this.mesh = new THREE.Mesh( this.#geometry, this.#material );
+        this.mesh = new THREE.Group();
         this.#factorys = new Array(180).fill(0).map(()=>this.createFactory())
         this.n = 0.5;
         // this.update();
@@ -41,8 +38,12 @@ export default class BufferFactory{
         const factory = this.#factorys[0];
         const vector = this.getPosition(dataArray);
         factory.vertices = new Float32Array(this.getVertices(vector));
-        factory.attribute = new THREE.BufferAttribute(factory.vertices, 3)
+        factory.attribute = new THREE.BufferAttribute(factory.vertices, 3);
         factory.geometry.setAttribute('position', factory.attribute);
+
+        factory.geometry.computeBoundingBox();
+        // factory.boxHelper = new THREE.Box3Helper(factory.geometry.boundingBox, 0xcccc00);
+        // this.mesh.add(factory.boxHelper);
 
         const colorVertices = new Float32Array(
             dataArray.reduce(
@@ -63,6 +64,8 @@ export default class BufferFactory{
         const len = this.#factorys.length;
         this.#factorys.forEach((factory, index)=>{
             factory.mesh.position.set(0,0,1 * (index - len));
+            factory.geometry.computeBoundingBox();
+            factory.geometry.boundingBox.translate(factory.mesh.position);
         })
     }
     setPosition(position){
@@ -78,7 +81,6 @@ export default class BufferFactory{
             }
         });
         this.#geometry.attributes.position.needsUpdate = "true";
-        window.index = this.#positionIndex
         const attribute = new THREE.BufferAttribute(this.#vertices, 3);
         attribute.setUsage( THREE.DynamicDrawUsage );
         this.#geometry.setAttribute('position', attribute);
@@ -228,7 +230,6 @@ export default class BufferFactory{
         });
         // this.setPosition(vertices);
         // this.setColor(colorVertices);
-        window.buffer = this.#geometry.attributes.position.array.length / 3;
     }
     getPosition(data){
         const t = 0//(Date.now() - this.#timestamp)/100;
@@ -304,21 +305,5 @@ export default class BufferFactory{
     update(){
         this.#transitionRadian+= this.#trasitionOmega;
         this.updataFactorys();
-        // const t = (Date.now() - this.#timestamp)/100;
-        // if(t > 90) return;
-
-        // this.getMusicData();
-        // this.mesh.rotation.x+= 0.005;
-        // this.mesh.rotation.y+= 0.02;
-        // this.mesh.rotation.z+= 0.001;
-
-        // const position = new Float32Array(900);
-        // for(let N=0; N<300;N++){
-        //     position[N*3] = N * Math.cos(N/10*this.n);
-        //     position[N*3+1] = N * Math.sin(N/10*this.n);
-        //     position[N*3+2] = 0;
-        // }
-        // this.#geometry.setAttribute('position', new THREE.BufferAttribute(position, 3)); //Float32Array
-        // this.n+= 0.002 * value.n/5;
     }
 }

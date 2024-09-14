@@ -2,11 +2,13 @@ import { useEffect, useRef, useState } from "react";
 import physic from "../js/physic";
 import manager from '../js/animateManager';
 import SlideMenuBtn from "./SlideMenuBtn";
-const CanvasSectionS3 = ({ canvas, ratio, max, status, handleClick}) => {
-    const menu = useRef();
-    const log = useRef();
-    const section = useRef();
-    const [uniqueID] = useState("SortAlgorithm");
+import RecordBtn from "./RecordBtn";
+
+const CanvasSectionS3 = ({ ratio, min, uniqueID = "SortAlgorithm"}) => {
+    const canvas = useRef(null);
+    const menu = useRef(null);
+    const log = useRef(null);
+    const section = useRef(null);
     useEffect(()=>{
         physic.setCanvas(canvas.current, log.current);
         manager.addSubjectElement(section.current);
@@ -21,8 +23,7 @@ const CanvasSectionS3 = ({ canvas, ratio, max, status, handleClick}) => {
     }, []);
     return (
         <section ref={section} className="section" id={uniqueID}>
-            <canvas ref={canvas} width={max * ratio} height={ratio * max * ratio}></canvas>
-            <button onClick={handleClick} value="S3" className="record">{status}</button>
+            <canvas ref={canvas} width={min * ratio} height={ratio * min * ratio}></canvas>
             <div ref={menu} className="gamemenu">
                 <header id=""><h3>粒子系統</h3></header>
                 <div id="pathConfig" className="parameter">
@@ -36,6 +37,7 @@ const CanvasSectionS3 = ({ canvas, ratio, max, status, handleClick}) => {
                 </div>
                 <div className="controlpanel">
                     <label>★</label>
+                    <RecordBtn canvas={canvas}/>
                     <button onClick={physic.start} id="bubbleSort">泡沫排序</button>
                     <button onClick={physic.start} id="selectionSort">選擇排序</button>
                     <button onClick={physic.start} id="insertionSort">插入排序</button>

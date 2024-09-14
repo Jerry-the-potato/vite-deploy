@@ -45,8 +45,8 @@ class Path extends PathConfig{
         this.targetY = targetY;
         this.originX = this.pointX;
         this.originY = this.pointY;
-        this.timer = frames;
-        this.period = frames;
+        this.timer = (frames >= 10) ? frames : 0;
+        this.period = (frames >= 10) ? frames : 1;
         cancelAnimationFrame(this.ID);
         this.ID = requestAnimationFrame(this.NextFrame);
     };

@@ -1,9 +1,9 @@
 import {useEffect, useState} from "react";
 
-function GetHyperLink(){
+function GetHyperLink({divRef}){
     const [hyperlink, setHyperlink] = useState();
     useEffect(() => {
-        const sections = document.getElementById("playground").getElementsByTagName("section");
+        const sections = divRef.current.getElementsByTagName("section");
         setHyperlink(Object.keys(sections).map((key) => {
             const ID = sections[key].id;
             return <a key={ID} className="list" href={"#"+ID} id={"to"+ID}>{ID}</a>
@@ -27,7 +27,7 @@ function GetHyperLink(){
     return hyperlink;
 }
 
-export default function NavigationBar({width}){
+export default function NavigationBar({width, divRef}){
 
     const [isOpen, setIsOpen] = useState(false);
     function handleClick() {
@@ -39,7 +39,7 @@ export default function NavigationBar({width}){
                 <a className="list" href="#S2" id="toS2">section2</a>
                 <a className="list" href="#S3" id="toS3">section3</a>
                 <a className="list" href="#cookie" id="tocookie">cookie</a> */}
-                <GetHyperLink></GetHyperLink>
+                <GetHyperLink divRef={divRef}></GetHyperLink>
                 <div onClick={handleClick} id="navSlider">
                     <p>{isOpen ? "X": "≡"}</p>
                 </div>

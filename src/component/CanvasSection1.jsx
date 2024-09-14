@@ -2,11 +2,11 @@ import { useState, useEffect, useRef } from "react";
 import lokaVolterra from '../js/lokaVolterra.js'
 import manager from "../js/animateManager.js";
 import SlideMenuBtn from "./SlideMenuBtn";
-
-const CanvasSectionS1 = ({canvas, ratio, max, status, handleClick}) => {
-    const bitmap = useRef();
-    const section = useRef();
-    const [uniqueID] = useState("LokaVolterra");
+import RecordBtn from "./RecordBtn.jsx";
+const CanvasSectionS1 = ({ratio, min, uniqueID = "LokaVolterra"}) => {
+    const canvas = useRef(null);
+    const bitmap = useRef(null);
+    const section = useRef(null);
     useEffect(()=>{
 		window.addEventListener("resize", lokaVolterra.resize, false);
         lokaVolterra.setCanvas(canvas.current, bitmap.current);
@@ -20,9 +20,9 @@ const CanvasSectionS1 = ({canvas, ratio, max, status, handleClick}) => {
             manager.unregisterAnimationCallback("update" + uniqueID);
             manager.unregisterAnimationCallback("render" + uniqueID);
         }
-    }, [])
+    }, []);
 
-    const menu = useRef();
+    const menu = useRef(null);
     const state = {
         "useMouse": useState(0),
         "isTransform": useState(0),
@@ -54,8 +54,8 @@ const CanvasSectionS1 = ({canvas, ratio, max, status, handleClick}) => {
     const [isWorker, setIsWorker] = useState(true);
     function handlePauseMain(){
         const name = (!isMain ? "resume" : "pause") + "AnimationByName";
-        manager[name]("renderS1");
-        manager[name]("updateS1");
+        manager[name]("render" + uniqueID);
+        manager[name]("update" + uniqueID);
         setIsMain(!isMain);
     }
     function handlePauseWorker(){
@@ -64,9 +64,8 @@ const CanvasSectionS1 = ({canvas, ratio, max, status, handleClick}) => {
     }
     return (
         <section ref={section} className="section" id={uniqueID}>
-            <canvas value={Math.random()} ref={canvas} width={max * ratio} height={ratio * max * ratio}></canvas>
-            <canvas ref={bitmap} width={max * ratio} height={ratio * max * ratio}></canvas>
-            <button onClick={handleClick} value="S1" className="record">{status}</button>
+            <canvas value={Math.random()} ref={canvas} width={min * ratio} height={ratio * min * ratio}></canvas>
+            <canvas ref={bitmap} width={min * ratio} height={ratio * min * ratio}></canvas>
             <div ref={menu} className="gamemenu">
                 <header id="header"><h3>Lotka Volterra 實驗場 + Web Woker</h3></header>
                 <div className="parameter">
@@ -83,6 +82,7 @@ const CanvasSectionS1 = ({canvas, ratio, max, status, handleClick}) => {
                     <button onClick={handleCanvasControl} id="isTransform" value={state.isTransform[0] ? 0 : 1}>{state.isTransform[0] == "1" ? "取消縮放" : "加入縮放"}</button>
                     <button onClick={handlePauseMain} id="pauseMain">{isMain ? "停止(左)" : "開始(左)"}</button>
                     <button onClick={handlePauseWorker} id="pauseWorker">{isWorker ? "停止(右)" : "開始(右)"}</button>
+                    <RecordBtn canvas={canvas}></RecordBtn>
                 </div>
                 <div id="dialogbox"><p id="dialog">∫此微分方程用於描述捕食者和獵物的此消彼長，沿著中心點呈現漩渦紋理</p></div>
                 <SlideMenuBtn menu={menu}></SlideMenuBtn>

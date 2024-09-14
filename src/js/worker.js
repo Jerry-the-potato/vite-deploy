@@ -55,8 +55,6 @@ function createPainter(){
 	}
 	this.draw = function(obj){ // 透過 painter.draw 呼叫其私有函式
 		let ctx = obj.ctx;
-		let w = this.pixelX;
-		let h = this.pixelY;
 		let x = obj.x;
 		let y = obj.y;
 		let r = obj.r;
@@ -143,7 +141,7 @@ function createPainter(){
 
 // 繪圖系統-main
 function main() {
-	board.width = board.width;
+	board.width = board.width * 1;
 	board_ctx.translate(board.width * 0.25, 0);
 	// console.log(painter.works);
 	painter.works.forEach(obj => {painter.draw(obj);});
@@ -152,12 +150,6 @@ function main() {
 	// self.postMessage({"name": "drawImage", "bitmap": bitmap});
 	requestID.painter = requestAnimationFrame(main);
 }
-
-function clearBoard() {
-	board_ctx.fillStyle = 'black';
-	board_ctx.fillRect(0, 0, board.width, board.height);
-}
-
 
 // 粒子系統
 let transitionRadian = 0;
@@ -285,9 +277,6 @@ function motion(list){
 	// 	if((n2 - n1) * one < 50) force = one * (50 - (n2 - n1) * one) / 20;
 	// 	return force;
 	// }
-	function getForce(d){
-		return force;
-	}
 	function addVelocity(a, v){
 		a.splice(1, 0, v);
 		a.splice(60, 1);

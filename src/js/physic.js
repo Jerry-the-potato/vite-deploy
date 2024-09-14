@@ -5,9 +5,9 @@ import Averager from "./averager";
 // 粒子系統事件管理員
 const createPhysic = function(){
     const frame = new Averager(60);
-	this.setCanvas = (canvas, log) => {
+	this.setCanvas = (canvas, pElement) => {
         this.system = new ParticleSystem(canvas.width/2, canvas.height/2);
-        this.system.sort.log = log;
+        this.system.sort.setLog(pElement);
         this.ctx = canvas.getContext("2d");
         this.ctx.lineCap = 'butt';
         this.ctx.textAlign = 'center';
@@ -17,7 +17,7 @@ const createPhysic = function(){
         this.ctx = null;
     }
     this.update = () => {this.system.update();}
-    this.render = () => {this.system.getRender(this.ctx);}
+    this.render = () => {this.system.render(this.ctx);}
     this.start = (e) => {
         const ID = e.target.id;
         if(!this.system.sort[ID]){

@@ -11,9 +11,7 @@ float rand(float s) {
 
 void main() {
     vec3 color = vec3(0.0, 0.0, 0.0);
-    // 將屏幕坐標轉換為複數平面坐標
     vec2 c = (gl_FragCoord.xy - u_resolution * 0.5) / u_zoom + u_offset;
-    // vec2 c = (gl_FragCoord.xy - u_resolution * 0.5) / u_zoom + u_offset;
     c.y *= -1.0; // 翻轉 y 軸
 
     // 反鋸齒 & 隨機取樣
@@ -65,19 +63,14 @@ void main() {
             if(I == 0.) break;
         }
     }
-
     color /= AA_LEVEL;
-    float width = 1.0 / u_zoom;
-    // float axisX = smoothstep(0.0, width, abs(c.y)); // 控制Y軸的寬度
-    // float axisY = smoothstep(0.0, width, abs(c.x)); // 控制X軸的寬度
+
      // 使用硬邊界
+    float width = 1.0 / u_zoom;
     float axisX = step(width / 2.0, abs(c.y));
     float axisY = step(width / 2.0, abs(c.x));
     
-    vec3 axisColor = vec3(0.0, 0.0, 0.0); // 藍色
-    
-    // vec3 finalColor = mix(color1, color2, grid); // 根據 grid 的值進行顏色混合
+    vec3 axisColor = vec3(0.0, 0.0, 0.0);
     vec3 finalColor = mix(axisColor, color, (axisX + axisY) / 2.0);
     gl_FragColor = vec4(finalColor, 1.0);
-    // gl_FragColor.rgb = mix(axisColor, gl_FragColor.rgb, (axisX + axisY) / 2.0);
 }

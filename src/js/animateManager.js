@@ -23,15 +23,19 @@ const managerMaker = function(){
         }
         return req;
     }
-    this.updateRequestAnimation = (id) => {
-        const names = this.getRequestById(id);
-        if(names === null) return;
+    this.cancelRequestAnimation = () => {
         
+    }
+    this.updateRequestAnimation = (id) => {
+        // 停止舊的動畫
         this.lastId = id;
         this.lastRequestName.forEach(name => {
             if(!this.request[name]) return;
             cancelAnimationFrame(this.request[name].ID);
         })
+        // 開始新的動畫
+        const names = this.getRequestById(id);
+        if(names === null) return;
         this.lastRequestName = names;
         
         names.forEach(name => {
@@ -87,7 +91,7 @@ const managerMaker = function(){
     this.addSubjectElement = (element) => {
         // elements.forEach((el) => {
         //     this.validId.push(el.id);
-        //     this.io.unobserve(el) // avoid observing one element mutiple time
+        //     this.io.unobserve(el)
         //     this.io.observe(el);
         // });
         this.subject[element.id] = element;
