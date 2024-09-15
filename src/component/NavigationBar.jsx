@@ -33,7 +33,10 @@ export default function NavigationBar({width, divRef}){
     function handleClick() {
         setIsOpen(!isOpen);
     }
-    return  <nav id="nav" style={{'left': isOpen ? 0 : -width +"px"}}>
+    return  <nav id="nav" style={{
+                'left': isOpen ? 0 : -width +"px",
+                'width': width
+            }}>
                 {/* <a className="list" href="#home" id="tohome">Home</a>
                 <a className="list" href="#S1" id="toS1">section1</a>
                 <a className="list" href="#S2" id="toS2">section2</a>

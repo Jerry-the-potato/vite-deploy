@@ -35,10 +35,13 @@ class Path extends PathConfig{
     
         this.originX = x;
         this.originY = y;
+
         this.targetX = x;
         this.targetY = y;
+        
         this.period = 90;
         this.timer = 0;
+        this.ID = 0;
     }
     NewTarget = function(targetX, targetY, frames){
         this.targetX = targetX;
