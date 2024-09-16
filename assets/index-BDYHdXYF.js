@@ -16,7 +16,7 @@ var __privateWrapper = (obj, member, setter, getter) => ({
     return __privateGet(obj, member, getter);
   }
 });
-var _geometry, _vertices, _positionIndex, _material, _factorys, _transitionRadian, _trasitionOmega, _timestamp, _rotation;
+var _geometry, _vertices, _positionIndex, _material, _factorys, _transitionRadian, _trasitionOmega;
 (function polyfill() {
   const relList = document.createElement("link").relList;
   if (relList && relList.supports && relList.supports("modulepreload")) {
@@ -7022,39 +7022,6 @@ var m = reactDomExports;
   createRoot = m.createRoot;
   m.hydrateRoot;
 }
-function GetHyperLink() {
-  const [hyperlink, setHyperlink] = reactExports.useState();
-  reactExports.useEffect(() => {
-    const sections = document.getElementById("playground").getElementsByTagName("section");
-    setHyperlink(Object.keys(sections).map((key) => {
-      const ID = sections[key].id;
-      return /* @__PURE__ */ jsxRuntimeExports.jsx("a", { className: "list", href: "#" + ID, id: "to" + ID, children: ID }, ID);
-    }));
-    function handleHashChange() {
-      const hash = window.location.hash;
-      if (!hash) return;
-      const targetElement = document.querySelector(hash);
-      if (!targetElement) return;
-      targetElement.scrollIntoView({ behavior: "smooth" });
-    }
-    handleHashChange();
-    window.addEventListener("hashchange", handleHashChange);
-    return () => {
-      window.removeEventListener("hashchange", handleHashChange);
-    };
-  }, []);
-  return hyperlink;
-}
-function NavigationBar({ width }) {
-  const [isOpen, setIsOpen] = reactExports.useState(false);
-  function handleClick() {
-    setIsOpen(!isOpen);
-  }
-  return /* @__PURE__ */ jsxRuntimeExports.jsxs("nav", { id: "nav", style: { "left": isOpen ? 0 : -width + "px" }, children: [
-    /* @__PURE__ */ jsxRuntimeExports.jsx(GetHyperLink, {}),
-    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { onClick: handleClick, id: "navSlider", children: /* @__PURE__ */ jsxRuntimeExports.jsx("p", { children: isOpen ? "X" : "≡" }) })
-  ] });
-}
 function useWindowSize(margin) {
   const [size, setSize] = reactExports.useState([window.innerWidth - margin * 2, window.innerHeight - margin * 2]);
   reactExports.useLayoutEffect(() => {
@@ -7066,7 +7033,7 @@ function useWindowSize(margin) {
 }
 function WorkerWrapper(options) {
   return new Worker(
-    "/vite-deploy/assets/worker-ZI55oAdN.js",
+    "/vite-deploy/assets/worker-C5BdF-Nt.js",
     {
       name: options == null ? void 0 : options.name
     }
@@ -7075,15 +7042,13 @@ function WorkerWrapper(options) {
 function createPainter() {
   this.works = [];
   this.pixelX = window.innerWidth;
-  this.pixelY = window.innerWidth;
+  this.pixelY = window.innerHeight;
   this.setPixel = function(w2, h) {
     this.pixelX = w2;
     this.pixelY = h;
   };
   this.draw = function(obj) {
     let ctx = obj.ctx;
-    this.pixelX;
-    this.pixelY;
     let x2 = obj.x;
     let y2 = obj.y;
     let r2 = obj.r;
@@ -7202,8 +7167,8 @@ class Path extends PathConfig {
       this.targetY = targetY;
       this.originX = this.pointX;
       this.originY = this.pointY;
-      this.timer = frames;
-      this.period = frames;
+      this.timer = frames >= 10 ? frames : 0;
+      this.period = frames >= 10 ? frames : 1;
       cancelAnimationFrame(this.ID);
       this.ID = requestAnimationFrame(this.NextFrame);
     });
@@ -7240,6 +7205,7 @@ class Path extends PathConfig {
     this.targetY = y2;
     this.period = 90;
     this.timer = 0;
+    this.ID = 0;
   }
   getPath() {
     return super.getPath();
@@ -7585,14 +7551,16 @@ const managerMaker = function() {
     }
     return req;
   };
+  this.cancelRequestAnimation = () => {
+  };
   this.updateRequestAnimation = (id2) => {
-    const names = this.getRequestById(id2);
-    if (names === null) return;
     this.lastId = id2;
     this.lastRequestName.forEach((name2) => {
       if (!this.request[name2]) return;
       cancelAnimationFrame(this.request[name2].ID);
     });
+    const names = this.getRequestById(id2);
+    if (names === null) return;
     this.lastRequestName = names;
     names.forEach((name2) => {
       if (typeof this.request[name2] === "undefined") return console.warn("invalid request");
@@ -7654,27 +7622,70 @@ const managerMaker = function() {
   return this;
 };
 const manager = new managerMaker();
-function SlideMenuBtn({ menu }) {
+function SlideMenuBtn({ menu, direction = "top" }) {
+  const [isOpen, setIsOpen] = reactExports.useState(true);
   function handleClick(e) {
     const m2 = menu.current;
     const b = e.target;
-    const rectMenu = m2.getBoundingClientRect();
-    const rectButton = b.getBoundingClientRect();
-    const height = rectButton.y - rectMenu.y;
-    if (b.innerText == "收起△") {
-      m2.style.top = "-" + height + "px";
-      b.innerText = "展開▽";
-    } else {
-      m2.style.top = "1%";
-      b.innerText = "收起△";
-    }
+    const menuRect = m2.getBoundingClientRect();
+    const buttonRect = b.getBoundingClientRect();
+    const positionOffset = {
+      "left": buttonRect.x - menuRect.x,
+      "top": buttonRect.y - menuRect.y
+    };
+    m2.style[direction] = !isOpen ? "" : "-" + positionOffset[direction] + "px";
+    setIsOpen(!isOpen);
   }
-  return /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: handleClick, className: "slideMenu", children: "收起△" });
+  return /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: handleClick, className: "slideMenu", children: isOpen ? "收起△" : "展開▽" });
 }
-const CanvasSectionS1 = ({ canvas, ratio, max, status, handleClick }) => {
-  const bitmap = reactExports.useRef();
-  const section = reactExports.useRef();
-  const [uniqueID] = reactExports.useState("LokaVolterra");
+function downloadMedia(data) {
+  var blob = new Blob(data, { type: "video/mp4" });
+  const recording_url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.style = "display: none;";
+  a.href = recording_url;
+  a.download = "video.mp4";
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(() => {
+    URL.revokeObjectURL(recording_url);
+    document.body.removeChild(a);
+  }, 0);
+}
+const media = {};
+function RecordBtn({ canvas, audio }) {
+  const [status, setStatus] = reactExports.useState("開始錄影");
+  function handleClick() {
+    if (status == "停止錄影") {
+      setStatus("開始錄影");
+      media.recorder.stop();
+      return;
+    }
+    const chunks = [];
+    media.canvas = canvas.current;
+    media.stream = media.canvas.captureStream(60);
+    if (audio) {
+      media.audio = audio.current;
+      media.audio.play();
+      media.audioStream = media.audio.captureStream();
+      media.stream = new MediaStream([...media.stream.getVideoTracks(), ...media.audioStream.getAudioTracks()]);
+    }
+    media.recorder = new MediaRecorder(media.stream, { mimeType: "video/mp4; codecs=vp9" });
+    media.recorder.ondataavailable = (evt) => {
+      chunks.push(evt.data);
+    };
+    media.recorder.onstop = () => {
+      downloadMedia(chunks);
+    };
+    media.recorder.start(1e3);
+    setStatus("停止錄影");
+  }
+  return /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: handleClick, children: status });
+}
+const CanvasSectionS1 = ({ ratio, min, uniqueID = "LokaVolterra" }) => {
+  const canvas = reactExports.useRef(null);
+  const bitmap = reactExports.useRef(null);
+  const section = reactExports.useRef(null);
   reactExports.useEffect(() => {
     window.addEventListener("resize", lokaVolterra.resize, false);
     lokaVolterra.setCanvas(canvas.current, bitmap.current);
@@ -7689,7 +7700,7 @@ const CanvasSectionS1 = ({ canvas, ratio, max, status, handleClick }) => {
       manager.unregisterAnimationCallback("render" + uniqueID);
     };
   }, []);
-  const menu = reactExports.useRef();
+  const menu = reactExports.useRef(null);
   const state = {
     "useMouse": reactExports.useState(0),
     "isTransform": reactExports.useState(0),
@@ -7721,8 +7732,8 @@ const CanvasSectionS1 = ({ canvas, ratio, max, status, handleClick }) => {
   const [isWorker, setIsWorker] = reactExports.useState(true);
   function handlePauseMain() {
     const name2 = (!isMain ? "resume" : "pause") + "AnimationByName";
-    manager[name2]("renderS1");
-    manager[name2]("updateS1");
+    manager[name2]("render" + uniqueID);
+    manager[name2]("update" + uniqueID);
     setIsMain(!isMain);
   }
   function handlePauseWorker() {
@@ -7730,9 +7741,8 @@ const CanvasSectionS1 = ({ canvas, ratio, max, status, handleClick }) => {
     setIsWorker(!isWorker);
   }
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("section", { ref: section, className: "section", id: uniqueID, children: [
-    /* @__PURE__ */ jsxRuntimeExports.jsx("canvas", { value: Math.random(), ref: canvas, width: max * ratio, height: ratio * max * ratio }),
-    /* @__PURE__ */ jsxRuntimeExports.jsx("canvas", { ref: bitmap, width: max * ratio, height: ratio * max * ratio }),
-    /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: handleClick, value: "S1", className: "record", children: status }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx("canvas", { value: Math.random(), ref: canvas, width: min * ratio, height: ratio * min * ratio }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx("canvas", { ref: bitmap, width: min * ratio, height: ratio * min * ratio }),
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { ref: menu, className: "gamemenu", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsx("header", { id: "header", children: /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { children: "Lotka Volterra 實驗場 + Web Woker" }) }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "parameter", children: [
@@ -7754,7 +7764,8 @@ const CanvasSectionS1 = ({ canvas, ratio, max, status, handleClick }) => {
         /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: handleCanvasControl, id: "useMouse", value: state.useMouse[0] ? 0 : 1, children: state.useMouse[0] ? "取消跟隨" : "跟隨滑鼠" }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: handleCanvasControl, id: "isTransform", value: state.isTransform[0] ? 0 : 1, children: state.isTransform[0] == "1" ? "取消縮放" : "加入縮放" }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: handlePauseMain, id: "pauseMain", children: isMain ? "停止(左)" : "開始(左)" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: handlePauseWorker, id: "pauseWorker", children: isWorker ? "停止(右)" : "開始(右)" })
+        /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: handlePauseWorker, id: "pauseWorker", children: isWorker ? "停止(右)" : "開始(右)" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(RecordBtn, { canvas })
       ] }),
       /* @__PURE__ */ jsxRuntimeExports.jsx("div", { id: "dialogbox", children: /* @__PURE__ */ jsxRuntimeExports.jsx("p", { id: "dialog", children: "∫此微分方程用於描述捕食者和獵物的此消彼長，沿著中心點呈現漩渦紋理" }) }),
       /* @__PURE__ */ jsxRuntimeExports.jsx(SlideMenuBtn, { menu })
@@ -7768,6 +7779,8 @@ const audioUrl = "/vite-deploy/assets/Lovely%20Piano%20Song-D2Oyr38W.mp3";
  * SPDX-License-Identifier: MIT
  */
 const REVISION = "167";
+const MOUSE = { LEFT: 0, MIDDLE: 1, RIGHT: 2, ROTATE: 0, DOLLY: 1, PAN: 2 };
+const TOUCH = { ROTATE: 0, PAN: 1, DOLLY_PAN: 2, DOLLY_ROTATE: 3 };
 const CullFaceNone = 0;
 const CullFaceBack = 1;
 const CullFaceFront = 2;
@@ -7963,6 +7976,7 @@ class EventDispatcher {
   }
 }
 const _lut = ["00", "01", "02", "03", "04", "05", "06", "07", "08", "09", "0a", "0b", "0c", "0d", "0e", "0f", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "1a", "1b", "1c", "1d", "1e", "1f", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "2a", "2b", "2c", "2d", "2e", "2f", "30", "31", "32", "33", "34", "35", "36", "37", "38", "39", "3a", "3b", "3c", "3d", "3e", "3f", "40", "41", "42", "43", "44", "45", "46", "47", "48", "49", "4a", "4b", "4c", "4d", "4e", "4f", "50", "51", "52", "53", "54", "55", "56", "57", "58", "59", "5a", "5b", "5c", "5d", "5e", "5f", "60", "61", "62", "63", "64", "65", "66", "67", "68", "69", "6a", "6b", "6c", "6d", "6e", "6f", "70", "71", "72", "73", "74", "75", "76", "77", "78", "79", "7a", "7b", "7c", "7d", "7e", "7f", "80", "81", "82", "83", "84", "85", "86", "87", "88", "89", "8a", "8b", "8c", "8d", "8e", "8f", "90", "91", "92", "93", "94", "95", "96", "97", "98", "99", "9a", "9b", "9c", "9d", "9e", "9f", "a0", "a1", "a2", "a3", "a4", "a5", "a6", "a7", "a8", "a9", "aa", "ab", "ac", "ad", "ae", "af", "b0", "b1", "b2", "b3", "b4", "b5", "b6", "b7", "b8", "b9", "ba", "bb", "bc", "bd", "be", "bf", "c0", "c1", "c2", "c3", "c4", "c5", "c6", "c7", "c8", "c9", "ca", "cb", "cc", "cd", "ce", "cf", "d0", "d1", "d2", "d3", "d4", "d5", "d6", "d7", "d8", "d9", "da", "db", "dc", "dd", "de", "df", "e0", "e1", "e2", "e3", "e4", "e5", "e6", "e7", "e8", "e9", "ea", "eb", "ec", "ed", "ee", "ef", "f0", "f1", "f2", "f3", "f4", "f5", "f6", "f7", "f8", "f9", "fa", "fb", "fc", "fd", "fe", "ff"];
+let _seed = 1234567;
 const DEG2RAD = Math.PI / 180;
 const RAD2DEG = 180 / Math.PI;
 function generateUUID() {
@@ -7979,8 +7993,101 @@ function clamp(value, min, max) {
 function euclideanModulo(n2, m2) {
   return (n2 % m2 + m2) % m2;
 }
+function mapLinear(x2, a1, a2, b1, b2) {
+  return b1 + (x2 - a1) * (b2 - b1) / (a2 - a1);
+}
+function inverseLerp(x2, y2, value) {
+  if (x2 !== y2) {
+    return (value - x2) / (y2 - x2);
+  } else {
+    return 0;
+  }
+}
 function lerp(x2, y2, t2) {
   return (1 - t2) * x2 + t2 * y2;
+}
+function damp(x2, y2, lambda, dt) {
+  return lerp(x2, y2, 1 - Math.exp(-lambda * dt));
+}
+function pingpong(x2, length = 1) {
+  return length - Math.abs(euclideanModulo(x2, length * 2) - length);
+}
+function smoothstep(x2, min, max) {
+  if (x2 <= min) return 0;
+  if (x2 >= max) return 1;
+  x2 = (x2 - min) / (max - min);
+  return x2 * x2 * (3 - 2 * x2);
+}
+function smootherstep(x2, min, max) {
+  if (x2 <= min) return 0;
+  if (x2 >= max) return 1;
+  x2 = (x2 - min) / (max - min);
+  return x2 * x2 * x2 * (x2 * (x2 * 6 - 15) + 10);
+}
+function randInt(low, high) {
+  return low + Math.floor(Math.random() * (high - low + 1));
+}
+function randFloat(low, high) {
+  return low + Math.random() * (high - low);
+}
+function randFloatSpread(range) {
+  return range * (0.5 - Math.random());
+}
+function seededRandom(s) {
+  if (s !== void 0) _seed = s;
+  let t2 = _seed += 1831565813;
+  t2 = Math.imul(t2 ^ t2 >>> 15, t2 | 1);
+  t2 ^= t2 + Math.imul(t2 ^ t2 >>> 7, t2 | 61);
+  return ((t2 ^ t2 >>> 14) >>> 0) / 4294967296;
+}
+function degToRad(degrees) {
+  return degrees * DEG2RAD;
+}
+function radToDeg(radians) {
+  return radians * RAD2DEG;
+}
+function isPowerOfTwo(value) {
+  return (value & value - 1) === 0 && value !== 0;
+}
+function ceilPowerOfTwo(value) {
+  return Math.pow(2, Math.ceil(Math.log(value) / Math.LN2));
+}
+function floorPowerOfTwo(value) {
+  return Math.pow(2, Math.floor(Math.log(value) / Math.LN2));
+}
+function setQuaternionFromProperEuler(q2, a, b, c, order) {
+  const cos = Math.cos;
+  const sin = Math.sin;
+  const c2 = cos(b / 2);
+  const s2 = sin(b / 2);
+  const c13 = cos((a + c) / 2);
+  const s13 = sin((a + c) / 2);
+  const c1_3 = cos((a - c) / 2);
+  const s1_3 = sin((a - c) / 2);
+  const c3_1 = cos((c - a) / 2);
+  const s3_1 = sin((c - a) / 2);
+  switch (order) {
+    case "XYX":
+      q2.set(c2 * s13, s2 * c1_3, s2 * s1_3, c2 * c13);
+      break;
+    case "YZY":
+      q2.set(s2 * s1_3, c2 * s13, s2 * c1_3, c2 * c13);
+      break;
+    case "ZXZ":
+      q2.set(s2 * c1_3, s2 * s1_3, c2 * s13, c2 * c13);
+      break;
+    case "XZX":
+      q2.set(c2 * s13, s2 * s3_1, s2 * c3_1, c2 * c13);
+      break;
+    case "YXY":
+      q2.set(s2 * c3_1, c2 * s13, s2 * s3_1, c2 * c13);
+      break;
+    case "ZYZ":
+      q2.set(s2 * s3_1, s2 * c3_1, c2 * s13, c2 * c13);
+      break;
+    default:
+      console.warn("THREE.MathUtils: .setQuaternionFromProperEuler() encountered an unknown order: " + order);
+  }
 }
 function denormalize(value, array) {
   switch (array.constructor) {
@@ -8022,6 +8129,32 @@ function normalize(value, array) {
       throw new Error("Invalid component type.");
   }
 }
+const MathUtils = {
+  DEG2RAD,
+  RAD2DEG,
+  generateUUID,
+  clamp,
+  euclideanModulo,
+  mapLinear,
+  inverseLerp,
+  lerp,
+  damp,
+  pingpong,
+  smoothstep,
+  smootherstep,
+  randInt,
+  randFloat,
+  randFloatSpread,
+  seededRandom,
+  degToRad,
+  radToDeg,
+  isPowerOfTwo,
+  ceilPowerOfTwo,
+  floorPowerOfTwo,
+  setQuaternionFromProperEuler,
+  normalize,
+  denormalize
+};
 class Vector2 {
   constructor(x2 = 0, y2 = 0) {
     Vector2.prototype.isVector2 = true;
@@ -25931,7 +26064,7 @@ class PointsMaterial extends Material {
   }
 }
 const _inverseMatrix = /* @__PURE__ */ new Matrix4();
-const _ray = /* @__PURE__ */ new Ray();
+const _ray$2 = /* @__PURE__ */ new Ray();
 const _sphere = /* @__PURE__ */ new Sphere();
 const _position$2 = /* @__PURE__ */ new Vector3();
 class Points extends Object3D {
@@ -25960,7 +26093,7 @@ class Points extends Object3D {
     _sphere.radius += threshold;
     if (raycaster.ray.intersectsSphere(_sphere) === false) return;
     _inverseMatrix.copy(matrixWorld).invert();
-    _ray.copy(raycaster.ray).applyMatrix4(_inverseMatrix);
+    _ray$2.copy(raycaster.ray).applyMatrix4(_inverseMatrix);
     const localThreshold = threshold / ((this.scale.x + this.scale.y + this.scale.z) / 3);
     const localThresholdSq = localThreshold * localThreshold;
     const index = geometry.index;
@@ -26002,10 +26135,10 @@ class Points extends Object3D {
   }
 }
 function testPoint(point, index, localThresholdSq, matrixWorld, raycaster, intersects, object) {
-  const rayPointDistanceSq = _ray.distanceSqToPoint(point);
+  const rayPointDistanceSq = _ray$2.distanceSqToPoint(point);
   if (rayPointDistanceSq < localThresholdSq) {
     const intersectPoint = new Vector3();
-    _ray.closestPointToPoint(point, intersectPoint);
+    _ray$2.closestPointToPoint(point, intersectPoint);
     intersectPoint.applyMatrix4(matrixWorld);
     const distance = raycaster.ray.origin.distanceTo(intersectPoint);
     if (distance < raycaster.near || distance > raycaster.far) return;
@@ -26087,6 +26220,49 @@ class SphereGeometry extends BufferGeometry {
   }
   static fromJSON(data) {
     return new SphereGeometry(data.radius, data.widthSegments, data.heightSegments, data.phiStart, data.phiLength, data.thetaStart, data.thetaLength);
+  }
+}
+class Spherical {
+  constructor(radius = 1, phi = 0, theta = 0) {
+    this.radius = radius;
+    this.phi = phi;
+    this.theta = theta;
+    return this;
+  }
+  set(radius, phi, theta) {
+    this.radius = radius;
+    this.phi = phi;
+    this.theta = theta;
+    return this;
+  }
+  copy(other) {
+    this.radius = other.radius;
+    this.phi = other.phi;
+    this.theta = other.theta;
+    return this;
+  }
+  // restrict phi to be between EPS and PI-EPS
+  makeSafe() {
+    const EPS = 1e-6;
+    this.phi = Math.max(EPS, Math.min(Math.PI - EPS, this.phi));
+    return this;
+  }
+  setFromVector3(v2) {
+    return this.setFromCartesianCoords(v2.x, v2.y, v2.z);
+  }
+  setFromCartesianCoords(x2, y2, z2) {
+    this.radius = Math.sqrt(x2 * x2 + y2 * y2 + z2 * z2);
+    if (this.radius === 0) {
+      this.theta = 0;
+      this.phi = 0;
+    } else {
+      this.theta = Math.atan2(x2, z2);
+      this.phi = Math.acos(clamp(y2 / this.radius, -1, 1));
+    }
+    return this;
+  }
+  clone() {
+    return new this.constructor().copy(this);
   }
 }
 class AxesHelper extends LineSegments {
@@ -26179,18 +26355,15 @@ class BufferFactory {
     __privateAdd(this, _factorys);
     __privateAdd(this, _transitionRadian, 0);
     __privateAdd(this, _trasitionOmega, Math.PI / 300);
-    __privateAdd(this, _timestamp, Date.now());
-    __privateAdd(this, _rotation, new Vector3(0, 0, 0));
     __privateSet(this, _geometry, new BufferGeometry());
     const attribute = new BufferAttribute(__privateGet(this, _vertices), 3);
     attribute.setUsage(DynamicDrawUsage);
     __privateGet(this, _geometry).setAttribute("position", attribute);
     __privateGet(this, _geometry).setAttribute("color", attribute);
-    window.fac = __privateGet(this, _factorys);
     __privateSet(this, _material, new MeshBasicMaterial({
       vertexColors: true
     }));
-    this.mesh = new Mesh(__privateGet(this, _geometry), __privateGet(this, _material));
+    this.mesh = new Group();
     __privateSet(this, _factorys, new Array(180).fill(0).map(() => this.createFactory()));
     this.n = 0.5;
   }
@@ -26211,6 +26384,7 @@ class BufferFactory {
     factory.vertices = new Float32Array(this.getVertices(vector));
     factory.attribute = new BufferAttribute(factory.vertices, 3);
     factory.geometry.setAttribute("position", factory.attribute);
+    factory.geometry.computeBoundingBox();
     const colorVertices = new Float32Array(
       dataArray.reduce(
         (vertices, data) => vertices.concat(...new Array(6 * 2 * 3).fill(0).map((index) => {
@@ -26231,6 +26405,8 @@ class BufferFactory {
     const len = __privateGet(this, _factorys).length;
     __privateGet(this, _factorys).forEach((factory, index) => {
       factory.mesh.position.set(0, 0, 1 * (index - len));
+      factory.geometry.computeBoundingBox();
+      factory.geometry.boundingBox.translate(factory.mesh.position);
     });
   }
   setPosition(position) {
@@ -26248,7 +26424,6 @@ class BufferFactory {
       }
     });
     __privateGet(this, _geometry).attributes.position.needsUpdate = "true";
-    window.index = __privateGet(this, _positionIndex);
     const attribute = new BufferAttribute(__privateGet(this, _vertices), 3);
     attribute.setUsage(DynamicDrawUsage);
     __privateGet(this, _geometry).setAttribute("position", attribute);
@@ -26370,7 +26545,6 @@ class BufferFactory {
       if (index % 3 == 2) return 0.2 + value / 50;
       return 0.2 + Math.random() * 0.5;
     });
-    window.buffer = __privateGet(this, _geometry).attributes.position.array.length / 3;
   }
   getPosition(data) {
     const t2 = 0;
@@ -26441,23 +26615,8 @@ _material = new WeakMap();
 _factorys = new WeakMap();
 _transitionRadian = new WeakMap();
 _trasitionOmega = new WeakMap();
-_timestamp = new WeakMap();
-_rotation = new WeakMap();
 const particleGeo = new BufferGeometry();
 particleGeo.setAttribute("position", new BufferAttribute(new Float32Array([0, 0, 0]), 3));
-function getPointsMaterial(size = 1, map = null) {
-  const material = new PointsMaterial({
-    size,
-    map,
-    color: 16777215,
-    transparent: true
-  });
-  return material;
-}
-function makeParticleMaterial(size, map) {
-  const particleMaterial = new Points(particleGeo, getPointsMaterial(size, map));
-  return particleMaterial;
-}
 function makeBall(radius = 15, w2 = 32, h = 16, size = 5e-3, color = 16776960) {
   const geometry = new SphereGeometry(radius, w2, h);
   const material = new PointsMaterial({ size, color });
@@ -26500,6 +26659,778 @@ class Averager {
     return this.fps;
   }
 }
+const _changeEvent = { type: "change" };
+const _startEvent = { type: "start" };
+const _endEvent = { type: "end" };
+const _ray = new Ray();
+const _plane = new Plane();
+const TILT_LIMIT = Math.cos(70 * MathUtils.DEG2RAD);
+class OrbitControls extends EventDispatcher {
+  constructor(object, domElement) {
+    super();
+    this.object = object;
+    this.domElement = domElement;
+    this.domElement.style.touchAction = "none";
+    this.enabled = true;
+    this.target = new Vector3();
+    this.cursor = new Vector3();
+    this.minDistance = 0;
+    this.maxDistance = Infinity;
+    this.minZoom = 0;
+    this.maxZoom = Infinity;
+    this.minTargetRadius = 0;
+    this.maxTargetRadius = Infinity;
+    this.minPolarAngle = 0;
+    this.maxPolarAngle = Math.PI;
+    this.minAzimuthAngle = -Infinity;
+    this.maxAzimuthAngle = Infinity;
+    this.enableDamping = false;
+    this.dampingFactor = 0.05;
+    this.enableZoom = true;
+    this.zoomSpeed = 1;
+    this.enableRotate = true;
+    this.rotateSpeed = 1;
+    this.enablePan = true;
+    this.panSpeed = 1;
+    this.screenSpacePanning = true;
+    this.keyPanSpeed = 7;
+    this.zoomToCursor = false;
+    this.autoRotate = false;
+    this.autoRotateSpeed = 2;
+    this.keys = { LEFT: "ArrowLeft", UP: "ArrowUp", RIGHT: "ArrowRight", BOTTOM: "ArrowDown" };
+    this.mouseButtons = { LEFT: MOUSE.ROTATE, MIDDLE: MOUSE.DOLLY, RIGHT: MOUSE.PAN };
+    this.touches = { ONE: TOUCH.ROTATE, TWO: TOUCH.DOLLY_PAN };
+    this.target0 = this.target.clone();
+    this.position0 = this.object.position.clone();
+    this.zoom0 = this.object.zoom;
+    this._domElementKeyEvents = null;
+    this.getPolarAngle = function() {
+      return spherical.phi;
+    };
+    this.getAzimuthalAngle = function() {
+      return spherical.theta;
+    };
+    this.getDistance = function() {
+      return this.object.position.distanceTo(this.target);
+    };
+    this.listenToKeyEvents = function(domElement2) {
+      domElement2.addEventListener("keydown", onKeyDown);
+      this._domElementKeyEvents = domElement2;
+    };
+    this.stopListenToKeyEvents = function() {
+      this._domElementKeyEvents.removeEventListener("keydown", onKeyDown);
+      this._domElementKeyEvents = null;
+    };
+    this.saveState = function() {
+      scope.target0.copy(scope.target);
+      scope.position0.copy(scope.object.position);
+      scope.zoom0 = scope.object.zoom;
+    };
+    this.reset = function() {
+      scope.target.copy(scope.target0);
+      scope.object.position.copy(scope.position0);
+      scope.object.zoom = scope.zoom0;
+      scope.object.updateProjectionMatrix();
+      scope.dispatchEvent(_changeEvent);
+      scope.update();
+      state = STATE.NONE;
+    };
+    this.update = function() {
+      const offset = new Vector3();
+      const quat = new Quaternion().setFromUnitVectors(object.up, new Vector3(0, 1, 0));
+      const quatInverse = quat.clone().invert();
+      const lastPosition = new Vector3();
+      const lastQuaternion = new Quaternion();
+      const lastTargetPosition = new Vector3();
+      const twoPI = 2 * Math.PI;
+      return function update(deltaTime = null) {
+        const position = scope.object.position;
+        offset.copy(position).sub(scope.target);
+        offset.applyQuaternion(quat);
+        spherical.setFromVector3(offset);
+        if (scope.autoRotate && state === STATE.NONE) {
+          rotateLeft(getAutoRotationAngle(deltaTime));
+        }
+        if (scope.enableDamping) {
+          spherical.theta += sphericalDelta.theta * scope.dampingFactor;
+          spherical.phi += sphericalDelta.phi * scope.dampingFactor;
+        } else {
+          spherical.theta += sphericalDelta.theta;
+          spherical.phi += sphericalDelta.phi;
+        }
+        let min = scope.minAzimuthAngle;
+        let max = scope.maxAzimuthAngle;
+        if (isFinite(min) && isFinite(max)) {
+          if (min < -Math.PI) min += twoPI;
+          else if (min > Math.PI) min -= twoPI;
+          if (max < -Math.PI) max += twoPI;
+          else if (max > Math.PI) max -= twoPI;
+          if (min <= max) {
+            spherical.theta = Math.max(min, Math.min(max, spherical.theta));
+          } else {
+            spherical.theta = spherical.theta > (min + max) / 2 ? Math.max(min, spherical.theta) : Math.min(max, spherical.theta);
+          }
+        }
+        spherical.phi = Math.max(scope.minPolarAngle, Math.min(scope.maxPolarAngle, spherical.phi));
+        spherical.makeSafe();
+        if (scope.enableDamping === true) {
+          scope.target.addScaledVector(panOffset, scope.dampingFactor);
+        } else {
+          scope.target.add(panOffset);
+        }
+        scope.target.sub(scope.cursor);
+        scope.target.clampLength(scope.minTargetRadius, scope.maxTargetRadius);
+        scope.target.add(scope.cursor);
+        let zoomChanged = false;
+        if (scope.zoomToCursor && performCursorZoom || scope.object.isOrthographicCamera) {
+          spherical.radius = clampDistance(spherical.radius);
+        } else {
+          const prevRadius = spherical.radius;
+          spherical.radius = clampDistance(spherical.radius * scale);
+          zoomChanged = prevRadius != spherical.radius;
+        }
+        offset.setFromSpherical(spherical);
+        offset.applyQuaternion(quatInverse);
+        position.copy(scope.target).add(offset);
+        scope.object.lookAt(scope.target);
+        if (scope.enableDamping === true) {
+          sphericalDelta.theta *= 1 - scope.dampingFactor;
+          sphericalDelta.phi *= 1 - scope.dampingFactor;
+          panOffset.multiplyScalar(1 - scope.dampingFactor);
+        } else {
+          sphericalDelta.set(0, 0, 0);
+          panOffset.set(0, 0, 0);
+        }
+        if (scope.zoomToCursor && performCursorZoom) {
+          let newRadius = null;
+          if (scope.object.isPerspectiveCamera) {
+            const prevRadius = offset.length();
+            newRadius = clampDistance(prevRadius * scale);
+            const radiusDelta = prevRadius - newRadius;
+            scope.object.position.addScaledVector(dollyDirection, radiusDelta);
+            scope.object.updateMatrixWorld();
+            zoomChanged = !!radiusDelta;
+          } else if (scope.object.isOrthographicCamera) {
+            const mouseBefore = new Vector3(mouse.x, mouse.y, 0);
+            mouseBefore.unproject(scope.object);
+            const prevZoom = scope.object.zoom;
+            scope.object.zoom = Math.max(scope.minZoom, Math.min(scope.maxZoom, scope.object.zoom / scale));
+            scope.object.updateProjectionMatrix();
+            zoomChanged = prevZoom !== scope.object.zoom;
+            const mouseAfter = new Vector3(mouse.x, mouse.y, 0);
+            mouseAfter.unproject(scope.object);
+            scope.object.position.sub(mouseAfter).add(mouseBefore);
+            scope.object.updateMatrixWorld();
+            newRadius = offset.length();
+          } else {
+            console.warn("WARNING: OrbitControls.js encountered an unknown camera type - zoom to cursor disabled.");
+            scope.zoomToCursor = false;
+          }
+          if (newRadius !== null) {
+            if (this.screenSpacePanning) {
+              scope.target.set(0, 0, -1).transformDirection(scope.object.matrix).multiplyScalar(newRadius).add(scope.object.position);
+            } else {
+              _ray.origin.copy(scope.object.position);
+              _ray.direction.set(0, 0, -1).transformDirection(scope.object.matrix);
+              if (Math.abs(scope.object.up.dot(_ray.direction)) < TILT_LIMIT) {
+                object.lookAt(scope.target);
+              } else {
+                _plane.setFromNormalAndCoplanarPoint(scope.object.up, scope.target);
+                _ray.intersectPlane(_plane, scope.target);
+              }
+            }
+          }
+        } else if (scope.object.isOrthographicCamera) {
+          const prevZoom = scope.object.zoom;
+          scope.object.zoom = Math.max(scope.minZoom, Math.min(scope.maxZoom, scope.object.zoom / scale));
+          if (prevZoom !== scope.object.zoom) {
+            scope.object.updateProjectionMatrix();
+            zoomChanged = true;
+          }
+        }
+        scale = 1;
+        performCursorZoom = false;
+        if (zoomChanged || lastPosition.distanceToSquared(scope.object.position) > EPS || 8 * (1 - lastQuaternion.dot(scope.object.quaternion)) > EPS || lastTargetPosition.distanceToSquared(scope.target) > EPS) {
+          scope.dispatchEvent(_changeEvent);
+          lastPosition.copy(scope.object.position);
+          lastQuaternion.copy(scope.object.quaternion);
+          lastTargetPosition.copy(scope.target);
+          return true;
+        }
+        return false;
+      };
+    }();
+    this.dispose = function() {
+      scope.domElement.removeEventListener("contextmenu", onContextMenu);
+      scope.domElement.removeEventListener("pointerdown", onPointerDown);
+      scope.domElement.removeEventListener("pointercancel", onPointerUp);
+      scope.domElement.removeEventListener("wheel", onMouseWheel);
+      scope.domElement.removeEventListener("pointermove", onPointerMove);
+      scope.domElement.removeEventListener("pointerup", onPointerUp);
+      const document3 = scope.domElement.getRootNode();
+      document3.removeEventListener("keydown", interceptControlDown, { capture: true });
+      if (scope._domElementKeyEvents !== null) {
+        scope._domElementKeyEvents.removeEventListener("keydown", onKeyDown);
+        scope._domElementKeyEvents = null;
+      }
+    };
+    const scope = this;
+    const STATE = {
+      NONE: -1,
+      ROTATE: 0,
+      DOLLY: 1,
+      PAN: 2,
+      TOUCH_ROTATE: 3,
+      TOUCH_PAN: 4,
+      TOUCH_DOLLY_PAN: 5,
+      TOUCH_DOLLY_ROTATE: 6
+    };
+    let state = STATE.NONE;
+    const EPS = 1e-6;
+    const spherical = new Spherical();
+    const sphericalDelta = new Spherical();
+    let scale = 1;
+    const panOffset = new Vector3();
+    const rotateStart = new Vector2();
+    const rotateEnd = new Vector2();
+    const rotateDelta = new Vector2();
+    const panStart = new Vector2();
+    const panEnd = new Vector2();
+    const panDelta = new Vector2();
+    const dollyStart = new Vector2();
+    const dollyEnd = new Vector2();
+    const dollyDelta = new Vector2();
+    const dollyDirection = new Vector3();
+    const mouse = new Vector2();
+    let performCursorZoom = false;
+    const pointers = [];
+    const pointerPositions = {};
+    let controlActive = false;
+    function getAutoRotationAngle(deltaTime) {
+      if (deltaTime !== null) {
+        return 2 * Math.PI / 60 * scope.autoRotateSpeed * deltaTime;
+      } else {
+        return 2 * Math.PI / 60 / 60 * scope.autoRotateSpeed;
+      }
+    }
+    function getZoomScale(delta) {
+      const normalizedDelta = Math.abs(delta * 0.01);
+      return Math.pow(0.95, scope.zoomSpeed * normalizedDelta);
+    }
+    function rotateLeft(angle) {
+      sphericalDelta.theta -= angle;
+    }
+    function rotateUp(angle) {
+      sphericalDelta.phi -= angle;
+    }
+    const panLeft = function() {
+      const v2 = new Vector3();
+      return function panLeft2(distance, objectMatrix) {
+        v2.setFromMatrixColumn(objectMatrix, 0);
+        v2.multiplyScalar(-distance);
+        panOffset.add(v2);
+      };
+    }();
+    const panUp = function() {
+      const v2 = new Vector3();
+      return function panUp2(distance, objectMatrix) {
+        if (scope.screenSpacePanning === true) {
+          v2.setFromMatrixColumn(objectMatrix, 1);
+        } else {
+          v2.setFromMatrixColumn(objectMatrix, 0);
+          v2.crossVectors(scope.object.up, v2);
+        }
+        v2.multiplyScalar(distance);
+        panOffset.add(v2);
+      };
+    }();
+    const pan = function() {
+      const offset = new Vector3();
+      return function pan2(deltaX, deltaY) {
+        const element = scope.domElement;
+        if (scope.object.isPerspectiveCamera) {
+          const position = scope.object.position;
+          offset.copy(position).sub(scope.target);
+          let targetDistance = offset.length();
+          targetDistance *= Math.tan(scope.object.fov / 2 * Math.PI / 180);
+          panLeft(2 * deltaX * targetDistance / element.clientHeight, scope.object.matrix);
+          panUp(2 * deltaY * targetDistance / element.clientHeight, scope.object.matrix);
+        } else if (scope.object.isOrthographicCamera) {
+          panLeft(deltaX * (scope.object.right - scope.object.left) / scope.object.zoom / element.clientWidth, scope.object.matrix);
+          panUp(deltaY * (scope.object.top - scope.object.bottom) / scope.object.zoom / element.clientHeight, scope.object.matrix);
+        } else {
+          console.warn("WARNING: OrbitControls.js encountered an unknown camera type - pan disabled.");
+          scope.enablePan = false;
+        }
+      };
+    }();
+    function dollyOut(dollyScale) {
+      if (scope.object.isPerspectiveCamera || scope.object.isOrthographicCamera) {
+        scale /= dollyScale;
+      } else {
+        console.warn("WARNING: OrbitControls.js encountered an unknown camera type - dolly/zoom disabled.");
+        scope.enableZoom = false;
+      }
+    }
+    function dollyIn(dollyScale) {
+      if (scope.object.isPerspectiveCamera || scope.object.isOrthographicCamera) {
+        scale *= dollyScale;
+      } else {
+        console.warn("WARNING: OrbitControls.js encountered an unknown camera type - dolly/zoom disabled.");
+        scope.enableZoom = false;
+      }
+    }
+    function updateZoomParameters(x2, y2) {
+      if (!scope.zoomToCursor) {
+        return;
+      }
+      performCursorZoom = true;
+      const rect = scope.domElement.getBoundingClientRect();
+      const dx = x2 - rect.left;
+      const dy = y2 - rect.top;
+      const w2 = rect.width;
+      const h = rect.height;
+      mouse.x = dx / w2 * 2 - 1;
+      mouse.y = -(dy / h) * 2 + 1;
+      dollyDirection.set(mouse.x, mouse.y, 1).unproject(scope.object).sub(scope.object.position).normalize();
+    }
+    function clampDistance(dist) {
+      return Math.max(scope.minDistance, Math.min(scope.maxDistance, dist));
+    }
+    function handleMouseDownRotate(event) {
+      rotateStart.set(event.clientX, event.clientY);
+    }
+    function handleMouseDownDolly(event) {
+      updateZoomParameters(event.clientX, event.clientX);
+      dollyStart.set(event.clientX, event.clientY);
+    }
+    function handleMouseDownPan(event) {
+      panStart.set(event.clientX, event.clientY);
+    }
+    function handleMouseMoveRotate(event) {
+      rotateEnd.set(event.clientX, event.clientY);
+      rotateDelta.subVectors(rotateEnd, rotateStart).multiplyScalar(scope.rotateSpeed);
+      const element = scope.domElement;
+      rotateLeft(2 * Math.PI * rotateDelta.x / element.clientHeight);
+      rotateUp(2 * Math.PI * rotateDelta.y / element.clientHeight);
+      rotateStart.copy(rotateEnd);
+      scope.update();
+    }
+    function handleMouseMoveDolly(event) {
+      dollyEnd.set(event.clientX, event.clientY);
+      dollyDelta.subVectors(dollyEnd, dollyStart);
+      if (dollyDelta.y > 0) {
+        dollyOut(getZoomScale(dollyDelta.y));
+      } else if (dollyDelta.y < 0) {
+        dollyIn(getZoomScale(dollyDelta.y));
+      }
+      dollyStart.copy(dollyEnd);
+      scope.update();
+    }
+    function handleMouseMovePan(event) {
+      panEnd.set(event.clientX, event.clientY);
+      panDelta.subVectors(panEnd, panStart).multiplyScalar(scope.panSpeed);
+      pan(panDelta.x, panDelta.y);
+      panStart.copy(panEnd);
+      scope.update();
+    }
+    function handleMouseWheel(event) {
+      updateZoomParameters(event.clientX, event.clientY);
+      if (event.deltaY < 0) {
+        dollyIn(getZoomScale(event.deltaY));
+      } else if (event.deltaY > 0) {
+        dollyOut(getZoomScale(event.deltaY));
+      }
+      scope.update();
+    }
+    function handleKeyDown(event) {
+      let needsUpdate = false;
+      switch (event.code) {
+        case scope.keys.UP:
+          if (event.ctrlKey || event.metaKey || event.shiftKey) {
+            rotateUp(2 * Math.PI * scope.rotateSpeed / scope.domElement.clientHeight);
+          } else {
+            pan(0, scope.keyPanSpeed);
+          }
+          needsUpdate = true;
+          break;
+        case scope.keys.BOTTOM:
+          if (event.ctrlKey || event.metaKey || event.shiftKey) {
+            rotateUp(-2 * Math.PI * scope.rotateSpeed / scope.domElement.clientHeight);
+          } else {
+            pan(0, -scope.keyPanSpeed);
+          }
+          needsUpdate = true;
+          break;
+        case scope.keys.LEFT:
+          if (event.ctrlKey || event.metaKey || event.shiftKey) {
+            rotateLeft(2 * Math.PI * scope.rotateSpeed / scope.domElement.clientHeight);
+          } else {
+            pan(scope.keyPanSpeed, 0);
+          }
+          needsUpdate = true;
+          break;
+        case scope.keys.RIGHT:
+          if (event.ctrlKey || event.metaKey || event.shiftKey) {
+            rotateLeft(-2 * Math.PI * scope.rotateSpeed / scope.domElement.clientHeight);
+          } else {
+            pan(-scope.keyPanSpeed, 0);
+          }
+          needsUpdate = true;
+          break;
+      }
+      if (needsUpdate) {
+        event.preventDefault();
+        scope.update();
+      }
+    }
+    function handleTouchStartRotate(event) {
+      if (pointers.length === 1) {
+        rotateStart.set(event.pageX, event.pageY);
+      } else {
+        const position = getSecondPointerPosition(event);
+        const x2 = 0.5 * (event.pageX + position.x);
+        const y2 = 0.5 * (event.pageY + position.y);
+        rotateStart.set(x2, y2);
+      }
+    }
+    function handleTouchStartPan(event) {
+      if (pointers.length === 1) {
+        panStart.set(event.pageX, event.pageY);
+      } else {
+        const position = getSecondPointerPosition(event);
+        const x2 = 0.5 * (event.pageX + position.x);
+        const y2 = 0.5 * (event.pageY + position.y);
+        panStart.set(x2, y2);
+      }
+    }
+    function handleTouchStartDolly(event) {
+      const position = getSecondPointerPosition(event);
+      const dx = event.pageX - position.x;
+      const dy = event.pageY - position.y;
+      const distance = Math.sqrt(dx * dx + dy * dy);
+      dollyStart.set(0, distance);
+    }
+    function handleTouchStartDollyPan(event) {
+      if (scope.enableZoom) handleTouchStartDolly(event);
+      if (scope.enablePan) handleTouchStartPan(event);
+    }
+    function handleTouchStartDollyRotate(event) {
+      if (scope.enableZoom) handleTouchStartDolly(event);
+      if (scope.enableRotate) handleTouchStartRotate(event);
+    }
+    function handleTouchMoveRotate(event) {
+      if (pointers.length == 1) {
+        rotateEnd.set(event.pageX, event.pageY);
+      } else {
+        const position = getSecondPointerPosition(event);
+        const x2 = 0.5 * (event.pageX + position.x);
+        const y2 = 0.5 * (event.pageY + position.y);
+        rotateEnd.set(x2, y2);
+      }
+      rotateDelta.subVectors(rotateEnd, rotateStart).multiplyScalar(scope.rotateSpeed);
+      const element = scope.domElement;
+      rotateLeft(2 * Math.PI * rotateDelta.x / element.clientHeight);
+      rotateUp(2 * Math.PI * rotateDelta.y / element.clientHeight);
+      rotateStart.copy(rotateEnd);
+    }
+    function handleTouchMovePan(event) {
+      if (pointers.length === 1) {
+        panEnd.set(event.pageX, event.pageY);
+      } else {
+        const position = getSecondPointerPosition(event);
+        const x2 = 0.5 * (event.pageX + position.x);
+        const y2 = 0.5 * (event.pageY + position.y);
+        panEnd.set(x2, y2);
+      }
+      panDelta.subVectors(panEnd, panStart).multiplyScalar(scope.panSpeed);
+      pan(panDelta.x, panDelta.y);
+      panStart.copy(panEnd);
+    }
+    function handleTouchMoveDolly(event) {
+      const position = getSecondPointerPosition(event);
+      const dx = event.pageX - position.x;
+      const dy = event.pageY - position.y;
+      const distance = Math.sqrt(dx * dx + dy * dy);
+      dollyEnd.set(0, distance);
+      dollyDelta.set(0, Math.pow(dollyEnd.y / dollyStart.y, scope.zoomSpeed));
+      dollyOut(dollyDelta.y);
+      dollyStart.copy(dollyEnd);
+      const centerX = (event.pageX + position.x) * 0.5;
+      const centerY = (event.pageY + position.y) * 0.5;
+      updateZoomParameters(centerX, centerY);
+    }
+    function handleTouchMoveDollyPan(event) {
+      if (scope.enableZoom) handleTouchMoveDolly(event);
+      if (scope.enablePan) handleTouchMovePan(event);
+    }
+    function handleTouchMoveDollyRotate(event) {
+      if (scope.enableZoom) handleTouchMoveDolly(event);
+      if (scope.enableRotate) handleTouchMoveRotate(event);
+    }
+    function onPointerDown(event) {
+      if (scope.enabled === false) return;
+      if (pointers.length === 0) {
+        scope.domElement.setPointerCapture(event.pointerId);
+        scope.domElement.addEventListener("pointermove", onPointerMove);
+        scope.domElement.addEventListener("pointerup", onPointerUp);
+      }
+      if (isTrackingPointer(event)) return;
+      addPointer(event);
+      if (event.pointerType === "touch") {
+        onTouchStart(event);
+      } else {
+        onMouseDown(event);
+      }
+    }
+    function onPointerMove(event) {
+      if (scope.enabled === false) return;
+      if (event.pointerType === "touch") {
+        onTouchMove(event);
+      } else {
+        onMouseMove(event);
+      }
+    }
+    function onPointerUp(event) {
+      removePointer(event);
+      switch (pointers.length) {
+        case 0:
+          scope.domElement.releasePointerCapture(event.pointerId);
+          scope.domElement.removeEventListener("pointermove", onPointerMove);
+          scope.domElement.removeEventListener("pointerup", onPointerUp);
+          scope.dispatchEvent(_endEvent);
+          state = STATE.NONE;
+          break;
+        case 1:
+          const pointerId = pointers[0];
+          const position = pointerPositions[pointerId];
+          onTouchStart({ pointerId, pageX: position.x, pageY: position.y });
+          break;
+      }
+    }
+    function onMouseDown(event) {
+      let mouseAction;
+      switch (event.button) {
+        case 0:
+          mouseAction = scope.mouseButtons.LEFT;
+          break;
+        case 1:
+          mouseAction = scope.mouseButtons.MIDDLE;
+          break;
+        case 2:
+          mouseAction = scope.mouseButtons.RIGHT;
+          break;
+        default:
+          mouseAction = -1;
+      }
+      switch (mouseAction) {
+        case MOUSE.DOLLY:
+          if (scope.enableZoom === false) return;
+          handleMouseDownDolly(event);
+          state = STATE.DOLLY;
+          break;
+        case MOUSE.ROTATE:
+          if (event.ctrlKey || event.metaKey || event.shiftKey) {
+            if (scope.enablePan === false) return;
+            handleMouseDownPan(event);
+            state = STATE.PAN;
+          } else {
+            if (scope.enableRotate === false) return;
+            handleMouseDownRotate(event);
+            state = STATE.ROTATE;
+          }
+          break;
+        case MOUSE.PAN:
+          if (event.ctrlKey || event.metaKey || event.shiftKey) {
+            if (scope.enableRotate === false) return;
+            handleMouseDownRotate(event);
+            state = STATE.ROTATE;
+          } else {
+            if (scope.enablePan === false) return;
+            handleMouseDownPan(event);
+            state = STATE.PAN;
+          }
+          break;
+        default:
+          state = STATE.NONE;
+      }
+      if (state !== STATE.NONE) {
+        scope.dispatchEvent(_startEvent);
+      }
+    }
+    function onMouseMove(event) {
+      switch (state) {
+        case STATE.ROTATE:
+          if (scope.enableRotate === false) return;
+          handleMouseMoveRotate(event);
+          break;
+        case STATE.DOLLY:
+          if (scope.enableZoom === false) return;
+          handleMouseMoveDolly(event);
+          break;
+        case STATE.PAN:
+          if (scope.enablePan === false) return;
+          handleMouseMovePan(event);
+          break;
+      }
+    }
+    function onMouseWheel(event) {
+      if (scope.enabled === false || scope.enableZoom === false || state !== STATE.NONE) return;
+      event.preventDefault();
+      scope.dispatchEvent(_startEvent);
+      handleMouseWheel(customWheelEvent(event));
+      scope.dispatchEvent(_endEvent);
+    }
+    function customWheelEvent(event) {
+      const mode = event.deltaMode;
+      const newEvent = {
+        clientX: event.clientX,
+        clientY: event.clientY,
+        deltaY: event.deltaY
+      };
+      switch (mode) {
+        case 1:
+          newEvent.deltaY *= 16;
+          break;
+        case 2:
+          newEvent.deltaY *= 100;
+          break;
+      }
+      if (event.ctrlKey && !controlActive) {
+        newEvent.deltaY *= 10;
+      }
+      return newEvent;
+    }
+    function interceptControlDown(event) {
+      if (event.key === "Control") {
+        controlActive = true;
+        const document3 = scope.domElement.getRootNode();
+        document3.addEventListener("keyup", interceptControlUp, { passive: true, capture: true });
+      }
+    }
+    function interceptControlUp(event) {
+      if (event.key === "Control") {
+        controlActive = false;
+        const document3 = scope.domElement.getRootNode();
+        document3.removeEventListener("keyup", interceptControlUp, { passive: true, capture: true });
+      }
+    }
+    function onKeyDown(event) {
+      if (scope.enabled === false || scope.enablePan === false) return;
+      handleKeyDown(event);
+    }
+    function onTouchStart(event) {
+      trackPointer(event);
+      switch (pointers.length) {
+        case 1:
+          switch (scope.touches.ONE) {
+            case TOUCH.ROTATE:
+              if (scope.enableRotate === false) return;
+              handleTouchStartRotate(event);
+              state = STATE.TOUCH_ROTATE;
+              break;
+            case TOUCH.PAN:
+              if (scope.enablePan === false) return;
+              handleTouchStartPan(event);
+              state = STATE.TOUCH_PAN;
+              break;
+            default:
+              state = STATE.NONE;
+          }
+          break;
+        case 2:
+          switch (scope.touches.TWO) {
+            case TOUCH.DOLLY_PAN:
+              if (scope.enableZoom === false && scope.enablePan === false) return;
+              handleTouchStartDollyPan(event);
+              state = STATE.TOUCH_DOLLY_PAN;
+              break;
+            case TOUCH.DOLLY_ROTATE:
+              if (scope.enableZoom === false && scope.enableRotate === false) return;
+              handleTouchStartDollyRotate(event);
+              state = STATE.TOUCH_DOLLY_ROTATE;
+              break;
+            default:
+              state = STATE.NONE;
+          }
+          break;
+        default:
+          state = STATE.NONE;
+      }
+      if (state !== STATE.NONE) {
+        scope.dispatchEvent(_startEvent);
+      }
+    }
+    function onTouchMove(event) {
+      trackPointer(event);
+      switch (state) {
+        case STATE.TOUCH_ROTATE:
+          if (scope.enableRotate === false) return;
+          handleTouchMoveRotate(event);
+          scope.update();
+          break;
+        case STATE.TOUCH_PAN:
+          if (scope.enablePan === false) return;
+          handleTouchMovePan(event);
+          scope.update();
+          break;
+        case STATE.TOUCH_DOLLY_PAN:
+          if (scope.enableZoom === false && scope.enablePan === false) return;
+          handleTouchMoveDollyPan(event);
+          scope.update();
+          break;
+        case STATE.TOUCH_DOLLY_ROTATE:
+          if (scope.enableZoom === false && scope.enableRotate === false) return;
+          handleTouchMoveDollyRotate(event);
+          scope.update();
+          break;
+        default:
+          state = STATE.NONE;
+      }
+    }
+    function onContextMenu(event) {
+      if (scope.enabled === false) return;
+      event.preventDefault();
+    }
+    function addPointer(event) {
+      pointers.push(event.pointerId);
+    }
+    function removePointer(event) {
+      delete pointerPositions[event.pointerId];
+      for (let i = 0; i < pointers.length; i++) {
+        if (pointers[i] == event.pointerId) {
+          pointers.splice(i, 1);
+          return;
+        }
+      }
+    }
+    function isTrackingPointer(event) {
+      for (let i = 0; i < pointers.length; i++) {
+        if (pointers[i] == event.pointerId) return true;
+      }
+      return false;
+    }
+    function trackPointer(event) {
+      let position = pointerPositions[event.pointerId];
+      if (position === void 0) {
+        position = new Vector2();
+        pointerPositions[event.pointerId] = position;
+      }
+      position.set(event.pageX, event.pageY);
+    }
+    function getSecondPointerPosition(event) {
+      const pointerId = event.pointerId === pointers[0] ? pointers[1] : pointers[0];
+      return pointerPositions[pointerId];
+    }
+    scope.domElement.addEventListener("contextmenu", onContextMenu);
+    scope.domElement.addEventListener("pointerdown", onPointerDown);
+    scope.domElement.addEventListener("pointercancel", onPointerUp);
+    scope.domElement.addEventListener("wheel", onMouseWheel, { passive: false });
+    const document2 = scope.domElement.getRootNode();
+    document2.addEventListener("keydown", interceptControlDown, { passive: true, capture: true });
+    this.update();
+  }
+}
 const createMusicAnalyser = function() {
   new Averager(60);
   this.firstTime = true;
@@ -26509,20 +27440,22 @@ const createMusicAnalyser = function() {
     this.firstTime = false;
   };
   this.setCanvas = (canvas) => {
-    this.buff = new BufferFactory();
     this.canvas = canvas;
     this.scene = new Scene();
-    this.camera = new PerspectiveCamera(75, canvas.width / canvas.height, 0.1, 1e3);
     this.renderer = new WebGLRenderer({ "alpha": true, "canvas": canvas });
+    this.renderer.setClearColor(0, 0);
+    this.camera = new PerspectiveCamera(75, canvas.width / canvas.height, 0.1, 1e3);
+    const radius = 300;
+    this.camera.position.set(radius / 4, radius / 3, radius / 3);
+    this.controls = new OrbitControls(this.camera, this.renderer.domElement);
+    this.controls.target.set(radius / 4, 0, -radius / 3);
     this.axis = new AxesHelper(300);
     this.scene.add(this.axis);
-    const radius = 200;
-    this.camera.position.set(radius / 4, radius / 2, radius / 2);
-    this.camera.rotation.set(-0.5, 0, 0);
     this.group1 = new Group();
     this.scene.add(this.group1);
-    this.group1.add(makeBall(radius, 30, 15, radius / 500), makeParticleMaterial(10));
-    this.group1.add(this.buff.mesh);
+    this.buff = new BufferFactory();
+    this.ball = makeBall(radius, 60, 30, radius / 500);
+    this.group1.add(this.buff.mesh, this.ball);
   };
   this.cleanup = () => {
     this.firstTime = true;
@@ -26577,6 +27510,7 @@ const createMusicAnalyser = function() {
       const data = [...dataArray].splice(0, 128);
       this.buff.transformData(data);
     }
+    this.controls.update();
     this.buff.update();
   };
   this.render = () => {
@@ -26585,9 +27519,11 @@ const createMusicAnalyser = function() {
   return this;
 };
 const musicAnalyser = new createMusicAnalyser();
-const SectionS2 = ({ audio, canvas, ratio, max, status, handleClick }) => {
-  const section = reactExports.useRef();
-  const [uniqueID] = reactExports.useState("MusicAnalyser");
+const CanvasSectionS2 = ({ ratio, min, uniqueID = "MusicAnalyser" }) => {
+  const canvas = reactExports.useRef(null);
+  const audio = reactExports.useRef(null);
+  const menu = reactExports.useRef(null);
+  const section = reactExports.useRef(null);
   reactExports.useEffect(() => {
     window.addEventListener("resize", musicAnalyser.resize, false);
     musicAnalyser.setCanvas(canvas.current);
@@ -26603,9 +27539,13 @@ const SectionS2 = ({ audio, canvas, ratio, max, status, handleClick }) => {
     };
   }, []);
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("section", { ref: section, className: "section", id: uniqueID, children: [
-    /* @__PURE__ */ jsxRuntimeExports.jsx("canvas", { ref: canvas, width: max * ratio, height: ratio * max * ratio }),
-    /* @__PURE__ */ jsxRuntimeExports.jsx("audio", { onPlay: musicAnalyser.getAnalyser, ref: audio, controls: true, id: "myAudio", style: { "position": "absolute", "left": "10px", "bottom": "10px" }, children: /* @__PURE__ */ jsxRuntimeExports.jsx("source", { src: audioUrl }) }),
-    /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: handleClick, value: "S2", className: "record", children: status })
+    /* @__PURE__ */ jsxRuntimeExports.jsx("canvas", { ref: canvas, width: min * ratio, height: ratio * min * ratio }),
+    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { ref: menu, className: "gamemenu", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx("header", { id: "header", children: /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { children: "MusicAnalyser" }) }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "controlpanel", children: /* @__PURE__ */ jsxRuntimeExports.jsx(RecordBtn, { canvas, audio }) }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(SlideMenuBtn, { menu })
+    ] }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx("audio", { onPlay: musicAnalyser.getAnalyser, ref: audio, controls: true, id: "myAudio", style: { "position": "absolute", "left": "10px", "bottom": "10px" }, children: /* @__PURE__ */ jsxRuntimeExports.jsx("source", { src: audioUrl }) })
   ] });
 };
 class SortAlgorithm {
@@ -26616,8 +27556,8 @@ class SortAlgorithm {
     this.isSorting = false;
     this.log = document.createElement("div");
   }
-  setLog() {
-    this.log = log;
+  setLog(element) {
+    this.log = element;
   }
   start(name2, columns) {
     this.secondColumns = [];
@@ -26853,7 +27793,7 @@ class SortAlgorithm {
           this.mergePhase = "1.Copy";
           this.timesEveryFrame = 1;
           this.secondColumns = JSON.parse(JSON.stringify(columns.slice(0, columns.length + 1)));
-          this.secondColumns.forEach((column, index) => {
+          this.secondColumns.forEach((column) => {
             column.path = new Path(column.x, column.y);
             column.path.NewTarget(column.x, column.y - this.height, 20);
             column.width /= 3;
@@ -26876,7 +27816,7 @@ class SortAlgorithm {
         col.forEach((column, index) => {
           column.height = columns[min + index].height;
           column.width = columns[min + index].width / 2;
-          column.path.NewTarget(column.x, column.y - this.height, 20);
+          column.path.NewTarget(column.x, column.y - this.height, 0);
         });
         this.mergePhase = "2.Merge";
         break;
@@ -27098,7 +28038,7 @@ class SortAlgorithm {
     this.j = 0;
     this.timesEveryFrame = 1;
   }
-  randomSort(columns) {
+  randomSort(columns, frames = 60) {
     const len = columns.length;
     const i = this.i;
     const j = this.j;
@@ -27110,7 +28050,7 @@ class SortAlgorithm {
     }
     const a = columns[j];
     const b = columns[(j * j + 1) % len];
-    SortAlgorithm.swapColumn(a, b, 60 - this.timesEveryFrame * 2);
+    SortAlgorithm.swapColumn(a, b, frames);
     this.j = this.i + this.j + 1;
   }
   instantRandomSortSetting() {
@@ -27119,7 +28059,7 @@ class SortAlgorithm {
     this.timesEveryFrame = 30;
   }
   instantRandomSort(columns) {
-    return this.randomSort(columns);
+    return this.randomSort(columns, 0);
   }
 }
 class ParticleSystem {
@@ -27132,7 +28072,7 @@ class ParticleSystem {
     this.i = 0;
     this.j = 0;
     this.maxValue = 865 * 0.4;
-    const length = Math.floor(x2 - 200);
+    const length = 50;
     const width = Math.max(Math.floor(x2 * 2 / length), 0.5);
     this.columns = new Array(length).fill().map((v2, i) => {
       return this.createColumn(x2 - width * length / 2 + width * i, y2 * 1.8, width, (i + 1) / length * this.maxValue);
@@ -27142,7 +28082,7 @@ class ParticleSystem {
     });
     const ballLen = Math.min(length * 2, 500);
     const ballSize = 2 + Math.floor(width / 3);
-    this.balls = new Array(ballLen).fill().map((v2, i) => {
+    this.balls = new Array(ballLen).fill().map(() => {
       const r2 = Math.pow(Math.random(), 0.6) * 865 / 4;
       const theta = Math.random() * 2 * Math.PI;
       return this.createBall(x2 + r2 * Math.cos(theta), 0.5 * y2 + r2 * Math.sin(theta), ballSize);
@@ -27279,16 +28219,13 @@ class ParticleSystem {
     this.texts.log.text = this.sort.log.innerText;
     this.columns.forEach((column) => {
       if (column.path != void 0) {
-        if (column.path.__proto__.constructor.name == "Path") {
-          column.path.NextFrame();
-        }
+        if (column.path.__proto__.constructor.name == "Path") ;
       }
     });
     this.sort.secondColumns.forEach((column, index) => {
       if (column.path == void 0) return;
       const funcitonName = column.path.__proto__.constructor.name;
       if (funcitonName != "Path") return console.warn("the path of columns[ " + index + " ] was never constructed by Path");
-      column.path.NextFrame();
     });
     this.walls.forEach((wall) => {
       wall.period += 0.25 * 2 * Math.PI / 60;
@@ -27300,7 +28237,7 @@ class ParticleSystem {
       ball.y = ball.y + ball.vy / 60;
       ball.vx = (ball.vx + ball.ax / 60) * this.slow;
       ball.vy = (ball.vy + ball.ay / 60) * this.slow;
-      this.balls.forEach((anotherBall, index2) => {
+      this.balls.forEach((anotherBall) => {
         if (ball == anotherBall) return;
         const dist = this.getDist(ball, anotherBall);
         if (dist < ball.r + anotherBall.r) {
@@ -27324,24 +28261,21 @@ class ParticleSystem {
       });
     });
   }
-  getRender(ctx) {
+  render(ctx) {
     ctx.fillStyle = "black";
     ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-    this.walls.forEach((wall) => {
-      ctx.beginPath();
-      ctx.arc(wall.x, wall.y, wall.length, wall.startAngle, wall.endAngle, false);
-      ctx.strokeStyle = "rgba(40, 60, 80, 1)";
-      ctx.lineWidth = wall.thick * 2;
-      ctx.stroke();
-    });
+    function mix(x2, from, to) {
+      return from + x2 * (to - from);
+    }
     function drawColumn(column) {
       ctx.beginPath();
       ctx.moveTo(column.path.pointX, column.path.pointY);
       ctx.lineTo(column.path.pointX, column.path.pointY - column.height);
       const c = column.height / 865 * 2;
-      const r2 = 246 + c * (195 - 246);
-      const g = 211 + c * (160 - 211);
-      const b = 101 + c * (133 - 101);
+      const t2 = 1 - column.path.timer / column.path.period * 0.5;
+      const r2 = mix(t2, 255, mix(c, 246, 195));
+      const g = mix(t2, 100, mix(c, 211, 160));
+      const b = mix(t2, 100, mix(c, 71, 133));
       ctx.strokeStyle = "rgba(" + r2 + "," + g + "," + b + ",1)";
       ctx.lineWidth = column.width;
       ctx.stroke();
@@ -27353,12 +28287,6 @@ class ParticleSystem {
       this.sort.secondColumns.forEach((column) => {
         drawColumn(column);
       });
-    this.balls.forEach((ball) => {
-      ctx.beginPath();
-      ctx.arc(ball.x, ball.y, ball.r, 0, 2 * Math.PI, false);
-      ctx.fillStyle = "#FFFFFF";
-      ctx.fill();
-    });
     Object.keys(this.texts).forEach((key) => {
       const text = this.texts[key];
       ctx.beginPath();
@@ -27370,9 +28298,9 @@ class ParticleSystem {
 }
 const createPhysic = function() {
   new Averager(60);
-  this.setCanvas = (canvas, log2) => {
+  this.setCanvas = (canvas, pElement) => {
     this.system = new ParticleSystem(canvas.width / 2, canvas.height / 2);
-    this.system.sort.log = log2;
+    this.system.sort.setLog(pElement);
     this.ctx = canvas.getContext("2d");
     this.ctx.lineCap = "butt";
     this.ctx.textAlign = "center";
@@ -27385,7 +28313,7 @@ const createPhysic = function() {
     this.system.update();
   };
   this.render = () => {
-    this.system.getRender(this.ctx);
+    this.system.render(this.ctx);
   };
   this.start = (e) => {
     const ID = e.target.id;
@@ -27411,13 +28339,13 @@ const createPhysic = function() {
   return this;
 };
 const physic = new createPhysic();
-const CanvasSectionS3 = ({ canvas, ratio, max, status, handleClick }) => {
-  const menu = reactExports.useRef();
-  const log2 = reactExports.useRef();
-  const section = reactExports.useRef();
-  const [uniqueID] = reactExports.useState("SortAlgorithm");
+const CanvasSectionS3 = ({ ratio, min, uniqueID = "SortAlgorithm" }) => {
+  const canvas = reactExports.useRef(null);
+  const menu = reactExports.useRef(null);
+  const log = reactExports.useRef(null);
+  const section = reactExports.useRef(null);
   reactExports.useEffect(() => {
-    physic.setCanvas(canvas.current, log2.current);
+    physic.setCanvas(canvas.current, log.current);
     manager.addSubjectElement(section.current);
     manager.registerAnimationCallback("update" + uniqueID, physic.update);
     manager.registerAnimationCallback("render" + uniqueID, physic.render);
@@ -27429,8 +28357,7 @@ const CanvasSectionS3 = ({ canvas, ratio, max, status, handleClick }) => {
     };
   }, []);
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("section", { ref: section, className: "section", id: uniqueID, children: [
-    /* @__PURE__ */ jsxRuntimeExports.jsx("canvas", { ref: canvas, width: max * ratio, height: ratio * max * ratio }),
-    /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: handleClick, value: "S3", className: "record", children: status }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx("canvas", { ref: canvas, width: min * ratio, height: ratio * min * ratio }),
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { ref: menu, className: "gamemenu", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsx("header", { id: "", children: /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { children: "粒子系統" }) }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { id: "pathConfig", className: "parameter", children: [
@@ -27447,6 +28374,7 @@ const CanvasSectionS3 = ({ canvas, ratio, max, status, handleClick }) => {
       ] }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "controlpanel", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx("label", { children: "★" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(RecordBtn, { canvas }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: physic.start, id: "bubbleSort", children: "泡沫排序" }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: physic.start, id: "selectionSort", children: "選擇排序" }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: physic.start, id: "insertionSort", children: "插入排序" }),
@@ -27460,7 +28388,7 @@ const CanvasSectionS3 = ({ canvas, ratio, max, status, handleClick }) => {
         /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: physic.cancel, id: "cancelSort", children: "取消" }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: physic.stepByStep, id: "stepByStep", children: "一步一步來" })
       ] }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { ref: log2, id: "sortLog", children: /* @__PURE__ */ jsxRuntimeExports.jsx("p", { id: "", children: "碰撞模擬和重力引擎" }) }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { ref: log, id: "sortLog", children: /* @__PURE__ */ jsxRuntimeExports.jsx("p", { id: "", children: "碰撞模擬和重力引擎" }) }),
       /* @__PURE__ */ jsxRuntimeExports.jsx(SlideMenuBtn, { menu })
     ] })
   ] });
@@ -27471,7 +28399,7 @@ const fragmentShaderSourceCircle = "precision mediump float;\nuniform vec2 u_res
 const fragmentShaderSourcePoint = "precision mediump float;\nuniform vec2 u_resolution;\nuniform float u_radius;\n\nvoid main() {\n    vec2 coord = gl_PointCoord - vec2(0.5);  // 計算當前像素相對於點中心的座標\n    float dist = length(coord);  // 計算當前像素與點中心的距離\n    float edge = min(2.0 / u_radius, 0.2);\n    float radius = 0.5; // 在點相對空間中，gl_PointSize默認範圍[0, 1]\n    float alpha = smoothstep(radius - edge, radius + edge * 0.1, dist);  // 使用 smoothstep 來處理反鋸齒\n    \n    if (dist > radius) {\n        discard;  // 如果超過半徑，丟棄該片段\n    }\n    // gl_FragColor = vec4(1.0, 1.0, 0.0, 1.0);\n    gl_FragColor = vec4(vec3(1.0, gl_FragCoord.xy / u_resolution), 1.0 - alpha);  // 顏色為紅色，帶有反鋸齒效果的透明度\n}";
 const fragmentShaderSourceJuila = "precision highp float;\n\nuniform mediump vec2 u_resolution; // 畫布的解析度\nuniform vec2 u_offset;\nuniform float u_zoom;\nuniform vec2 u_c; // 常數c的值 \n\nvec2 complexMul(vec2 a, vec2 b) {\n    return vec2(a.x * b.x - a.y * b.y, a.x * b.y + a.y * b.x);\n}\n\nvoid main() {\n    vec2 z = (gl_FragCoord.xy - u_resolution * 0.5) / u_zoom + u_offset;\n    const int maxIterations = 100;\n    for(int i = 0; i < maxIterations; i++) {\n        z = complexMul(z, z) + u_c + u_offset;\n        if(dot(z, z) > 4.0){\n            float color = 0.1 + 0.7 * float(i) / float(maxIterations);\n            gl_FragColor = vec4(vec3(color), 1.0);\n\n            float n1 = (sin(pow(float(i), 0.6) * 50.0 / 100.0) * 0.35) + 0.65;\n            float n2 = (cos(pow(float(i), 0.6) * 50.0 / 100.0) * 0.35) + 0.65;\n            gl_FragColor = vec4(clamp(vec3(n1, 0.85 * n1, 0.55 * n1), 0.0, 1.0), 1.0);\n            break;\n        }\n    }\n}";
 const fragmentShaderSourceManderbrot = "precision highp float;\n\nuniform mediump vec2 u_resolution;\nuniform vec2 u_offset;\nuniform float u_zoom;\n\nstruct DoubleVec2 {\n    float high;\n    float low;\n};\n\nfloat decimalPlaces = 30.0;\nfloat scale = pow(10.0, decimalPlaces);\nfloat scaleReverse = pow(10.0, -decimalPlaces);\nfloat scaleSqrt = pow(10.0, decimalPlaces / 2.0);\n\nfloat getHigh(float value){\n    float scaledValue = value * scale;\n    float truncatedValue = floor(scaledValue);\n    float result = truncatedValue * scaleReverse;\n    return result;\n    // return value;\n}\n\n// 雙精度加法\nDoubleVec2 dadd(DoubleVec2 a, DoubleVec2 b) {\n    // 使用高位和低位加法\n    float sumHigh = getHigh(a.high + b.high);\n    float sumLow = a.low + b.low;\n\n    // 計算進位\n    float carry = floor(sumLow) * scaleReverse;\n\n    // 分配尾數\n    DoubleVec2 result;\n    result.high = sumHigh + 0.0;\n    result.low = sumLow - floor(sumLow);\n\n    if(floor(sumLow) > 1.0) result.high = 0.0;\n\n    return result;\n}\n\n//雙精度減法\nDoubleVec2 dminus(DoubleVec2 a, DoubleVec2 b) {\n    float sumHigh = getHigh(a.high - b.high);\n    float sumLow = a.low - b.low;\n    \n    // 分配尾數\n    DoubleVec2 result;\n    result.high = sumHigh + 0.0;\n    result.low = sumLow - floor(sumLow);\n\n    return result;\n}\n\nfloat fmul(float a, float b){\n    float left = (a * scaleSqrt - floor(a * scaleSqrt)) ;\n    float right = (b * scaleSqrt - floor(b * scaleSqrt)) ;\n    return left * right;\n}\n\n// 雙精度乘法\nDoubleVec2 dmul(DoubleVec2 a, DoubleVec2 b) {\n\n    // 0, 1, 2 表示單位，有多少次 2^(24)\n    // 其中 high 是 0，low 是 1，因此2會進位到1，1會進位到0\n    float hh0 = a.high * b.high; // 標準乘法\n    float hh1 = fmul(a.high, b.high); // 溢出小數\n    float hl1 = a.high * b.low + a.low * b.high; // 高位進位\n    float ll2 = a.low * b.low; // 低位進位\n\n    // 單位: n0 = n1 * scaleReverse; n1 = n2 * scaleReverse;\n    float high0 = hh0;\n    float low1 = hh1 + hl1 + floor(ll2) * scaleReverse;\n    // 返回結果\n    DoubleVec2 result;\n    result.high = getHigh(high0 + floor(low1) * scaleReverse);\n    result.low = low1 - floor(low1);\n\n    return result;\n}\n\n\nfloat getExponent(float num){\n    float exponent = floor(log(abs(num)) / log(10.0));\n    return pow(10.0, exponent);\n}\n\n// 雙精度除單精度\nDoubleVec2 ddiv(DoubleVec2 a, float b) {\n\n    float e = getExponent(b);\n    float hh0 = a.high / b;\n    float hh1 = (a.high) / floor(b / e) / e;\n    float hl1 = a.low / b;\n\n    float high0 = hh0;\n    float low1 = hh1 + hl1;\n\n    DoubleVec2 result;\n    result.high = getHigh(high0 + floor(low1) * scaleReverse);\n    result.low = low1 - floor(low1);\n\n    // if(low1 > 0.8) result.high = 0.0;\n    // if(floor(a.high / 100.0) * 100.0 == a.high) result.high = 0.0;\n\n    // if(hh0 / scaleReverse == hh1){\n    //     result.low = hh1;\n    // }\n    // else{\n    //     // result.low = hh1;\n    // }\n\n\n\n    return result;\n}\n\n// 將單精度浮點數轉換為倍精度結構\nDoubleVec2 floatToDoubleVec2(float f) {\n    DoubleVec2 result;\n    result.high = f;\n    result.low = 0.0;\n    return result;\n}\n\n// 將 DoubleVec2 結構轉換為單一浮點數\nfloat DoubleVec2ToFloat(DoubleVec2 d) {\n    return d.high;\n}\n\n// 161789956.22774595\n// 161789956.22774595\n// 546041102.2686427\n// 31958509.872147348\n\n// 2623956791.0043197\n// 802316031.8259898\n// 75031682.7451647\n\nvoid main(){\n\n    const bool isDouble = true;\n    const bool isDouble2 = false;\n    if(isDouble2){\n        \n        DoubleVec2 cX = floatToDoubleVec2(gl_FragCoord.x - u_resolution.x * 0.5 + u_offset.x);\n        DoubleVec2 cY = floatToDoubleVec2(gl_FragCoord.y - u_resolution.y * 0.5 + u_offset.y);\n        cX = ddiv(cX, u_zoom);\n        cY = ddiv(cY, u_zoom);\n        // if(u_offset.x > floor(u_offset.x)) return;\n\n        // if(cX.low == 0.0 && cY.low == 0.0) return;\n        // if(gl_FragCoord.x < 500.0) return;\n        // if(pow(10.0, -44.) == 0.0) return;\n        \n        DoubleVec2 zX = floatToDoubleVec2(0.0);\n        DoubleVec2 zY = floatToDoubleVec2(0.0);\n\n        for (float i = 0.0; i < 100.0; i++) {\n\n            // z = z^2 + c\n            DoubleVec2 zX2 = dmul(zX, zX);\n            DoubleVec2 zY2 = dmul(zY, zY);\n            DoubleVec2 zXY = dmul(zX, zY);\n\n            zX = dadd(dminus(zX2, zY2), cX);\n            zY = dadd(dadd(zXY, zXY), cY);\n\n            // if(zX.low == 0.0 && zY.low == 0.0) return;\n\n            // 使用倍精度計算長度\n            DoubleVec2 len2 = dadd(dmul(zX, zX), dmul(zY, zY));\n            if (DoubleVec2ToFloat(len2) > 4.0) {\n                float color = i / 100.0;\n                gl_FragColor = vec4(color * 0.9, color * 0.8, color * 0.25, 1.0);\n                break;\n            }\n        }\n        return;\n    }\n\n    vec2 c = (gl_FragCoord.xy - u_resolution * 0.5) / u_zoom + u_offset;\n    // vec2 c = (gl_FragCoord.xy - u_resolution * 0.5  + u_offset) / u_zoom;\n    vec2 z = vec2(0.0, 0.0);\n    \n    for (float i = 0.0; i < 100.0; i++) {\n\n        z = vec2(z.x * z.x - z.y * z.y, 2.0 * z.x * z.y) + c;\n        if (length(z) > 2.0){\n            float color = i / 100.0;\n            gl_FragColor = vec4(color, color * 0.5, color * 0.25, 1.0);\n            break;\n        }\n    }\n}\n";
-const fragmentShaderSourceBurningShip = "precision highp float;\n\nuniform mediump vec2 u_resolution;\nuniform vec2 u_offset;\nuniform float u_zoom;\nuniform float u_transform;\n\nfloat rand(float s) {\n  return fract(sin(s*12.9898) * 43758.5453);\n}\n\nvoid main() {\n    vec3 color = vec3(0.0, 0.0, 0.0);\n    // 將屏幕坐標轉換為複數平面坐標\n    vec2 c = (gl_FragCoord.xy - u_resolution * 0.5) / u_zoom + u_offset;\n    // vec2 c = (gl_FragCoord.xy - u_resolution * 0.5) / u_zoom + u_offset;\n    c.y *= -1.0; // 翻轉 y 軸\n\n    // 反鋸齒 & 隨機取樣\n    const float AA_LEVEL = 2.0;\n    for (float I = 0.; I < AA_LEVEL; I++) {\n        \n        float dx = u_offset.x - floor(u_offset.x);\n        float dy = u_offset.y - floor(u_offset.y);\n        vec2 dc = vec2(rand(dx * I * 0.54321 ), rand(dy * I * 0.12345 )) / u_zoom;\n        if(I == 0.0) dc *= 0.0;\n        vec2 z = vec2(0.0);\n        float iteration = 0.0;\n        const float max_iterations = 100.0;\n\n        // 比較迭代前後的差異進行顏色渲染\n        vec3 sum = vec3(0.0, 0.0, 0.0);\n        vec2 pz = z;\n        vec2 ppz = z;\n\n        // Burning Ship 分形迭代\n        iteration = max_iterations;\n        for (float i = 0.0; i < max_iterations; i++) {\n            if(i < u_transform) z = vec2(abs(z.x), abs(z.y)); // 將實部與虛部取絕對值\n            z = vec2(z.x * z.x - z.y * z.y, 2.0 * z.x * z.y) + c + dc;\n            \n            if (length(z) > 4.0){\n                iteration = i;\n                break; // 如果距離超過閾值，退出迴圈\n            }\n            ppz = pz;\n            pz = z;\n            sum.x += dot(z - pz, pz - ppz);\n            sum.y += dot(z - pz, z - pz);\n            sum.z += dot(z - ppz, pz - ppz);\n        }\n\n        // 計算顏色\n        // float color = 0.1 + 0.7 * (iteration / max_iterations);\n        // gl_FragColor = vec4(vec3(color, color * 0.75, color * 0.25), 1.0);\n        if(iteration < max_iterations){\n            float n1 = sin((iteration) * 0.15) * 0.35 + 0.65;\n            float n2 = cos((iteration) * 1.50) * 0.15 + 0.65;\n            color+= vec3(clamp(vec3(n1, n2, (n1 + n2) / 2.0), 0.0, 1.0));\n        }\n        else{\n            sum = abs(sum) / max_iterations;\n            vec3 color = sin(abs(sum * 5.0)) * 0.45 + 0.5;\n            color+= vec3(clamp(color, 0.0, 1.0));\n            if(I == 0.) break;\n        }\n    }\n\n    color /= AA_LEVEL;\n    float width = 1.0 / u_zoom;\n    // float axisX = smoothstep(0.0, width, abs(c.y)); // 控制Y軸的寬度\n    // float axisY = smoothstep(0.0, width, abs(c.x)); // 控制X軸的寬度\n     // 使用硬邊界\n    float axisX = step(width / 2.0, abs(c.y));\n    float axisY = step(width / 2.0, abs(c.x));\n    \n    vec3 axisColor = vec3(0.0, 0.0, 0.0); // 藍色\n    \n    // vec3 finalColor = mix(color1, color2, grid); // 根據 grid 的值進行顏色混合\n    vec3 finalColor = mix(axisColor, color, (axisX + axisY) / 2.0);\n    gl_FragColor = vec4(finalColor, 1.0);\n    // gl_FragColor.rgb = mix(axisColor, gl_FragColor.rgb, (axisX + axisY) / 2.0);\n}";
+const fragmentShaderSourceBurningShip = "precision highp float;\n\nuniform mediump vec2 u_resolution;\nuniform vec2 u_offset;\nuniform float u_zoom;\nuniform float u_transform;\n\nfloat rand(float s) {\n  return fract(sin(s*12.9898) * 43758.5453);\n}\n\nvoid main() {\n    vec3 color = vec3(0.0, 0.0, 0.0);\n    vec2 c = (gl_FragCoord.xy - u_resolution * 0.5) / u_zoom + u_offset;\n    c.y *= -1.0; // 翻轉 y 軸\n\n    // 反鋸齒 & 隨機取樣\n    const float AA_LEVEL = 2.0;\n    for (float I = 0.; I < AA_LEVEL; I++) {\n        \n        float dx = u_offset.x - floor(u_offset.x);\n        float dy = u_offset.y - floor(u_offset.y);\n        vec2 dc = vec2(rand(dx * I * 0.54321 ), rand(dy * I * 0.12345 )) / u_zoom;\n        if(I == 0.0) dc *= 0.0;\n        vec2 z = vec2(0.0);\n        float iteration = 0.0;\n        const float max_iterations = 100.0;\n\n        // 比較迭代前後的差異進行顏色渲染\n        vec3 sum = vec3(0.0, 0.0, 0.0);\n        vec2 pz = z;\n        vec2 ppz = z;\n\n        // Burning Ship 分形迭代\n        iteration = max_iterations;\n        for (float i = 0.0; i < max_iterations; i++) {\n            if(i < u_transform) z = vec2(abs(z.x), abs(z.y)); // 將實部與虛部取絕對值\n            z = vec2(z.x * z.x - z.y * z.y, 2.0 * z.x * z.y) + c + dc;\n            \n            if (length(z) > 4.0){\n                iteration = i;\n                break; // 如果距離超過閾值，退出迴圈\n            }\n            ppz = pz;\n            pz = z;\n            sum.x += dot(z - pz, pz - ppz);\n            sum.y += dot(z - pz, z - pz);\n            sum.z += dot(z - ppz, pz - ppz);\n        }\n\n        // 計算顏色\n        // float color = 0.1 + 0.7 * (iteration / max_iterations);\n        // gl_FragColor = vec4(vec3(color, color * 0.75, color * 0.25), 1.0);\n        if(iteration < max_iterations){\n            float n1 = sin((iteration) * 0.15) * 0.35 + 0.65;\n            float n2 = cos((iteration) * 1.50) * 0.15 + 0.65;\n            color+= vec3(clamp(vec3(n1, n2, (n1 + n2) / 2.0), 0.0, 1.0));\n        }\n        else{\n            sum = abs(sum) / max_iterations;\n            vec3 color = sin(abs(sum * 5.0)) * 0.45 + 0.5;\n            color+= vec3(clamp(color, 0.0, 1.0));\n            if(I == 0.) break;\n        }\n    }\n    color /= AA_LEVEL;\n\n     // 使用硬邊界\n    float width = 1.0 / u_zoom;\n    float axisX = step(width / 2.0, abs(c.y));\n    float axisY = step(width / 2.0, abs(c.x));\n    \n    vec3 axisColor = vec3(0.0, 0.0, 0.0);\n    vec3 finalColor = mix(axisColor, color, (axisX + axisY) / 2.0);\n    gl_FragColor = vec4(finalColor, 1.0);\n}";
 const fragmentShaderSourceAntiAliasing = "precision highp float;\n\nuniform sampler2D u_texture;  // 接收上一步的 texture\nvarying vec2 v_texCoord;  // 傳遞紋理坐標\n\nvoid main() {\n    // 獲取當前像素以及周圍的像素值進行抗鋸齒處理\n    vec3 color = texture2D(u_texture, v_texCoord).rgb;\n\n    // 動態應用 FXAA 或其他抗鋸齒技術\n    // vec3 antiAliasedColor = applyFXAA(u_texture, v_texCoord);\n\n    // 最終輸出\n    gl_FragColor = vec4(color, 1.0);\n}";
 function createShader(gl2, type, source) {
   const shader = gl2.createShader(type);
@@ -27691,58 +28619,13 @@ const createGLSL = function() {
   return this;
 };
 const myGLSL = new createGLSL();
-function downloadMedia(data) {
-  var blob = new Blob(data, { type: "video/mp4" });
-  const recording_url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.style = "display: none;";
-  a.href = recording_url;
-  a.download = "video.mp4";
-  document.body.appendChild(a);
-  a.click();
-  setTimeout(() => {
-    URL.revokeObjectURL(recording_url);
-    document.body.removeChild(a);
-  }, 0);
-}
-function RecordBtn({ canvas, audio }) {
-  const [media, setMedia] = reactExports.useState({});
-  const [status, setStatus] = reactExports.useState("開始錄影");
-  function handleClick(e) {
-    if (status == "停止錄影") {
-      setStatus("開始錄影");
-      media.recorder.stop();
-      return;
-    }
-    const chunks = [];
-    media.canvas = canvas;
-    media.stream = media.canvas.captureStream(60);
-    if (audio) {
-      media.audio = audio;
-      media.audio.play();
-      media.audioStream = media.audio.captureStream();
-      media.stream = new MediaStream([...media.stream.getVideoTracks(), ...media.audioStream.getAudioTracks()]);
-    }
-    media.recorder = new MediaRecorder(media.stream, { mimeType: "video/mp4; codecs=vp9" });
-    media.recorder.ondataavailable = (evt) => {
-      chunks.push(evt.data);
-    };
-    media.recorder.onstop = () => {
-      downloadMedia(chunks);
-    };
-    media.recorder.start(1e3);
-    setStatus("停止錄影");
-  }
-  return /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: handleClick, children: status });
-}
 const MESSAGE_MOUSE_READY = "滑鼠可以操作畫面：";
 const MESSAGE_MOUSE_LOCKED = "滑鼠已鎖定！點擊上方按鈕以解鎖";
 const MESSAGE_DRAGGING = "開始拖曳移動畫面";
 const MESSAGE_ZOOMING = "滾輪放大縮小";
-const CanvasSectionS4 = ({ ratio, max }) => {
-  const canvas = reactExports.useRef();
-  const section = reactExports.useRef();
-  const [uniqueID] = reactExports.useState("JuliaSet");
+const CanvasSectionS4 = ({ ratio, min, uniqueID = "JuliaSet" }) => {
+  const canvas = reactExports.useRef(null);
+  const section = reactExports.useRef(null);
   reactExports.useEffect(() => {
     manager.addSubjectElement(section.current);
     manager.registerAnimationCallback("update" + uniqueID, myGLSL.update);
@@ -27761,15 +28644,14 @@ const CanvasSectionS4 = ({ ratio, max }) => {
   const [zoom, setZoom] = reactExports.useState(250);
   const [offsetX, setOffsetX] = reactExports.useState(0);
   const [offsetY, setOffsetY] = reactExports.useState(0);
-  const [transform, setTransform] = reactExports.useState(0);
   const frameRef = reactExports.useRef();
   reactExports.useEffect(() => {
-    const data = { isJulia, useMouse, real, imaginary, zoom, offsetX, offsetY, transform };
+    const data = { isJulia, useMouse, real, imaginary, zoom, offsetX, offsetY };
     if (frameRef.current) cancelAnimationFrame(frameRef.current);
     frameRef.current = requestAnimationFrame(() => {
       myGLSL.updateData(data);
     });
-  }, [isJulia, useMouse, real, imaginary, zoom, offsetX, offsetY, transform]);
+  }, [isJulia, useMouse, real, imaginary, zoom, offsetX, offsetY]);
   function resetScreen() {
     setReal(0);
     setImaginary(0);
@@ -27777,7 +28659,7 @@ const CanvasSectionS4 = ({ ratio, max }) => {
     setOffsetX(0);
     setOffsetY(0);
   }
-  const menu = reactExports.useRef();
+  const menu = reactExports.useRef(null);
   const [isWheel, setIsWheel] = reactExports.useState(false);
   function handleWheel(e) {
     setIsWheel(true);
@@ -27791,7 +28673,7 @@ const CanvasSectionS4 = ({ ratio, max }) => {
   }
   const [isMouseDown, setIsMouseDown] = reactExports.useState(false);
   const preMouse = reactExports.useRef([0, 0]);
-  const logRef = reactExports.useRef();
+  const logRef = reactExports.useRef(null);
   function handleMouseDown(e) {
     if (e.target.tagName == "BUTTON" || e.target.tagName == "INPUT") return;
     setIsWheel(false);
@@ -27805,7 +28687,7 @@ const CanvasSectionS4 = ({ ratio, max }) => {
     canvas.current.classList.remove("cursor-grabbing");
     canvas.current.classList.add("cursor-grab");
   }
-  function handleMouseMove(e) {
+  function handleMouseMove() {
     if (!useMouse) return;
     if (isMouseDown) {
       const addOffsetX = (myMouse.targetX - preMouse.current[0]) / zoom * 50;
@@ -27886,7 +28768,7 @@ const CanvasSectionS4 = ({ ratio, max }) => {
       onTouchMove: handleTouchMove,
       onTouchEnd: handleTouchEnd,
       children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx("canvas", { ref: canvas, className: "cursor-grab", id: "canvasS4", width: max * ratio, height: ratio * max * ratio }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("canvas", { ref: canvas, className: "cursor-grab", id: "canvasS4", width: min * ratio, height: ratio * min * ratio }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { ref: menu, className: "gamemenu", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx("header", { id: "header", children: /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { children: isJulia ? "JuliaSet" : "Manderbrot" }) }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "parameter", children: [
@@ -27909,12 +28791,12 @@ const CanvasSectionS4 = ({ ratio, max }) => {
           ] }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "controlpanel", children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx("label", { children: "★" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: (e) => setUseMouse(!useMouse), id: "useMouse", children: useMouse ? "只允許使用面板" : "還是用滑鼠好了" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: () => setUseMouse(!useMouse), id: "useMouse", children: useMouse ? "只允許使用面板" : "還是用滑鼠好了" }),
             /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: resetScreen, children: "畫面置中" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(RecordBtn, { canvas: canvas.current }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(RecordBtn, { canvas }),
             /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: () => setIsJulia(!isJulia), children: isJulia == true ? "觀看更多" : "回到Julia" }),
             !isJulia && /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: () => myGLSL.setTransform(0), disabled: name == "Manderbrot" ? true : false, children: "查看Manderbrot" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: () => myGLSL.setTransform(0), disabled: false, children: "查看Manderbrot" }),
               /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: () => myGLSL.setTransform(100), disabled: false, children: "查看BurningShip" })
             ] })
           ] }),
@@ -33610,95 +34492,99 @@ function CookieTable() {
   }, []);
   return /* @__PURE__ */ jsxRuntimeExports.jsx("section", { className: "section", id: "cookie", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Table, { columns, rows }) });
 }
+function GetHyperLink({ divRef }) {
+  const [hyperlink, setHyperlink] = reactExports.useState();
+  reactExports.useEffect(() => {
+    const sections = divRef.current.getElementsByTagName("section");
+    setHyperlink(Object.keys(sections).map((key) => {
+      const ID = sections[key].id;
+      return /* @__PURE__ */ jsxRuntimeExports.jsx("a", { className: "list", href: "#" + ID, id: "to" + ID, children: ID }, ID);
+    }));
+  }, []);
+  return hyperlink;
+}
+function handleHashChange() {
+  const hash = window.location.hash;
+  if (!hash) return;
+  const targetElement = document.querySelector(hash);
+  if (!targetElement) return;
+  targetElement.scrollIntoView({ behavior: "smooth" });
+}
+function NavigationBar({ width, divRef }) {
+  reactExports.useEffect(() => {
+    handleHashChange();
+    window.addEventListener("hashchange", handleHashChange);
+    return () => {
+      window.removeEventListener("hashchange", handleHashChange);
+    };
+  }, []);
+  const [isOpen, setIsOpen] = reactExports.useState(false);
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs("nav", { id: "nav", style: {
+    "left": (isOpen ? 0 : -width) + "px",
+    "width": width
+  }, children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsx(GetHyperLink, { divRef }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { onClick: () => setIsOpen(!isOpen), id: "navSlider", children: /* @__PURE__ */ jsxRuntimeExports.jsx("p", { children: isOpen ? "X" : "≡" }) })
+  ] });
+}
 function Playground({ margin }) {
-  const [isOpen, setIsOpen] = reactExports.useState(true);
   const breakpoint = 992 - margin * 2;
   const [width, height] = useWindowSize(margin);
-  const [ratio, setRatio] = reactExports.useState(width > breakpoint ? 1 : 2);
-  const [max, setMax] = reactExports.useState(getMax(width, height));
-  reactExports.useEffect(() => {
-    setRatio(width > breakpoint ? 1 : 2);
-    setMax(getMax(width, height));
-  }, [width]);
-  function getMax(w2, h) {
-    if (w2 > breakpoint) return w2 < h ? w2 : h;
-    else return w2 * 2 < h ? w2 : h / 2;
+  const ratio = width > breakpoint ? 1 : 2;
+  const min = getMin(width, height);
+  console.log("update");
+  function getMin(w2, h) {
+    const min2 = w2 > breakpoint ? w2 < h ? w2 : h : w2 < h * 0.5 ? w2 : h * 0.5;
+    return min2;
   }
   const divRef = reactExports.useRef();
   function handleMouseMove(e) {
     const rect = divRef.current.getBoundingClientRect();
-    const a = (e.pageX - rect.x) * ratio;
-    const b = (e.pageY - rect.y) * ratio;
+    const x2 = (e.pageX - rect.x) * ratio;
+    const y2 = (e.pageY - rect.y) * ratio;
     const frames = 30;
-    myMouse.NewTarget(a, b, frames);
+    myMouse.NewTarget(x2, y2, frames);
   }
   function handleTouchMove(e) {
     const rect = divRef.current.getBoundingClientRect();
-    const a = (e.touches[0].clientX - rect.x) * ratio;
-    const b = (e.touches[0].clientY - rect.y) * ratio;
+    const x2 = (e.touches[0].clientX - rect.x) * ratio;
+    const y2 = (e.touches[0].clientY - rect.y) * ratio;
     const frames = 30;
-    myMouse.NewTarget(a, b, frames);
+    myMouse.NewTarget(x2, y2, frames);
   }
-  const audio = reactExports.useRef();
-  const canvas = { "S1": reactExports.useRef(), "S2": reactExports.useRef(), "S3": reactExports.useRef() };
-  const [media] = reactExports.useState({});
-  const [status, setStatus] = reactExports.useState("Record");
-  function handleRecord(e) {
-    if (status == "Stop") {
-      setStatus("Record");
-      media.recorder.stop();
-      return;
-    }
-    const chunks = [];
-    const ID = e.target.value;
-    media.canvas = canvas[ID].current;
-    media.stream = media.canvas.captureStream(60);
-    media.audio = audio.current;
-    if (ID == "S2") {
-      media.audio.play();
-      media.audioStream = media.audio.captureStream();
-      media.stream = new MediaStream([...media.stream.getVideoTracks(), ...media.audioStream.getAudioTracks()]);
-    }
-    media.recorder = new MediaRecorder(media.stream, { mimeType: "video/mp4; codecs=vp9" });
-    media.recorder.ondataavailable = (evt) => {
-      chunks.push(evt.data);
+  function getStyle() {
+    return {
+      "width": min + "px",
+      "height": min * ratio + "px",
+      "margin": margin + "px auto"
     };
-    media.recorder.onstop = () => {
-      downloadMedia(chunks);
-    };
-    media.recorder.start(1e3);
-    setStatus("Stop");
   }
-  return /* @__PURE__ */ jsxRuntimeExports.jsx(jsxRuntimeExports.Fragment, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
-    "div",
-    {
-      id: "playground",
-      ref: divRef,
-      onMouseMoveCapture: handleMouseMove,
-      onTouchMoveCapture: handleTouchMove,
-      onTouchStartCapture: handleTouchMove,
-      style: {
-        "width": max + "px",
-        "height": max * ratio + "px",
-        "margin": margin + "px auto"
-      },
-      children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(CanvasSectionS4, { ratio, max }),
-        isOpen && /* @__PURE__ */ jsxRuntimeExports.jsx(CanvasSectionS1, { canvas: canvas.S1, ratio, max, status, handleClick: handleRecord, manager, myMouse }),
-        isOpen && /* @__PURE__ */ jsxRuntimeExports.jsx(SectionS2, { canvas: canvas.S2, audio, ratio, max, status, handleClick: handleRecord, manager, myMouse }),
-        isOpen && /* @__PURE__ */ jsxRuntimeExports.jsx(CanvasSectionS3, { canvas: canvas.S3, ratio, max, status, handleClick: handleRecord, manager, myMouse }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(CookieTable, {})
-      ]
-    }
-  ) });
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsxs(
+      "div",
+      {
+        id: "playground",
+        ref: divRef,
+        onMouseMoveCapture: handleMouseMove,
+        onTouchMoveCapture: handleTouchMove,
+        onTouchStartCapture: handleTouchMove,
+        style: getStyle(),
+        children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(CanvasSectionS4, { ratio, min }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(CanvasSectionS1, { ratio, min }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(CanvasSectionS2, { ratio, min }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(CanvasSectionS3, { ratio, min }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(CookieTable, {})
+        ]
+      }
+    ),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(NavigationBar, { width: ratio == 1 ? 250 : 150, divRef })
+  ] });
 }
 function App() {
-  return /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
-    /* @__PURE__ */ jsxRuntimeExports.jsx(NavigationBar, { width: 250 }),
-    /* @__PURE__ */ jsxRuntimeExports.jsx(Playground, { margin: 20 })
-  ] });
+  return /* @__PURE__ */ jsxRuntimeExports.jsx(jsxRuntimeExports.Fragment, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(Playground, { margin: 20 }) });
 }
 const domNode = document.getElementById("root");
 const root = createRoot(domNode);
 root.render(/* @__PURE__ */ jsxRuntimeExports.jsx(App, {}));
-//# sourceMappingURL=index-YaFXXNaO.js.map
+//# sourceMappingURL=index-BDYHdXYF.js.map

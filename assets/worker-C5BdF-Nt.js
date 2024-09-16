@@ -48,8 +48,6 @@
     };
     this.draw = function(obj) {
       let ctx = obj.ctx;
-      this.pixelX;
-      this.pixelY;
       let x = obj.x;
       let y = obj.y;
       let r = obj.r;
@@ -135,7 +133,7 @@
     };
   }
   function main() {
-    board.width = board.width;
+    board.width = board.width * 1;
     board_ctx.translate(board.width * 0.25, 0);
     painter.works.forEach((obj) => {
       painter.draw(obj);
@@ -391,4 +389,4 @@
     painter.works.push(circle, crescent1, crescent2, crescent3, text1, text2, text3);
   }
 })();
-//# sourceMappingURL=worker-ZI55oAdN.js.map
+//# sourceMappingURL=worker-C5BdF-Nt.js.map
