@@ -1,18 +1,24 @@
-export default function SlideMenuBtn({menu}){
+import { useState } from 'react';
+
+export default function SlideMenuBtn({menu, direction ="top"}){
+    const [isOpen, setIsOpen] = useState(true);
+
     function handleClick(e){
-        const m = menu.current;
-        const b = e.target;
-        const rectMenu = m.getBoundingClientRect();
-        const rectButton = b.getBoundingClientRect();
-        const height = rectButton.y - rectMenu.y;
-        if(b.innerText == "收起△"){
-            m.style.top = "-" + height + "px";
-            b.innerText = "展開▽";
-        }
-        else{
-            m.style.top = "1%";
-            b.innerText = "收起△";
-        }
+        const m = menu.current; // menuElement
+        const b = e.target; // buttonElement
+        const menuRect  = m.getBoundingClientRect();
+        const buttonRect  = b.getBoundingClientRect();
+        const positionOffset = {
+            "left": buttonRect.x - menuRect.x,
+            "top": buttonRect.y - menuRect.y
+        };
+
+        m.style[direction] = !isOpen ? "" : "-" + positionOffset[direction] + "px";
+        // m.style.top = isOpen ? "" :　"-" + top + "px";
+        // m.style.left = "-" + left + "px";
+        setIsOpen(!isOpen);
     }
-    return <button onClick={handleClick} className="slideMenu">收起△</button>
+    return <button onClick={handleClick} className="slideMenu">
+        {isOpen ? "收起△" : "展開▽"}
+    </button>;
 }

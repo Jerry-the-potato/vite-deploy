@@ -142,9 +142,9 @@ div#playground section h4{
   -webkit-user-select: none;  /* Chrome , Safari*/
   position: absolute;
   left: 0;
-  margin: 0 10px;
+  margin: 0 1%;
   right: 0;
-  width: auto;
+  width: 98%;
   /* height: 20%; */
   top: 1%;
   border-radius: 1em;

@@ -8,33 +8,32 @@ function GetHyperLink({divRef}){
             const ID = sections[key].id;
             return <a key={ID} className="list" href={"#"+ID} id={"to"+ID}>{ID}</a>
         }));
+    }, []);
+    return hyperlink;
+}
 
-        function handleHashChange(){
-            const hash = window.location.hash;
-            if (!hash) return;
+function handleHashChange(){
+    const hash = window.location.hash;
+    if (!hash) return;
 
-            const targetElement = document.querySelector(hash);
-            if (!targetElement) return;
+    const targetElement = document.querySelector(hash);
+    if (!targetElement) return;
 
-            targetElement.scrollIntoView({ behavior: 'smooth' });
-        };
+    targetElement.scrollIntoView({ behavior: 'smooth' });
+};
+
+export default function NavigationBar({width, divRef}){
+    useEffect(() => {
         handleHashChange();
         window.addEventListener('hashchange', handleHashChange);
         return () => {
             window.removeEventListener('hashchange', handleHashChange);
         }
     }, []);
-    return hyperlink;
-}
-
-export default function NavigationBar({width, divRef}){
 
     const [isOpen, setIsOpen] = useState(false);
-    function handleClick() {
-        setIsOpen(!isOpen);
-    }
     return  <nav id="nav" style={{
-                'left': isOpen ? 0 : -width +"px",
+                'left': (isOpen ? 0 : -width) + "px",
                 'width': width
             }}>
                 {/* <a className="list" href="#home" id="tohome">Home</a>
@@ -43,7 +42,7 @@ export default function NavigationBar({width, divRef}){
                 <a className="list" href="#S3" id="toS3">section3</a>
                 <a className="list" href="#cookie" id="tocookie">cookie</a> */}
                 <GetHyperLink divRef={divRef}></GetHyperLink>
-                <div onClick={handleClick} id="navSlider">
+                <div onClick={() => setIsOpen(!isOpen)} id="navSlider">
                     <p>{isOpen ? "X": "≡"}</p>
                 </div>
             </nav>

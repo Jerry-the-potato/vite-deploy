@@ -47,7 +47,7 @@ function Playground({margin}){
         <>
             <div id="playground" ref={divRef} onMouseMoveCapture={handleMouseMove} onTouchMoveCapture={handleTouchMove} onTouchStartCapture={handleTouchMove}
                 style={getStyle()}>
-                {/* <CanvasSection4 ratio={ratio} min={min}/> */}
+                <CanvasSection4 ratio={ratio} min={min}/>
                 <CanvasSection1 ratio={ratio} min={min}/>
                 <CanvasSection2 ratio={ratio} min={min}/>
                 <CanvasSection3 ratio={ratio} min={min}/>
