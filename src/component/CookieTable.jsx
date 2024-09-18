@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import axios from 'axios';
 import Table from './Table.jsx'
 function CookieTable(){
     const [tableData, setTableData] = useState([]);
@@ -40,13 +41,35 @@ function CookieTable(){
             { id: 23, name: "energybar 能量棒", price: '55', onsale: true, tag: 'filling healthy chewy', rate: '⭐️⭐️⭐️⭐️', expiryDate: '2025-03-20', category: 'snack', stock: 100 }
         ])
         
-        const newRows = newTableData.map((data, index) => {
-            // return data; 需要ID作為Table取得key的手段
-            return { key: index, ...data }
-            return {url: data.url, id: index, price: data.price, name: data.name, onsale: data.onsale, tag: data.tag, rate: data.rate}
-        })
-        setTableData(newTableData);
-        setRows(newRows);
+        // const newRows = newTableData.map((data, index) => {
+        //     return { key: index, ...data }
+        //     return {url: data.url, id: index, price: data.price, name: data.name, onsale: data.onsale, tag: data.tag, rate: data.rate}
+        // })
+        // setTableData(newTableData);
+        // setRows(newRows);
+        
+        // axios.post('http://localhost:3000/cookie/bulk', { cookies: newTableData })
+        //     .then(response => {
+        //         console.log('Data saved:', response.data);
+        //     })
+        //     .catch(error => {
+        //         console.error('Error saving data:', error);
+        //     });
+        axios.get('http://localhost:3000/cookie')
+            .then(response => {
+                const cookie = response.data.cookie;
+                const newRows = cookie.map((data, index) => {
+                    // return data; 需要ID作為Table取得key的手段
+                    return { key: index, ...data }
+                    return {url: data.url, id: index, price: data.price, name: data.name, onsale: data.onsale, tag: data.tag, rate: data.rate}
+                })
+                setTableData(cookie);
+                setRows(newRows);
+            })
+            .catch(error => {
+                console.error('Error gathering data:', error);
+            });
+
     }, [])
     return <section className="section" id="cookie">
             <Table columns={columns} rows={rows}/>

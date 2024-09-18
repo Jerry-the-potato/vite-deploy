@@ -4,6 +4,8 @@ const media = {};
 export default function RecordBtn({canvas, audio}){
     const [isRecording, setIsRecording] = useState(false);
     function handleClick(){
+        setIsRecording(!isRecording);
+
         if(isRecording){
             media.recorder.stop();
             return;
@@ -11,7 +13,7 @@ export default function RecordBtn({canvas, audio}){
         const chunks = [];
         media.canvas = canvas.current;
         media.stream = media.canvas.captureStream(60); // fps
-        if(audio){
+        if(audio?.current){
             media.audio = audio.current;
             media.audio.play();
             media.audioStream = media.audio.captureStream();
@@ -22,8 +24,6 @@ export default function RecordBtn({canvas, audio}){
         // Provide recorded data when recording stops
         media.recorder.onstop = () => {downloadMedia(chunks);};
         media.recorder.start(1000);
-
-        setIsRecording(!isRecording);
     }
 
     return (
