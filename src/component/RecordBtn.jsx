@@ -2,10 +2,9 @@ import {useState} from 'react'
 import downloadMedia from '../js/downloadMedia';
 const media = {};
 export default function RecordBtn({canvas, audio}){
-    const [status, setStatus] = useState("開始錄影");
+    const [isRecording, setIsRecording] = useState(false);
     function handleClick(){
-        if(status == "停止錄影"){
-            setStatus("開始錄影")
+        if(isRecording){
             media.recorder.stop();
             return;
         }
@@ -23,10 +22,11 @@ export default function RecordBtn({canvas, audio}){
         // Provide recorded data when recording stops
         media.recorder.onstop = () => {downloadMedia(chunks);};
         media.recorder.start(1000);
-        setStatus("停止錄影");
+
+        setIsRecording(!isRecording);
     }
 
     return (
-        <button onClick={handleClick}>{status}</button>
+        <button onClick={handleClick}>{isRecording ? "停止錄影" : "開始錄影"}</button>
     )
 }

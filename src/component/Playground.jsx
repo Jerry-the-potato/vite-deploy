@@ -13,7 +13,6 @@ function Playground({margin}){
     const [width, height] = useWindowSize(margin);
     const ratio = (width > breakpoint) ? 1 : 2;
     const min = getMin(width, height);
-    console.log("update");
     function getMin(w, h){
         const min = (w > breakpoint)
             ? ((w < h) ? w : h)

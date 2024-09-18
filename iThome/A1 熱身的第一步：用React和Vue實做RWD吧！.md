@@ -135,20 +135,15 @@ function Playground({margin}){
 ### 比例與畫面更新
 
 在元件中，我們使用 992px 作為桌面與移動端的斷點，並根據視窗大小動態更新 ratio 和 min：
-#### React－以副作用的方式更新
+#### React 直接在元件內更新
 ```
 const breakpoint = 992 - margin * 2;
 const [width, height] = useWindowSize(margin);
-const [ratio, setRatio] = useState((width > breakpoint) ? 1 : 2);
-const [min, setMax] = useState(getMin(width, height));
-
-useEffect(()=>{
-    setRatio((width > breakpoint) ? 1 : 2)
-    setMax(getMin(width, height));
-}, [width, height]);
+const ratio = (width > breakpoint) ? 1 : 2;
+const min = getMin(width, height);
 ```
-
-#### Vue－computed自動更新，必須定義參數型別
+> 一個常見的誤解是，把大部分變數都作為useState來定義，在這個例子中，useWindowSize 會帶動元件的渲染，使內部重新執行，屬於較單純的上下游依賴關係。
+#### Vue－透過computed依賴更新，且必須定義參數型別
 ```
 const props = defineProps({
   margin: Number,
@@ -172,4 +167,4 @@ function getMin(w, h){
 > 例如：如果螢幕寬高是 340x740，扣除 margin 後為 300x700，則將高度除以二進行比較（即 300x350），最終得出最小值為 300，最終佈局為 300x600。
 
 ### 結語
-透過這種簡單且高效的設計方法，我們實現了自適應的響應式布局，灑花～如同開篇提到的，前幾天會先從元件下手，準備好一個canvas友善的開發環境，
+透過這種簡單且高效的設計方法，我們實現了自適應的響應式布局，灑花～如同開篇提到的，第一個主題會先從元件下手，準備好一個canvas友善的開發環境，開頭展示的圖片，是下個主題會用到的粒子系統，敬請期待囉~

@@ -115,69 +115,88 @@ function Table({ columns, rows }){
           orderBy: accessor,
         }))
       }
-      
-
-    return (
-        <>
-        <table className="table">
-            <thead className="thead">
-                {}
-            </thead>
-            <tbody>
-                <tr className="tr">
-                    {columns.map(column => {
-                        return (
-                            <th className="th" key={column.accessor}>
-                                <span>{column.label}</span>
-                            </th>
-                        )
-                    })}
-                </tr>
-                <tr className="tr">
-                    {columns.map(column => {
-                        const sortIcon = () => {
-                            if (column.accessor === sort.orderBy) {
+    
+    function Title(){
+        return (
+            <tr className="tr">
+                {columns.map(column => {
+                    return (
+                        <th className="th" key={column.accessor}>
+                            <span>{column.label}</span>
+                        </th>
+                    )
+                })}
+            </tr>
+        );
+    };
+    function SearchInput(){
+        return (
+            <tr className="tr">
+                {columns.map(column => {
+                    return (
+                        <th className="th" key={`${column.accessor}-search`}>
+                            <label><input
+                                className="input"
+                                key={`${column.accessor}-search`}
+                                type="search"
+                                placeholder={`搜尋${column.label}`}
+                                value={filters[column.accessor] || ""}
+                                onChange={event => handleSearch(event.target.value, column.accessor)}
+                            /></label>
+                        </th>
+                    )
+                })}
+            </tr>
+        );
+    }
+    function SortBtn(){
+        return (
+            <tr className="tr">
+                {columns.map(column => {
+                    {/* const sortIcon = () => {
+                        if (column.accessor === sort.orderBy) {
                             if (sort.order === 'asc') {
                                 return '🟢'
                             }
                             return '🔴'
-                            } else {
+                        } else {
                             return '️⚪'
-                            }
                         }
-                        return (
-                            <th className="th" key={`${column.accessor}-search`}>
-                                <label><input
-                                    className="input"
-                                    key={`${column.accessor}-search`}
-                                    type="search"
-                                    placeholder={`搜尋${column.label}`}
-                                    value={filters[column.accessor] || ""}
-                                    onChange={event => handleSearch(event.target.value, column.accessor)}
-                                /></label>
-                                <button className="button" onClick={() => handleSort(column.accessor)}>{sortIcon()}</button>
-                            </th>
-                        )
-                    })}
-                </tr>
+                    } */}
+                    return (
+                        <th className="th" key={`${column.accessor}-search`}>
+                            <button className="button" onClick={() => handleSort(column.accessor)}>{
+                                (column.accessor === sort.orderBy)
+                                    ? (sort.order === 'asc' ? '升序🟢' : '降序🔴') : '️排序⚪'
+                            }</button>
+                        </th>
+                    )
+                })}
+            </tr>
+        );
+    }
+    function TableHead(){
+        return (
+            <thead className="thead">
+                <Title></Title>
+                <SearchInput></SearchInput>
+                <SortBtn></SortBtn>
+            </thead>
+        );
+    };
+    function TableBody(){
+        return (
+            <tbody>
                 {calculatedRows.map(row => {
                     return (
-                    <tr className="tr" key={row.id}>
+                    <tr className="tr" key={row.key}>
                         {columns.map(column =>{
                             if (column.format) {
-                                if(column.accessor == "co"){
-                                    return <td className="td" key={column.accessor}><a href={row.url}>{column.format(row[column.accessor])}</a></td>
-                                }
                                 return <td className="td" key={column.accessor}>{column.format(row[column.accessor])}</td>
                             }
-                            const isBig = column.accessor == "role" && row[column.accessor].length > 10
                             return (
-                                <td className="td" style={{"fontSize": isBig ? "0.8em" : "1em"}} key={column.accessor}>
-                                    {column.accessor == "co"? <a 
-                                        style={{"color": "inherit"}} 
-                                        target="_blank" 
-                                        href={row.url}>
-                                            {row[column.accessor]}</a> : row[column.accessor]}
+                                <td className="td" key={column.accessor}>
+                                   {row[column.accessor]}
                                 </td>
                             )
                         })}
@@ -185,15 +204,43 @@ function Table({ columns, rows }){
                     )
                 })}
             </tbody>
-        </table>
-        <Pagination
-            activePage={activePage}
-            count={count}
-            rowsPerPage={rowsPerPage}
-            totalPages={totalPages}
-            setActivePage={setActivePage}
-        />
-        </>
+        );
+
+    }
+    
+    return (
+        <div style={{ width: '100%', overflow: 'auto', margin: 0 }}>
+            <table className="table">
+                <thead className="thead">
+                    <Title></Title>
+                    <tr className="tr">
+                        {columns.map(column => {
+                            return (
+                                <th className="th" key={`${column.accessor}-search`}>
+                                    <label><input
+                                        className="input"
+                                        key={`${column.accessor}-search`}
+                                        type="search"
+                                        placeholder={`搜尋${column.label}`}
+                                        value={filters[column.accessor] || ""}
+                                        onChange={event => handleSearch(event.target.value, column.accessor)}
+                                    /></label>
+                                </th>
+                            )
+                        })}
+                    </tr>
+                    <SortBtn></SortBtn>
+                </thead>
+                <TableBody></TableBody>
+            </table>
+            <Pagination
+                activePage={activePage}
+                count={count}
+                rowsPerPage={rowsPerPage}
+                totalPages={totalPages}
+                setActivePage={setActivePage}
+            />
+        </div>
     )
 }
 

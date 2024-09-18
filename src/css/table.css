@@ -1,9 +1,10 @@
 .table{
-    width: 100%;
+    width: max-content;
     border-color: var(--soft-color);
-    border-width: 1em;
+    border-collapse: collapse;
+    /* border-width: 1em;
     border-radius: 2em;
-    border-style: double;
+    border-style: double; */
 }
     .thead, tbody{
     }
@@ -12,32 +13,47 @@
             height: 1em;
         }
         .th:nth-child(1), .td:nth-child(1){
-            width: 2.5em;
+            min-width: 2.5em;
+        }
+        .th:nth-child(2)::after, .td:nth-child(2)::after{
+            content: "";
+            position: absolute;
+            right: 0px;
+            top: 0px;
+            width: 10px;
+            height: 100%;
+            box-shadow: inset 10px 0 8px -8px var(--main-color);
+            transform: translateX(100%);
         }
         .th:nth-child(2), .td:nth-child(2){
-            width: 4.5em;
+            min-width: 5em;
             color: var(--textbg-color);;
+            position: sticky;
+            left: 0px;
+            z-index: 2;
         }
         .th:nth-child(3), .td:nth-child(3){
-            width: 2.5em;
+            min-width: 5em;
         }
         .th:nth-child(4), .td:nth-child(4){
-            width: 1em;
+            min-width: 5em;
         }
         .th:nth-child(5), .td:nth-child(5){
-            width: 2.5em;
+            min-width: 5em;
         }
             .th, .td{
-                text-align: center;
-                vertical-align: bottom;
-                padding: 0 0 0 0.4em;
-                border-width: 0.01em;
+                text-align: left;
+                vertical-align: middle;
+                padding: 0.4em;
+                border-bottom: 1px solid var(--soft-color);
+                background-color: #000000;
+                /* border-width: 0.01em;
                 border-color: var(--soft-color);
-                border-style:dashed;
+                border-style:dashed; */
             }
             .input{
-                font-size: 0.8em;
-                width: 90%;
+                font-size: 0.7em;
+                width: 8em;
                 padding: 0.1em 0.4em 0.1em 0.4em;
                 border-radius: 0.5em;
                 color: var(--main-color);
