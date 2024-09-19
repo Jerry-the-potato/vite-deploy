@@ -36696,7 +36696,7 @@ lodash.exports;
 var lodashExports = lodash.exports;
 const _ = /* @__PURE__ */ getDefaultExportFromCjs(lodashExports);
 const Pagination = ({ activePage, count, rowsPerPage, totalPages, setActivePage }) => {
-  const beginning = activePage === 1 ? 1 : rowsPerPage * (activePage - 1) + 1;
+  const beginning = rowsPerPage * (activePage - 1) + 1;
   const end = activePage === totalPages ? count : beginning + rowsPerPage - 1;
   const isDisabled = activePage === 1;
   const isLastDisabled = activePage === totalPages;
@@ -36789,46 +36789,46 @@ function Table({ columns, rows }) {
       orderBy: accessor
     }));
   };
-  function Title() {
+  const Title = reactExports.useMemo(() => {
     return /* @__PURE__ */ jsxRuntimeExports.jsx("tr", { className: "tr", children: columns.map((column) => {
       return /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "th", children: /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: column.label }) }, column.accessor);
     }) });
-  }
-  function SortBtn() {
+  }, [columns]);
+  const FilterInput = reactExports.useMemo(() => {
+    return /* @__PURE__ */ jsxRuntimeExports.jsx("tr", { className: "tr", children: columns.map((column) => {
+      return /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "th", children: /* @__PURE__ */ jsxRuntimeExports.jsx("label", { children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+        "input",
+        {
+          className: "input",
+          type: "search",
+          placeholder: `搜尋${column.label}`,
+          value: filters[column.accessor] || "",
+          onChange: (event) => handleSearch(event.target.value, column.accessor)
+        },
+        `${column.accessor}-search`
+      ) }) }, `${column.accessor}-search`);
+    }) });
+  }, [columns, filters]);
+  const SortBtn = reactExports.useMemo(() => {
     return /* @__PURE__ */ jsxRuntimeExports.jsx("tr", { className: "tr", children: columns.map((column) => {
       return /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "th", children: /* @__PURE__ */ jsxRuntimeExports.jsx("button", { className: "button", onClick: () => handleSort(column.accessor), children: column.accessor === sort.orderBy ? sort.order === "asc" ? "升序🟢" : "降序🔴" : "️排序⚪" }) }, `${column.accessor}-search`);
     }) });
-  }
-  function TableBody() {
-    return /* @__PURE__ */ jsxRuntimeExports.jsx("tbody", { children: calculatedRows.map((row) => {
+  }, [columns, sort]);
+  const Content = reactExports.useMemo(() => {
+    return /* @__PURE__ */ jsxRuntimeExports.jsx(jsxRuntimeExports.Fragment, { children: calculatedRows.map((row) => {
       return /* @__PURE__ */ jsxRuntimeExports.jsx("tr", { className: "tr", children: columns.map((column) => {
-        if (column.format) {
-          return /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "td", children: column.format(row[column.accessor]) }, column.accessor);
-        }
-        return /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "td", children: row[column.accessor] }, column.accessor);
+        return /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "td", children: column.format ? column.format(row[column.accessor]) : row[column.accessor] }, column.accessor);
       }) }, row.key);
     }) });
-  }
+  }, [columns, calculatedRows]);
   return /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
-    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { style: { width: "100%", maxHeight: "90%", overflow: "auto", margin: 0 }, children: /* @__PURE__ */ jsxRuntimeExports.jsxs("table", { className: "table", children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { style: { maxHeight: "90%", overflow: "auto", margin: 0 }, children: /* @__PURE__ */ jsxRuntimeExports.jsxs("table", { className: "table", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsxs("thead", { className: "thead", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(Title, {}),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("tr", { className: "tr", children: columns.map((column) => {
-          return /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "th", children: /* @__PURE__ */ jsxRuntimeExports.jsx("label", { children: /* @__PURE__ */ jsxRuntimeExports.jsx(
-            "input",
-            {
-              className: "input",
-              type: "search",
-              placeholder: `搜尋${column.label}`,
-              value: filters[column.accessor] || "",
-              onChange: (event) => handleSearch(event.target.value, column.accessor)
-            },
-            `${column.accessor}-search`
-          ) }) }, `${column.accessor}-search`);
-        }) }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(SortBtn, {})
+        Title,
+        FilterInput,
+        SortBtn
       ] }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx(TableBody, {})
+      /* @__PURE__ */ jsxRuntimeExports.jsx("tbody", { children: Content })
     ] }) }),
     /* @__PURE__ */ jsxRuntimeExports.jsx(
       Pagination,
@@ -36856,7 +36856,15 @@ function CookieTable() {
     { accessor: "stock", label: "庫存" }
   ];
   reactExports.useEffect(() => {
-    tableData.concat([
+    axios.get("http://localhost:3000/cookie").then((response) => {
+      const cookie = response.data.cookie;
+      setTableData(cookie);
+    }).catch((error) => {
+      console.error("Error gathering data:", error);
+    });
+  }, []);
+  reactExports.useEffect(() => {
+    const newTableData = tableData.concat([
       { id: 1, name: "potatochip 洋芋片", price: "50", onsale: true, tag: "salty crispy delicious", rate: "⭐️⭐️⭐️⭐️", expiryDate: "2025-01-01", category: "snack", stock: 100 },
       { id: 2, name: "chocolate 巧克力", price: "30", onsale: false, tag: "sweet rich smooth", rate: "⭐️⭐️⭐️⭐️⭐️", expiryDate: "2024-12-15", category: "dessert", stock: 150 },
       { id: 3, name: "biscuit 餅乾", price: "25", onsale: true, tag: "crunchy light buttery", rate: "⭐️", expiryDate: "2024-11-30", category: "snack", stock: 200 },
@@ -36881,17 +36889,11 @@ function CookieTable() {
       { id: 22, name: "ricecracker 米餅", price: "29", onsale: false, tag: "crunchy salty light", rate: "⭐️⭐️⭐️", expiryDate: "2025-01-10", category: "snack", stock: 200 },
       { id: 23, name: "energybar 能量棒", price: "55", onsale: true, tag: "filling healthy chewy", rate: "⭐️⭐️⭐️⭐️", expiryDate: "2025-03-20", category: "snack", stock: 100 }
     ]);
-    axios.get("http://localhost:3000/cookie").then((response) => {
-      const cookie = response.data.cookie;
-      const newRows = cookie.map((data, index) => {
-        return { key: index, ...data };
-      });
-      setTableData(cookie);
-      setRows(newRows);
-    }).catch((error) => {
-      console.error("Error gathering data:", error);
+    const newRows = newTableData.map((data, index) => {
+      return { ...data, key: index };
     });
-  }, []);
+    setRows(newRows);
+  }, [tableData]);
   return /* @__PURE__ */ jsxRuntimeExports.jsx("section", { className: "section", id: "cookie", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Table, { columns, rows }) });
 }
 function GetHyperLink({ divRef }) {
@@ -36988,4 +36990,4 @@ function App() {
 const domNode = document.getElementById("root");
 const root = createRoot(domNode);
 root.render(/* @__PURE__ */ jsxRuntimeExports.jsx(App, {}));
-//# sourceMappingURL=index-DdGyXCf2.js.map
+//# sourceMappingURL=index-BKXDXAAL.js.map
