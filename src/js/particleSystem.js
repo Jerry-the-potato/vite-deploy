@@ -12,7 +12,7 @@ export default class ParticleSystem{
         this.i = 0;
         this.j = 0;
         this.maxValue = 865*0.4;
-        const length = 50 || Math.floor(x - 200);
+        const length = Math.floor((x - 200) / 4);
         const width = Math.max(Math.floor(x*2/length), 0.5);
         this.columns = new Array(length).fill().map((v,i) => {
             return this.createColumn(x - width * length/2 + width * i, y * 1.8, width, ((i+1)/length) * this.maxValue);

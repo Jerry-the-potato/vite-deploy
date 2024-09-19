@@ -44,7 +44,7 @@
             .th, .td{
                 text-align: left;
                 vertical-align: middle;
-                padding: 0.4em;
+                padding: 1rem;
                 border-bottom: 1px solid var(--soft-color);
                 background-color: #000000;
                 /* border-width: 0.01em;
@@ -56,15 +56,15 @@
                 width: 8em;
                 padding: 0.1em 0.4em 0.1em 0.4em;
                 border-radius: 0.5em;
-                color: var(--main-color);
-                background-color: var(--soft-color);
+                color: var(--soft-color);
+                background-color: var(--darker-color);
                 /* border-width: 0; */
             }
 .pagination{
-    position: absolute;
-    width: -webkit-fill-available;
+    /* position: absolute; */
+    /* width: -webkit-fill-available; */
     display: flex;
-    bottom: 1em;
+    /* bottom: 1em; */
     margin: 0.5em;
 }
 .pagDescription{

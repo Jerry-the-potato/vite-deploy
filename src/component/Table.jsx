@@ -209,30 +209,32 @@ function Table({ columns, rows }){
     }
     
     return (
-        <div style={{ width: '100%', overflow: 'auto', margin: 0 }}>
-            <table className="table">
-                <thead className="thead">
-                    <Title></Title>
-                    <tr className="tr">
-                        {columns.map(column => {
-                            return (
-                                <th className="th" key={`${column.accessor}-search`}>
-                                    <label><input
-                                        className="input"
-                                        key={`${column.accessor}-search`}
-                                        type="search"
-                                        placeholder={`搜尋${column.label}`}
-                                        value={filters[column.accessor] || ""}
-                                        onChange={event => handleSearch(event.target.value, column.accessor)}
-                                    /></label>
-                                </th>
-                            )
-                        })}
-                    </tr>
-                    <SortBtn></SortBtn>
-                </thead>
-                <TableBody></TableBody>
-            </table>
+        <>
+            <div style={{ width: '100%', maxHeight:'90%', overflow: 'auto', margin: 0 }}>
+                <table className="table">
+                    <thead className="thead">
+                        <Title></Title>
+                        <tr className="tr">
+                            {columns.map(column => {
+                                return (
+                                    <th className="th" key={`${column.accessor}-search`}>
+                                        <label><input
+                                            className="input"
+                                            key={`${column.accessor}-search`}
+                                            type="search"
+                                            placeholder={`搜尋${column.label}`}
+                                            value={filters[column.accessor] || ""}
+                                            onChange={event => handleSearch(event.target.value, column.accessor)}
+                                        /></label>
+                                    </th>
+                                )
+                            })}
+                        </tr>
+                        <SortBtn></SortBtn>
+                    </thead>
+                    <TableBody></TableBody>
+                </table>
+            </div>
             <Pagination
                 activePage={activePage}
                 count={count}
@@ -240,7 +242,7 @@ function Table({ columns, rows }){
                 totalPages={totalPages}
                 setActivePage={setActivePage}
             />
-        </div>
+        </>
     )
 }
 

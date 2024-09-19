@@ -18,26 +18,28 @@ const createPhysic = function(){
     }
     this.update = () => {this.system.update();}
     this.render = () => {this.system.render(this.ctx);}
-    this.start = (e) => {
-        const ID = e.target.id;
+    this.start = (ID, path) => {
         if(!this.system.sort[ID]){
             console.warn("invalid function name. Button id " + ID + " is not any of sortFunctions");
             return;
         }
+        this.setPath(path);
         this.system.sort.start(ID, this.system.columns);
     }
     this.cancel = () => {
         this.system.sort.isSorting = false;
-        this.system.sort.send(name + " is interrupted!");
     }
     this.stepByStep = () => {
         this.system.sort.isSorting = true;
         this.system.sort.isStoping = true;
-        this.system.sort.send(name + " is proceeding step by step. Click again!");
     }
-    this.setPath = (e) => {
-        const ID = e.target.id;
-        PathConfig[ID] = e.target.value;
+    this.setPath = (path) => {
+        // const ID = e.target.id;
+        // PathConfig[ID] = e.target.value;
+        PathConfig.leapLinear = path.leapLinear;
+        PathConfig.leapEasein = path.leapEasein;
+        PathConfig.leapEaseout = path.leapEaseout;
+        PathConfig.resetPath(-1, 0, 2);
     }
 	return this;
 }
