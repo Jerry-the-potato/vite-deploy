@@ -254,13 +254,13 @@ export default class ParticleSystem{
         ctx.fillStyle = 'black';
         ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 
-        // this.walls.forEach((wall) => {
-        //     ctx.beginPath();
-        //     ctx.arc(wall.x, wall.y, wall.length, wall.startAngle, wall.endAngle, false);
-        //     ctx.strokeStyle = 'rgba(40, 60, 80, 1)';
-        //     ctx.lineWidth = wall.thick * 2;
-        //     ctx.stroke();
-        // });
+        this.walls.forEach((wall) => {
+            ctx.beginPath();
+            ctx.arc(wall.x, wall.y, wall.length, wall.startAngle, wall.endAngle, false);
+            ctx.strokeStyle = 'rgba(40, 60, 80, 1)';
+            ctx.lineWidth = wall.thick * 2;
+            ctx.stroke();
+        });
         function mix(x, from, to){
             return from + x * (to - from);
         }
@@ -292,12 +292,12 @@ export default class ParticleSystem{
         this.sort.secondColumns.forEach((column) => {
             drawColumn(column);
         })
-        // this.balls.forEach((ball) => {
-        //     ctx.beginPath();
-        //     ctx.arc(ball.x, ball.y, ball.r, 0, 2 * Math.PI, false);
-        //     ctx.fillStyle = "#FFFFFF";
-        //     ctx.fill();
-        // });
+        this.balls.forEach((ball) => {
+            ctx.beginPath();
+            ctx.arc(ball.x, ball.y, ball.r, 0, 2 * Math.PI, false);
+            ctx.fillStyle = "#FFFFFF";
+            ctx.fill();
+        });
         Object.keys(this.texts).forEach((key) => {
             const text = this.texts[key];
             ctx.beginPath();
