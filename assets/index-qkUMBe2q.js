@@ -7555,53 +7555,53 @@ const managerMaker = function() {
   };
   this.updateRequestAnimation = (id2) => {
     this.lastId = id2;
-    this.lastRequestName.forEach((name2) => {
-      if (!this.request[name2]) return;
-      cancelAnimationFrame(this.request[name2].ID);
+    this.lastRequestName.forEach((name) => {
+      if (!this.request[name]) return;
+      cancelAnimationFrame(this.request[name].ID);
     });
     const names = this.getRequestById(id2);
     if (names === null) return;
     this.lastRequestName = names;
-    names.forEach((name2) => {
-      if (typeof this.request[name2] === "undefined") return console.warn("invalid request");
-      if (typeof this.request[name2].method === "undefined") return console.warn("invalid requestMethod");
-      if (this.request[name2].isPause) return;
-      this.request[name2].ID = requestAnimationFrame(this.request[name2].method);
+    names.forEach((name) => {
+      if (typeof this.request[name] === "undefined") return console.warn("invalid request");
+      if (typeof this.request[name].method === "undefined") return console.warn("invalid requestMethod");
+      if (this.request[name].isPause) return;
+      this.request[name].ID = requestAnimationFrame(this.request[name].method);
     });
   };
-  this.pauseAnimationByName = (name2) => {
-    cancelAnimationFrame(this.request[name2].ID);
-    this.request[name2].isPause = true;
+  this.pauseAnimationByName = (name) => {
+    cancelAnimationFrame(this.request[name].ID);
+    this.request[name].isPause = true;
   };
-  this.resumeAnimationByName = (name2) => {
-    this.request[name2].isPause = false;
-    cancelAnimationFrame(this.request[name2].ID);
-    this.request[name2].ID = requestAnimationFrame(this.request[name2].method);
+  this.resumeAnimationByName = (name) => {
+    this.request[name].isPause = false;
+    cancelAnimationFrame(this.request[name].ID);
+    this.request[name].ID = requestAnimationFrame(this.request[name].method);
   };
   this.addAnimationCallback = (callback) => {
     const string = callback.name || "#" + Math.random();
-    const name2 = string.match(" ") ? string.split(" ")[1] : string;
-    this.request[name2] = this.request[name2] || {};
-    this.request[name2].method = (function animate() {
+    const name = string.match(" ") ? string.split(" ")[1] : string;
+    this.request[name] = this.request[name] || {};
+    this.request[name].method = (function animate() {
       callback();
-      this.request[name2].ID = requestAnimationFrame(animate.bind(this));
+      this.request[name].ID = requestAnimationFrame(animate.bind(this));
     }).bind(this);
-    const isValid = Object.keys(this.subject).some((ID) => name2.includes(ID));
-    if (!isValid) console.warn("naming issue: " + name2 + " should include one of following letters: " + this.subject);
+    const isValid = Object.keys(this.subject).some((ID) => name.includes(ID));
+    if (!isValid) console.warn("naming issue: " + name + " should include one of following letters: " + this.subject);
   };
-  this.registerAnimationCallback = (name2, callback) => {
-    this.request[name2] = this.request[name2] || {};
-    this.request[name2].method = (function animate() {
+  this.registerAnimationCallback = (name, callback) => {
+    this.request[name] = this.request[name] || {};
+    this.request[name].method = (function animate() {
       callback();
-      this.request[name2].ID = requestAnimationFrame(animate.bind(this));
+      this.request[name].ID = requestAnimationFrame(animate.bind(this));
     }).bind(this);
-    const isValid = Object.keys(this.subject).some((ID) => name2.includes(ID));
-    if (!isValid) console.warn("naming issue: " + name2 + " should include one of following letters: " + this.subject);
+    const isValid = Object.keys(this.subject).some((ID) => name.includes(ID));
+    if (!isValid) console.warn("naming issue: " + name + " should include one of following letters: " + this.subject);
   };
-  this.unregisterAnimationCallback = (name2) => {
-    cancelAnimationFrame(this.request[name2].ID);
-    this.request[name2].method = null;
-    delete this.request[name2];
+  this.unregisterAnimationCallback = (name) => {
+    cancelAnimationFrame(this.request[name].ID);
+    this.request[name].method = null;
+    delete this.request[name];
   };
   this.io = new IntersectionObserver((entries) => {
     entries.forEach((entry) => {
@@ -7724,9 +7724,9 @@ const CanvasSectionS1 = ({ ratio, min, uniqueID = "LokaVolterra" }) => {
   const [isMain, setIsMain] = reactExports.useState(true);
   const [isWorker, setIsWorker] = reactExports.useState(true);
   function handlePauseMain() {
-    const name2 = (!isMain ? "resume" : "pause") + "AnimationByName";
-    manager[name2]("render" + uniqueID);
-    manager[name2]("update" + uniqueID);
+    const name = (!isMain ? "resume" : "pause") + "AnimationByName";
+    manager[name]("render" + uniqueID);
+    manager[name]("update" + uniqueID);
     setIsMain(!isMain);
   }
   function handlePauseWorker() {
@@ -8708,8 +8708,8 @@ function arrayNeedsUint32(array) {
   }
   return false;
 }
-function createElementNS(name2) {
-  return document.createElementNS("http://www.w3.org/1999/xhtml", name2);
+function createElementNS(name) {
+  return document.createElementNS("http://www.w3.org/1999/xhtml", name);
 }
 function createCanvasElement() {
   const canvas = createElementNS("canvas");
@@ -12338,25 +12338,25 @@ class Object3D extends EventDispatcher {
   getObjectById(id2) {
     return this.getObjectByProperty("id", id2);
   }
-  getObjectByName(name2) {
-    return this.getObjectByProperty("name", name2);
+  getObjectByName(name) {
+    return this.getObjectByProperty("name", name);
   }
-  getObjectByProperty(name2, value) {
-    if (this[name2] === value) return this;
+  getObjectByProperty(name, value) {
+    if (this[name] === value) return this;
     for (let i = 0, l2 = this.children.length; i < l2; i++) {
       const child = this.children[i];
-      const object = child.getObjectByProperty(name2, value);
+      const object = child.getObjectByProperty(name, value);
       if (object !== void 0) {
         return object;
       }
     }
     return void 0;
   }
-  getObjectsByProperty(name2, value, result = []) {
-    if (this[name2] === value) result.push(this);
+  getObjectsByProperty(name, value, result = []) {
+    if (this[name] === value) result.push(this);
     const children = this.children;
     for (let i = 0, l2 = children.length; i < l2; i++) {
-      children[i].getObjectsByProperty(name2, value, result);
+      children[i].getObjectsByProperty(name, value, result);
     }
     return result;
   }
@@ -13058,9 +13058,9 @@ class Color {
     let m2;
     if (m2 = /^(\w+)\(([^\)]*)\)/.exec(style)) {
       let color;
-      const name2 = m2[1];
+      const name = m2[1];
       const components = m2[2];
-      switch (name2) {
+      switch (name) {
         case "rgb":
         case "rgba":
           if (color = /^\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*(?:,\s*(\d*\.?\d+)\s*)?$/.exec(components)) {
@@ -13956,19 +13956,19 @@ class BufferGeometry extends EventDispatcher {
     }
     return this;
   }
-  getAttribute(name2) {
-    return this.attributes[name2];
+  getAttribute(name) {
+    return this.attributes[name];
   }
-  setAttribute(name2, attribute) {
-    this.attributes[name2] = attribute;
+  setAttribute(name, attribute) {
+    this.attributes[name] = attribute;
     return this;
   }
-  deleteAttribute(name2) {
-    delete this.attributes[name2];
+  deleteAttribute(name) {
+    delete this.attributes[name];
     return this;
   }
-  hasAttribute(name2) {
-    return this.attributes[name2] !== void 0;
+  hasAttribute(name) {
+    return this.attributes[name] !== void 0;
   }
   addGroup(start, count, materialIndex = 0) {
     this.groups.push({
@@ -14326,21 +14326,21 @@ class BufferGeometry extends EventDispatcher {
     const geometry2 = new BufferGeometry();
     const indices = this.index.array;
     const attributes = this.attributes;
-    for (const name2 in attributes) {
-      const attribute = attributes[name2];
+    for (const name in attributes) {
+      const attribute = attributes[name];
       const newAttribute = convertBufferAttribute(attribute, indices);
-      geometry2.setAttribute(name2, newAttribute);
+      geometry2.setAttribute(name, newAttribute);
     }
     const morphAttributes = this.morphAttributes;
-    for (const name2 in morphAttributes) {
+    for (const name in morphAttributes) {
       const morphArray = [];
-      const morphAttribute = morphAttributes[name2];
+      const morphAttribute = morphAttributes[name];
       for (let i = 0, il2 = morphAttribute.length; i < il2; i++) {
         const attribute = morphAttribute[i];
         const newAttribute = convertBufferAttribute(attribute, indices);
         morphArray.push(newAttribute);
       }
-      geometry2.morphAttributes[name2] = morphArray;
+      geometry2.morphAttributes[name] = morphArray;
     }
     geometry2.morphTargetsRelative = this.morphTargetsRelative;
     const groups = this.groups;
@@ -14430,18 +14430,18 @@ class BufferGeometry extends EventDispatcher {
       this.setIndex(index.clone(data));
     }
     const attributes = source.attributes;
-    for (const name2 in attributes) {
-      const attribute = attributes[name2];
-      this.setAttribute(name2, attribute.clone(data));
+    for (const name in attributes) {
+      const attribute = attributes[name];
+      this.setAttribute(name, attribute.clone(data));
     }
     const morphAttributes = source.morphAttributes;
-    for (const name2 in morphAttributes) {
+    for (const name in morphAttributes) {
       const array = [];
-      const morphAttribute = morphAttributes[name2];
+      const morphAttribute = morphAttributes[name];
       for (let i = 0, l2 = morphAttribute.length; i < l2; i++) {
         array.push(morphAttribute[i].clone(data));
       }
-      this.morphAttributes[name2] = array;
+      this.morphAttributes[name] = array;
     }
     this.morphTargetsRelative = source.morphTargetsRelative;
     const groups = source.groups;
@@ -14514,9 +14514,9 @@ class Mesh extends Object3D {
         this.morphTargetInfluences = [];
         this.morphTargetDictionary = {};
         for (let m2 = 0, ml2 = morphAttribute.length; m2 < ml2; m2++) {
-          const name2 = morphAttribute[m2].name || String(m2);
+          const name = morphAttribute[m2].name || String(m2);
           this.morphTargetInfluences.push(0);
-          this.morphTargetDictionary[name2] = m2;
+          this.morphTargetDictionary[name] = m2;
         }
       }
     }
@@ -14894,46 +14894,46 @@ class ShaderMaterial extends Material {
     const data = super.toJSON(meta);
     data.glslVersion = this.glslVersion;
     data.uniforms = {};
-    for (const name2 in this.uniforms) {
-      const uniform = this.uniforms[name2];
+    for (const name in this.uniforms) {
+      const uniform = this.uniforms[name];
       const value = uniform.value;
       if (value && value.isTexture) {
-        data.uniforms[name2] = {
+        data.uniforms[name] = {
           type: "t",
           value: value.toJSON(meta).uuid
         };
       } else if (value && value.isColor) {
-        data.uniforms[name2] = {
+        data.uniforms[name] = {
           type: "c",
           value: value.getHex()
         };
       } else if (value && value.isVector2) {
-        data.uniforms[name2] = {
+        data.uniforms[name] = {
           type: "v2",
           value: value.toArray()
         };
       } else if (value && value.isVector3) {
-        data.uniforms[name2] = {
+        data.uniforms[name] = {
           type: "v3",
           value: value.toArray()
         };
       } else if (value && value.isVector4) {
-        data.uniforms[name2] = {
+        data.uniforms[name] = {
           type: "v4",
           value: value.toArray()
         };
       } else if (value && value.isMatrix3) {
-        data.uniforms[name2] = {
+        data.uniforms[name] = {
           type: "m3",
           value: value.toArray()
         };
       } else if (value && value.isMatrix4) {
-        data.uniforms[name2] = {
+        data.uniforms[name] = {
           type: "m4",
           value: value.toArray()
         };
       } else {
-        data.uniforms[name2] = {
+        data.uniforms[name] = {
           value
         };
       }
@@ -16732,14 +16732,14 @@ function WebGLBindingStates(gl2, attributes) {
     const geometryAttributes = geometry.attributes;
     let attributesNum = 0;
     const programAttributes = program.getAttributes();
-    for (const name2 in programAttributes) {
-      const programAttribute = programAttributes[name2];
+    for (const name in programAttributes) {
+      const programAttribute = programAttributes[name];
       if (programAttribute.location >= 0) {
-        const cachedAttribute = cachedAttributes[name2];
-        let geometryAttribute = geometryAttributes[name2];
+        const cachedAttribute = cachedAttributes[name];
+        let geometryAttribute = geometryAttributes[name];
         if (geometryAttribute === void 0) {
-          if (name2 === "instanceMatrix" && object.instanceMatrix) geometryAttribute = object.instanceMatrix;
-          if (name2 === "instanceColor" && object.instanceColor) geometryAttribute = object.instanceColor;
+          if (name === "instanceMatrix" && object.instanceMatrix) geometryAttribute = object.instanceMatrix;
+          if (name === "instanceColor" && object.instanceColor) geometryAttribute = object.instanceColor;
         }
         if (cachedAttribute === void 0) return true;
         if (cachedAttribute.attribute !== geometryAttribute) return true;
@@ -16756,20 +16756,20 @@ function WebGLBindingStates(gl2, attributes) {
     const attributes2 = geometry.attributes;
     let attributesNum = 0;
     const programAttributes = program.getAttributes();
-    for (const name2 in programAttributes) {
-      const programAttribute = programAttributes[name2];
+    for (const name in programAttributes) {
+      const programAttribute = programAttributes[name];
       if (programAttribute.location >= 0) {
-        let attribute = attributes2[name2];
+        let attribute = attributes2[name];
         if (attribute === void 0) {
-          if (name2 === "instanceMatrix" && object.instanceMatrix) attribute = object.instanceMatrix;
-          if (name2 === "instanceColor" && object.instanceColor) attribute = object.instanceColor;
+          if (name === "instanceMatrix" && object.instanceMatrix) attribute = object.instanceMatrix;
+          if (name === "instanceColor" && object.instanceColor) attribute = object.instanceColor;
         }
         const data = {};
         data.attribute = attribute;
         if (attribute && attribute.data) {
           data.data = attribute.data;
         }
-        cache[name2] = data;
+        cache[name] = data;
         attributesNum++;
       }
     }
@@ -16822,13 +16822,13 @@ function WebGLBindingStates(gl2, attributes) {
     const geometryAttributes = geometry.attributes;
     const programAttributes = program.getAttributes();
     const materialDefaultAttributeValues = material.defaultAttributeValues;
-    for (const name2 in programAttributes) {
-      const programAttribute = programAttributes[name2];
+    for (const name in programAttributes) {
+      const programAttribute = programAttributes[name];
       if (programAttribute.location >= 0) {
-        let geometryAttribute = geometryAttributes[name2];
+        let geometryAttribute = geometryAttributes[name];
         if (geometryAttribute === void 0) {
-          if (name2 === "instanceMatrix" && object.instanceMatrix) geometryAttribute = object.instanceMatrix;
-          if (name2 === "instanceColor" && object.instanceColor) geometryAttribute = object.instanceColor;
+          if (name === "instanceMatrix" && object.instanceMatrix) geometryAttribute = object.instanceMatrix;
+          if (name === "instanceColor" && object.instanceColor) geometryAttribute = object.instanceColor;
         }
         if (geometryAttribute !== void 0) {
           const normalized = geometryAttribute.normalized;
@@ -16894,7 +16894,7 @@ function WebGLBindingStates(gl2, attributes) {
             }
           }
         } else if (materialDefaultAttributeValues !== void 0) {
-          const value = materialDefaultAttributeValues[name2];
+          const value = materialDefaultAttributeValues[name];
           if (value !== void 0) {
             switch (value.length) {
               case 2:
@@ -18031,12 +18031,12 @@ function WebGLCubeUVMaps(renderer) {
 }
 function WebGLExtensions(gl2) {
   const extensions = {};
-  function getExtension(name2) {
-    if (extensions[name2] !== void 0) {
-      return extensions[name2];
+  function getExtension(name) {
+    if (extensions[name] !== void 0) {
+      return extensions[name];
     }
     let extension;
-    switch (name2) {
+    switch (name) {
       case "WEBGL_depth_texture":
         extension = gl2.getExtension("WEBGL_depth_texture") || gl2.getExtension("MOZ_WEBGL_depth_texture") || gl2.getExtension("WEBKIT_WEBGL_depth_texture");
         break;
@@ -18050,14 +18050,14 @@ function WebGLExtensions(gl2) {
         extension = gl2.getExtension("WEBGL_compressed_texture_pvrtc") || gl2.getExtension("WEBKIT_WEBGL_compressed_texture_pvrtc");
         break;
       default:
-        extension = gl2.getExtension(name2);
+        extension = gl2.getExtension(name);
     }
-    extensions[name2] = extension;
+    extensions[name] = extension;
     return extension;
   }
   return {
-    has: function(name2) {
-      return getExtension(name2) !== null;
+    has: function(name) {
+      return getExtension(name) !== null;
     },
     init: function() {
       getExtension("EXT_color_buffer_float");
@@ -18067,10 +18067,10 @@ function WebGLExtensions(gl2) {
       getExtension("WEBGL_multisampled_render_to_texture");
       getExtension("WEBGL_render_shared_exponent");
     },
-    get: function(name2) {
-      const extension = getExtension(name2);
+    get: function(name) {
+      const extension = getExtension(name);
       if (extension === null) {
-        warnOnce("THREE.WebGLRenderer: " + name2 + " extension not supported.");
+        warnOnce("THREE.WebGLRenderer: " + name + " extension not supported.");
       }
       return extension;
     }
@@ -18084,11 +18084,11 @@ function WebGLGeometries(gl2, attributes, info, bindingStates) {
     if (geometry.index !== null) {
       attributes.remove(geometry.index);
     }
-    for (const name2 in geometry.attributes) {
-      attributes.remove(geometry.attributes[name2]);
+    for (const name in geometry.attributes) {
+      attributes.remove(geometry.attributes[name]);
     }
-    for (const name2 in geometry.morphAttributes) {
-      const array = geometry.morphAttributes[name2];
+    for (const name in geometry.morphAttributes) {
+      const array = geometry.morphAttributes[name];
       for (let i = 0, l2 = array.length; i < l2; i++) {
         attributes.remove(array[i]);
       }
@@ -18115,12 +18115,12 @@ function WebGLGeometries(gl2, attributes, info, bindingStates) {
   }
   function update(geometry) {
     const geometryAttributes = geometry.attributes;
-    for (const name2 in geometryAttributes) {
-      attributes.update(geometryAttributes[name2], gl2.ARRAY_BUFFER);
+    for (const name in geometryAttributes) {
+      attributes.update(geometryAttributes[name], gl2.ARRAY_BUFFER);
     }
     const morphAttributes = geometry.morphAttributes;
-    for (const name2 in morphAttributes) {
-      const array = morphAttributes[name2];
+    for (const name in morphAttributes) {
+      const array = morphAttributes[name];
       for (let i = 0, l2 = array.length; i < l2; i++) {
         attributes.update(array[i], gl2.ARRAY_BUFFER);
       }
@@ -19028,13 +19028,13 @@ class WebGLUniforms {
       parseUniform(info, addr, this);
     }
   }
-  setValue(gl2, name2, value, textures) {
-    const u2 = this.map[name2];
+  setValue(gl2, name, value, textures) {
+    const u2 = this.map[name];
     if (u2 !== void 0) u2.setValue(gl2, value, textures);
   }
-  setOptional(gl2, object, name2) {
-    const v2 = object[name2];
-    if (v2 !== void 0) this.setValue(gl2, name2, v2);
+  setOptional(gl2, object, name) {
+    const v2 = object[name];
+    if (v2 !== void 0) this.setValue(gl2, name, v2);
   }
   static upload(gl2, seq, values, textures) {
     for (let i = 0, n2 = seq.length; i !== n2; ++i) {
@@ -19163,10 +19163,10 @@ function generateVertexExtensions(parameters) {
 }
 function generateDefines(defines) {
   const chunks = [];
-  for (const name2 in defines) {
-    const value = defines[name2];
+  for (const name in defines) {
+    const value = defines[name];
     if (value === false) continue;
-    chunks.push("#define " + name2 + " " + value);
+    chunks.push("#define " + name + " " + value);
   }
   return chunks.join("\n");
 }
@@ -19175,14 +19175,14 @@ function fetchAttributeLocations(gl2, program) {
   const n2 = gl2.getProgramParameter(program, gl2.ACTIVE_ATTRIBUTES);
   for (let i = 0; i < n2; i++) {
     const info = gl2.getActiveAttrib(program, i);
-    const name2 = info.name;
+    const name = info.name;
     let locationSize = 1;
     if (info.type === gl2.FLOAT_MAT2) locationSize = 2;
     if (info.type === gl2.FLOAT_MAT3) locationSize = 3;
     if (info.type === gl2.FLOAT_MAT4) locationSize = 4;
-    attributes[name2] = {
+    attributes[name] = {
       type: info.type,
-      location: gl2.getAttribLocation(program, name2),
+      location: gl2.getAttribLocation(program, name),
       locationSize
     };
   }
@@ -20004,9 +20004,9 @@ function WebGLPrograms(renderer, cubemaps, cubeuvmaps, extensions, capabilities,
       array.push(parameters.customFragmentShaderID);
     }
     if (parameters.defines !== void 0) {
-      for (const name2 in parameters.defines) {
-        array.push(name2);
-        array.push(parameters.defines[name2]);
+      for (const name in parameters.defines) {
+        array.push(name);
+        array.push(parameters.defines[name]);
       }
     }
     if (parameters.isRawShaderMaterial === false) {
@@ -25978,9 +25978,9 @@ class Line extends Object3D {
         this.morphTargetInfluences = [];
         this.morphTargetDictionary = {};
         for (let m2 = 0, ml2 = morphAttribute.length; m2 < ml2; m2++) {
-          const name2 = morphAttribute[m2].name || String(m2);
+          const name = morphAttribute[m2].name || String(m2);
           this.morphTargetInfluences.push(0);
-          this.morphTargetDictionary[name2] = m2;
+          this.morphTargetDictionary[name] = m2;
         }
       }
     }
@@ -26119,9 +26119,9 @@ class Points extends Object3D {
         this.morphTargetInfluences = [];
         this.morphTargetDictionary = {};
         for (let m2 = 0, ml2 = morphAttribute.length; m2 < ml2; m2++) {
-          const name2 = morphAttribute[m2].name || String(m2);
+          const name = morphAttribute[m2].name || String(m2);
           this.morphTargetInfluences.push(0);
-          this.morphTargetDictionary[name2] = m2;
+          this.morphTargetDictionary[name] = m2;
         }
       }
     }
@@ -27552,13 +27552,13 @@ class SortAlgorithm {
   setLog(element) {
     this.log = element;
   }
-  start(name2, columns) {
+  start(name, columns) {
     this.secondColumns = [];
-    this.send(name2 + " is processing");
-    this.sortFunction = this[name2];
+    this.send(name + " is processing");
+    this.sortFunction = this[name];
     this.timesEveryFrame = Math.ceil(columns.length / 25);
     this.isSorting = true;
-    this[name2 + "Setting"](columns);
+    this[name + "Setting"](columns);
   }
   update(columns) {
     if (!this.isSorting) return;
@@ -28065,7 +28065,7 @@ class ParticleSystem {
     this.i = 0;
     this.j = 0;
     this.maxValue = 865 * 0.4;
-    const length = 50;
+    const length = Math.floor((x2 - 200) / 4);
     const width = Math.max(Math.floor(x2 * 2 / length), 0.5);
     this.columns = new Array(length).fill().map((v2, i) => {
       return this.createColumn(x2 - width * length / 2 + width * i, y2 * 1.8, width, (i + 1) / length * this.maxValue);
@@ -28308,26 +28308,26 @@ const createPhysic = function() {
   this.render = () => {
     this.system.render(this.ctx);
   };
-  this.start = (e) => {
-    const ID = e.target.id;
+  this.start = (ID, path) => {
     if (!this.system.sort[ID]) {
       console.warn("invalid function name. Button id " + ID + " is not any of sortFunctions");
       return;
     }
+    this.setPath(path);
     this.system.sort.start(ID, this.system.columns);
   };
   this.cancel = () => {
     this.system.sort.isSorting = false;
-    this.system.sort.send(name + " is interrupted!");
   };
   this.stepByStep = () => {
     this.system.sort.isSorting = true;
     this.system.sort.isStoping = true;
-    this.system.sort.send(name + " is proceeding step by step. Click again!");
   };
-  this.setPath = (e) => {
-    const ID = e.target.id;
-    PathConfig[ID] = e.target.value;
+  this.setPath = (path) => {
+    PathConfig.leapLinear = path.leapLinear;
+    PathConfig.leapEasein = path.leapEasein;
+    PathConfig.leapEaseout = path.leapEaseout;
+    PathConfig.resetPath(-1, 0, 2);
   };
   return this;
 };
@@ -28349,35 +28349,54 @@ const CanvasSectionS3 = ({ ratio, min, uniqueID = "SortAlgorithm" }) => {
       manager.unregisterAnimationCallback("render" + uniqueID);
     };
   }, []);
+  const [path, setPath] = reactExports.useState({
+    "leapLinear": 0,
+    "leapEasein": -2,
+    "leapEaseout": 2
+  });
+  function handleChange(e) {
+    const ID = e.target.id;
+    const value = e.target.value;
+    setPath((path2) => {
+      return { ...path2, [ID]: value };
+    });
+  }
+  reactExports.useEffect(() => {
+    physic.setPath(path);
+  }, [path]);
+  function handleClick(e) {
+    const ID = e.target.id;
+    physic.start(ID, path);
+  }
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("section", { ref: section, className: "section", id: uniqueID, children: [
     /* @__PURE__ */ jsxRuntimeExports.jsx("canvas", { ref: canvas, width: min * ratio, height: ratio * min * ratio }),
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { ref: menu, className: "gamemenu", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsx("header", { id: "", children: /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { children: "粒子系統" }) }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { id: "pathConfig", className: "parameter", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx("label", { children: "linear :" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("input", { onChange: physic.setPath, type: "number", id: "leapLinear", defaultValue: "0" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("input", { onChange: handleChange, type: "number", id: "leapLinear", value: path.leapLinear }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("label", { children: "easein :" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("input", { onChange: physic.setPath, type: "number", id: "leapEasein", defaultValue: "-2" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("input", { onChange: handleChange, type: "number", id: "leapEasein", value: path.leapEasein }),
         ratio > 1 && /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx("label", { children: " " }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("label", { children: " " })
         ] }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("label", { children: "easeout :" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("input", { onChange: physic.setPath, type: "number", id: "leapEaseout", defaultValue: "2" })
+        /* @__PURE__ */ jsxRuntimeExports.jsx("input", { onChange: handleChange, type: "number", id: "leapEaseout", value: path.leapEaseout })
       ] }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "controlpanel", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx("label", { children: "★" }),
         /* @__PURE__ */ jsxRuntimeExports.jsx(RecordBtn, { canvas }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: physic.start, id: "bubbleSort", children: "泡沫排序" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: physic.start, id: "selectionSort", children: "選擇排序" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: physic.start, id: "insertionSort", children: "插入排序" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: physic.start, id: "quickSort", children: "快速排序" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: physic.start, id: "mergeSort", children: "合併排序" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: physic.start, id: "heapSort", children: "堆排序" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: physic.start, id: "shellSort", children: "希爾排序" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: physic.start, id: "countingSort", children: "計數排序" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: physic.start, id: "randomSort", children: "打亂" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: physic.start, id: "instantRandomSort", children: "立刻打亂" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: handleClick, id: "bubbleSort", children: "泡沫排序" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: handleClick, id: "selectionSort", children: "選擇排序" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: handleClick, id: "insertionSort", children: "插入排序" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: handleClick, id: "quickSort", children: "快速排序" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: handleClick, id: "mergeSort", children: "合併排序" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: handleClick, id: "heapSort", children: "堆排序" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: handleClick, id: "shellSort", children: "希爾排序" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: handleClick, id: "countingSort", children: "計數排序" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: handleClick, id: "randomSort", children: "打亂" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: handleClick, id: "instantRandomSort", children: "立刻打亂" }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: physic.cancel, id: "cancelSort", children: "取消" }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: physic.stepByStep, id: "stepByStep", children: "一步一步來" })
       ] }),
@@ -29018,20 +29037,20 @@ const isRegExp = kindOfTest("RegExp");
 const reduceDescriptors = (obj, reducer) => {
   const descriptors2 = Object.getOwnPropertyDescriptors(obj);
   const reducedDescriptors = {};
-  forEach(descriptors2, (descriptor, name2) => {
+  forEach(descriptors2, (descriptor, name) => {
     let ret;
-    if ((ret = reducer(descriptor, name2, obj)) !== false) {
-      reducedDescriptors[name2] = ret || descriptor;
+    if ((ret = reducer(descriptor, name, obj)) !== false) {
+      reducedDescriptors[name] = ret || descriptor;
     }
   });
   Object.defineProperties(obj, reducedDescriptors);
 };
 const freezeMethods = (obj) => {
-  reduceDescriptors(obj, (descriptor, name2) => {
-    if (isFunction(obj) && ["arguments", "caller", "callee"].indexOf(name2) !== -1) {
+  reduceDescriptors(obj, (descriptor, name) => {
+    if (isFunction(obj) && ["arguments", "caller", "callee"].indexOf(name) !== -1) {
       return false;
     }
-    const value = obj[name2];
+    const value = obj[name];
     if (!isFunction(value)) return;
     descriptor.enumerable = false;
     if ("writable" in descriptor) {
@@ -29040,7 +29059,7 @@ const freezeMethods = (obj) => {
     }
     if (!descriptor.set) {
       descriptor.set = () => {
-        throw Error("Can not rewrite read-only method '" + name2 + "'");
+        throw Error("Can not rewrite read-only method '" + name + "'");
       };
     }
   });
@@ -29383,8 +29402,8 @@ function AxiosURLSearchParams(params, options) {
   params && toFormData(params, this, options);
 }
 const prototype = AxiosURLSearchParams.prototype;
-prototype.append = function append(name2, value) {
-  this._pairs.push([name2, value]);
+prototype.append = function append(name, value) {
+  this._pairs.push([name, value]);
 };
 prototype.toString = function toString2(encoder) {
   const _encode = encoder ? function(value) {
@@ -29527,8 +29546,8 @@ function toURLEncodedForm(data, options) {
     }
   }, options));
 }
-function parsePropPath(name2) {
-  return utils$1.matchAll(/\w+|\[(\w*)]/g, name2).map((match) => {
+function parsePropPath(name) {
+  return utils$1.matchAll(/\w+|\[(\w*)]/g, name).map((match) => {
     return match[0] === "[]" ? "" : match[1] || match[0];
   });
 }
@@ -29546,32 +29565,32 @@ function arrayToObject(arr) {
 }
 function formDataToJSON(formData) {
   function buildPath(path, value, target, index) {
-    let name2 = path[index++];
-    if (name2 === "__proto__") return true;
-    const isNumericKey = Number.isFinite(+name2);
+    let name = path[index++];
+    if (name === "__proto__") return true;
+    const isNumericKey = Number.isFinite(+name);
     const isLast = index >= path.length;
-    name2 = !name2 && utils$1.isArray(target) ? target.length : name2;
+    name = !name && utils$1.isArray(target) ? target.length : name;
     if (isLast) {
-      if (utils$1.hasOwnProp(target, name2)) {
-        target[name2] = [target[name2], value];
+      if (utils$1.hasOwnProp(target, name)) {
+        target[name] = [target[name], value];
       } else {
-        target[name2] = value;
+        target[name] = value;
       }
       return !isNumericKey;
     }
-    if (!target[name2] || !utils$1.isObject(target[name2])) {
-      target[name2] = [];
+    if (!target[name] || !utils$1.isObject(target[name])) {
+      target[name] = [];
     }
-    const result = buildPath(path, value, target[name2], index);
-    if (result && utils$1.isArray(target[name2])) {
-      target[name2] = arrayToObject(target[name2]);
+    const result = buildPath(path, value, target[name], index);
+    if (result && utils$1.isArray(target[name])) {
+      target[name] = arrayToObject(target[name]);
     }
     return !isNumericKey;
   }
   if (utils$1.isFormData(formData) && utils$1.isFunction(formData.entries)) {
     const obj = {};
-    utils$1.forEachEntry(formData, (name2, value) => {
-      buildPath(parsePropPath(name2), value, obj, 0);
+    utils$1.forEachEntry(formData, (name, value) => {
+      buildPath(parsePropPath(name), value, obj, 0);
     });
     return obj;
   }
@@ -30123,20 +30142,20 @@ const isURLSameOrigin = platform.hasStandardBrowserEnv ? (
 const cookies = platform.hasStandardBrowserEnv ? (
   // Standard browser envs support document.cookie
   {
-    write(name2, value, expires, path, domain, secure) {
-      const cookie = [name2 + "=" + encodeURIComponent(value)];
+    write(name, value, expires, path, domain, secure) {
+      const cookie = [name + "=" + encodeURIComponent(value)];
       utils$1.isNumber(expires) && cookie.push("expires=" + new Date(expires).toGMTString());
       utils$1.isString(path) && cookie.push("path=" + path);
       utils$1.isString(domain) && cookie.push("domain=" + domain);
       secure === true && cookie.push("secure");
       document.cookie = cookie.join("; ");
     },
-    read(name2) {
-      const match = document.cookie.match(new RegExp("(^|;\\s*)(" + name2 + ")=([^;]*)"));
+    read(name) {
+      const match = document.cookie.match(new RegExp("(^|;\\s*)(" + name + ")=([^;]*)"));
       return match ? decodeURIComponent(match[3]) : null;
     },
-    remove(name2) {
-      this.write(name2, "", Date.now() - 864e5);
+    remove(name) {
+      this.write(name, "", Date.now() - 864e5);
     }
   }
 ) : (
@@ -36777,8 +36796,8 @@ function Table({ columns, rows }) {
       }) }, row.key);
     }) });
   }
-  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { width: "100%", overflow: "auto", margin: 0 }, children: [
-    /* @__PURE__ */ jsxRuntimeExports.jsxs("table", { className: "table", children: [
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { style: { width: "100%", maxHeight: "90%", overflow: "auto", margin: 0 }, children: /* @__PURE__ */ jsxRuntimeExports.jsxs("table", { className: "table", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsxs("thead", { className: "thead", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx(Title, {}),
         /* @__PURE__ */ jsxRuntimeExports.jsx("tr", { className: "tr", children: columns.map((column) => {
@@ -36797,7 +36816,7 @@ function Table({ columns, rows }) {
         /* @__PURE__ */ jsxRuntimeExports.jsx(SortBtn, {})
       ] }),
       /* @__PURE__ */ jsxRuntimeExports.jsx(TableBody, {})
-    ] }),
+    ] }) }),
     /* @__PURE__ */ jsxRuntimeExports.jsx(
       Pagination,
       {
@@ -36956,4 +36975,4 @@ function App() {
 const domNode = document.getElementById("root");
 const root = createRoot(domNode);
 root.render(/* @__PURE__ */ jsxRuntimeExports.jsx(App, {}));
-//# sourceMappingURL=index-CPpImMDr.js.map
+//# sourceMappingURL=index-qkUMBe2q.js.map
