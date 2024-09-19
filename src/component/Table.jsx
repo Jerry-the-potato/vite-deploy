@@ -1,7 +1,7 @@
 import {useState, useMemo} from "react";
 import _ from "lodash";
 const Pagination = ({ activePage, count, rowsPerPage, totalPages, setActivePage }) => {
-    const beginning = activePage === 1 ? 1 : rowsPerPage * (activePage - 1) + 1;
+    const beginning = rowsPerPage * (activePage - 1) + 1;
     const end = activePage === totalPages ? count : beginning + rowsPerPage - 1;
     const isDisabled = activePage === 1;
     const isLastDisabled = activePage === totalPages;
@@ -96,13 +96,12 @@ function Table({ columns, rows }){
             setFilters(prevFilters => ({
                 ...prevFilters,
                 [accessor]: value,
-              }))
+            }))
         } else {
             setFilters(prevFilters => {
-            const updatedFilters = { ...prevFilters }
-            delete updatedFilters[accessor]
-        
-            return updatedFilters
+                const updatedFilters = { ...prevFilters }
+                delete updatedFilters[accessor]
+                return updatedFilters
             })
         }
     }
@@ -111,12 +110,12 @@ function Table({ columns, rows }){
     const handleSort = accessor => {
         setActivePage(1)
         setSort(prevSort => ({
-          order: prevSort.order === 'desc' && prevSort.orderBy === accessor ? 'asc' : 'desc',
-          orderBy: accessor,
+            order: prevSort.order === 'desc' && prevSort.orderBy === accessor ? 'asc' : 'desc',
+            orderBy: accessor,
         }))
-      }
+    }
     
-    function Title(){
+    const Title = useMemo(() => {
         return (
             <tr className="tr">
                 {columns.map(column => {
@@ -128,8 +127,8 @@ function Table({ columns, rows }){
                 })}
             </tr>
         );
-    };
-    function SearchInput(){
+    }, [columns]);
+    const FilterInput = useMemo(() => {
         return (
             <tr className="tr">
                 {columns.map(column => {
@@ -148,8 +147,8 @@ function Table({ columns, rows }){
                 })}
             </tr>
         );
-    }
-    function SortBtn(){
+    }, [columns, filters]);
+    const SortBtn = useMemo(() => {
         return (
             <tr className="tr">
                 {columns.map(column => {
@@ -174,65 +173,39 @@ function Table({ columns, rows }){
                 })}
             </tr>
         );
-    }
-    function TableHead(){
+    }, [columns, sort]);
+    const Content = useMemo(() => {
         return (
-            <thead className="thead">
-                <Title></Title>
-                <SearchInput></SearchInput>
-                <SortBtn></SortBtn>
-            </thead>
-        );
-    };
-    function TableBody(){
-        return (
-            <tbody>
+            <>
                 {calculatedRows.map(row => {
                     return (
                     <tr className="tr" key={row.key}>
                         {columns.map(column =>{
-                            if (column.format) {
-                                return <td className="td" key={column.accessor}>{column.format(row[column.accessor])}</td>
-                            }
                             return (
                                 <td className="td" key={column.accessor}>
-                                   {row[column.accessor]}
+                                    {(column.format) ? column.format(row[column.accessor]) : row[column.accessor]}
                                 </td>
                             )
                         })}
                     </tr>
                     )
                 })}
-            </tbody>
-        );
-
-    }
+            </>
+        )
+    }, [columns, calculatedRows]);
     
     return (
         <>
-            <div style={{ width: '100%', maxHeight:'90%', overflow: 'auto', margin: 0 }}>
+            <div style={{ maxHeight:'90%', overflow: 'auto', margin: 0 }}>
                 <table className="table">
                     <thead className="thead">
-                        <Title></Title>
-                        <tr className="tr">
-                            {columns.map(column => {
-                                return (
-                                    <th className="th" key={`${column.accessor}-search`}>
-                                        <label><input
-                                            className="input"
-                                            key={`${column.accessor}-search`}
-                                            type="search"
-                                            placeholder={`搜尋${column.label}`}
-                                            value={filters[column.accessor] || ""}
-                                            onChange={event => handleSearch(event.target.value, column.accessor)}
-                                        /></label>
-                                    </th>
-                                )
-                            })}
-                        </tr>
-                        <SortBtn></SortBtn>
+                        {Title}
+                        {FilterInput}
+                        {SortBtn}
                     </thead>
-                    <TableBody></TableBody>
+                    <tbody>
+                        {Content}
+                    </tbody>
                 </table>
             </div>
             <Pagination

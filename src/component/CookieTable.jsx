@@ -14,6 +14,16 @@ function CookieTable(){
         { accessor: 'category', label: '類別' },
         { accessor: 'stock', label: '庫存' },
     ]
+    useEffect(() => {
+        axios.get('http://localhost:3000/cookie')
+            .then(response => {
+                const cookie = response.data.cookie;
+                setTableData(cookie);
+            })
+            .catch(error => {
+                console.error('Error gathering data:', error);
+            });
+    }, []);
     useEffect(()=>{
         const newTableData = tableData.concat([
             { id: 1, name: "potatochip 洋芋片", price: '50', onsale: true, tag: 'salty crispy delicious', rate: '⭐️⭐️⭐️⭐️', expiryDate: '2025-01-01', category: 'snack', stock: 100 },
@@ -41,12 +51,10 @@ function CookieTable(){
             { id: 23, name: "energybar 能量棒", price: '55', onsale: true, tag: 'filling healthy chewy', rate: '⭐️⭐️⭐️⭐️', expiryDate: '2025-03-20', category: 'snack', stock: 100 }
         ])
         
-        // const newRows = newTableData.map((data, index) => {
-        //     return { key: index, ...data }
-        //     return {url: data.url, id: index, price: data.price, name: data.name, onsale: data.onsale, tag: data.tag, rate: data.rate}
-        // })
-        // setTableData(newTableData);
-        // setRows(newRows);
+        const newRows = newTableData.map((data, index) => {
+            return { ...data, key: index }
+        })
+        setRows(newRows);
         
         // axios.post('http://localhost:3000/cookie/bulk', { cookies: newTableData })
         //     .then(response => {
@@ -55,22 +63,8 @@ function CookieTable(){
         //     .catch(error => {
         //         console.error('Error saving data:', error);
         //     });
-        axios.get('http://localhost:3000/cookie')
-            .then(response => {
-                const cookie = response.data.cookie;
-                const newRows = cookie.map((data, index) => {
-                    // return data; 需要ID作為Table取得key的手段
-                    return { key: index, ...data }
-                    return {url: data.url, id: index, price: data.price, name: data.name, onsale: data.onsale, tag: data.tag, rate: data.rate}
-                })
-                setTableData(cookie);
-                setRows(newRows);
-            })
-            .catch(error => {
-                console.error('Error gathering data:', error);
-            });
 
-    }, [])
+    }, [tableData]);
     return <section className="section" id="cookie">
             <Table columns={columns} rows={rows}/>
         </section>
