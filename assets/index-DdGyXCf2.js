@@ -28257,6 +28257,13 @@ class ParticleSystem {
   render(ctx) {
     ctx.fillStyle = "black";
     ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+    this.walls.forEach((wall) => {
+      ctx.beginPath();
+      ctx.arc(wall.x, wall.y, wall.length, wall.startAngle, wall.endAngle, false);
+      ctx.strokeStyle = "rgba(40, 60, 80, 1)";
+      ctx.lineWidth = wall.thick * 2;
+      ctx.stroke();
+    });
     function mix(x2, from, to) {
       return from + x2 * (to - from);
     }
@@ -28280,6 +28287,12 @@ class ParticleSystem {
       this.sort.secondColumns.forEach((column) => {
         drawColumn(column);
       });
+    this.balls.forEach((ball) => {
+      ctx.beginPath();
+      ctx.arc(ball.x, ball.y, ball.r, 0, 2 * Math.PI, false);
+      ctx.fillStyle = "#FFFFFF";
+      ctx.fill();
+    });
     Object.keys(this.texts).forEach((key) => {
       const text = this.texts[key];
       ctx.beginPath();
@@ -36975,4 +36988,4 @@ function App() {
 const domNode = document.getElementById("root");
 const root = createRoot(domNode);
 root.render(/* @__PURE__ */ jsxRuntimeExports.jsx(App, {}));
-//# sourceMappingURL=index-qkUMBe2q.js.map
+//# sourceMappingURL=index-DdGyXCf2.js.map
