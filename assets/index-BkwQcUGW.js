@@ -7540,21 +7540,14 @@ const lokaVolterra = new createLokaVolterra();
 const managerMaker = function() {
   this.subject = [];
   this.globalKey = "dev";
-  this.lastId = "";
   this.lastRequestName = [];
   this.request = {};
   this.getRequestById = (id2) => {
     if (typeof isSomethingHappended !== "undefined") return null;
-    const req = [];
-    for (let key in this.request) {
-      if (key.includes(id2) || key.includes(this.globalKey)) req.push(key);
-    }
+    const req = Object.keys(this.request).filter((key) => key.includes(id2) || key.includes(this.globalKey));
     return req;
   };
-  this.cancelRequestAnimation = () => {
-  };
   this.updateRequestAnimation = (id2) => {
-    this.lastId = id2;
     this.lastRequestName.forEach((name) => {
       if (!this.request[name]) return;
       cancelAnimationFrame(this.request[name].ID);
@@ -7569,34 +7562,23 @@ const managerMaker = function() {
       this.request[name].ID = requestAnimationFrame(this.request[name].method);
     });
   };
-  this.pauseAnimationByName = (name) => {
-    cancelAnimationFrame(this.request[name].ID);
-    this.request[name].isPause = true;
-  };
-  this.resumeAnimationByName = (name) => {
-    this.request[name].isPause = false;
-    cancelAnimationFrame(this.request[name].ID);
-    this.request[name].ID = requestAnimationFrame(this.request[name].method);
-  };
-  this.addAnimationCallback = (callback) => {
-    const string = callback.name || "#" + Math.random();
-    const name = string.match(" ") ? string.split(" ")[1] : string;
-    this.request[name] = this.request[name] || {};
-    this.request[name].method = (function animate() {
+  this.createAnimation = (name, callback) => {
+    const animate = () => {
       callback();
-      this.request[name].ID = requestAnimationFrame(animate.bind(this));
-    }).bind(this);
+      this.request[name].ID = requestAnimationFrame(animate);
+    };
+    this.request[name] = {
+      method: animate,
+      isPause: false
+    };
+  };
+  this.nameValidation = (name) => {
     const isValid = Object.keys(this.subject).some((ID) => name.includes(ID));
     if (!isValid) console.warn("naming issue: " + name + " should include one of following letters: " + this.subject);
   };
   this.registerAnimationCallback = (name, callback) => {
-    this.request[name] = this.request[name] || {};
-    this.request[name].method = (function animate() {
-      callback();
-      this.request[name].ID = requestAnimationFrame(animate.bind(this));
-    }).bind(this);
-    const isValid = Object.keys(this.subject).some((ID) => name.includes(ID));
-    if (!isValid) console.warn("naming issue: " + name + " should include one of following letters: " + this.subject);
+    this.createAnimation(name, callback);
+    this.nameValidation(name);
   };
   this.unregisterAnimationCallback = (name) => {
     cancelAnimationFrame(this.request[name].ID);
@@ -7610,14 +7592,33 @@ const managerMaker = function() {
     });
   });
   this.addSubjectElement = (element) => {
+    if (!element.id) return console.warn("Element must have an ID");
     this.subject[element.id] = element;
     this.io.unobserve(element);
     this.io.observe(element);
   };
   this.removeSubjectID = (id2) => {
+    if (!this.subject[id2]) return console.warn("Element ID not found");
     const element = this.subject[id2];
     this.io.unobserve(element);
     delete this.subject[id2];
+  };
+  this.publicPauseAnimation = (name) => {
+    if (!this.request[name]) return;
+    cancelAnimationFrame(this.request[name].ID);
+    this.request[name].isPause = true;
+  };
+  this.publicResumeAnimation = (name) => {
+    if (!this.request[name]) return;
+    this.request[name].isPause = false;
+    cancelAnimationFrame(this.request[name].ID);
+    this.request[name].ID = requestAnimationFrame(this.request[name].method);
+  };
+  this.publicListAllAnimations = () => {
+    return Object.keys(this.request);
+  };
+  this.publicListLastAnimations = () => {
+    return this.lastRequestName;
   };
   return this;
 };
@@ -7675,7 +7676,7 @@ function RecordBtn({ canvas, audio }) {
   }
   return /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: handleClick, children: isRecording ? "停止錄影" : "開始錄影" });
 }
-const CanvasSectionS1 = ({ ratio, min, uniqueID = "LokaVolterra" }) => {
+const CanvasSectionS1 = ({ ratio, min, sectinoID = "LokaVolterra" }) => {
   const canvas = reactExports.useRef(null);
   const bitmap = reactExports.useRef(null);
   const section = reactExports.useRef(null);
@@ -7683,14 +7684,14 @@ const CanvasSectionS1 = ({ ratio, min, uniqueID = "LokaVolterra" }) => {
     window.addEventListener("resize", lokaVolterra.resize, false);
     lokaVolterra.setCanvas(canvas.current, bitmap.current);
     manager.addSubjectElement(section.current);
-    manager.registerAnimationCallback("update" + uniqueID, lokaVolterra.update);
-    manager.registerAnimationCallback("render" + uniqueID, lokaVolterra.render);
+    manager.registerAnimationCallback("update" + sectinoID, lokaVolterra.update);
+    manager.registerAnimationCallback("render" + sectinoID, lokaVolterra.render);
     return () => {
       window.removeEventListener("resize", lokaVolterra.resize);
       lokaVolterra.cleanup();
-      manager.removeSubjectID(uniqueID);
-      manager.unregisterAnimationCallback("update" + uniqueID);
-      manager.unregisterAnimationCallback("render" + uniqueID);
+      manager.removeSubjectID(sectinoID);
+      manager.unregisterAnimationCallback("update" + sectinoID);
+      manager.unregisterAnimationCallback("render" + sectinoID);
     };
   }, []);
   const menu = reactExports.useRef(null);
@@ -7724,16 +7725,19 @@ const CanvasSectionS1 = ({ ratio, min, uniqueID = "LokaVolterra" }) => {
   const [isMain, setIsMain] = reactExports.useState(true);
   const [isWorker, setIsWorker] = reactExports.useState(true);
   function handlePauseMain() {
-    const name = (!isMain ? "resume" : "pause") + "AnimationByName";
-    manager[name]("render" + uniqueID);
-    manager[name]("update" + uniqueID);
+    const methodMap = {
+      true: (name) => manager.publicPauseAnimation(name),
+      false: (name) => manager.publicResumeAnimation(name)
+    };
+    methodMap[isMain]("render" + sectinoID);
+    methodMap[isMain]("update" + sectinoID);
     setIsMain(!isMain);
   }
   function handlePauseWorker() {
     lokaVolterra["pauseWorker"](!isWorker);
     setIsWorker(!isWorker);
   }
-  return /* @__PURE__ */ jsxRuntimeExports.jsxs("section", { ref: section, className: "section", id: uniqueID, children: [
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs("section", { ref: section, className: "section", id: sectinoID, children: [
     /* @__PURE__ */ jsxRuntimeExports.jsx("canvas", { value: Math.random(), ref: canvas, width: min * ratio, height: ratio * min * ratio }),
     /* @__PURE__ */ jsxRuntimeExports.jsx("canvas", { ref: bitmap, width: min * ratio, height: ratio * min * ratio }),
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { ref: menu, className: "gamemenu", children: [
@@ -27512,7 +27516,7 @@ const createMusicAnalyser = function() {
   return this;
 };
 const musicAnalyser = new createMusicAnalyser();
-const CanvasSectionS2 = ({ ratio, min, uniqueID = "MusicAnalyser" }) => {
+const CanvasSectionS2 = ({ ratio, min, sectinoID = "MusicAnalyser" }) => {
   const canvas = reactExports.useRef(null);
   const audio = reactExports.useRef(null);
   const menu = reactExports.useRef(null);
@@ -27521,17 +27525,17 @@ const CanvasSectionS2 = ({ ratio, min, uniqueID = "MusicAnalyser" }) => {
     window.addEventListener("resize", musicAnalyser.resize, false);
     musicAnalyser.setCanvas(canvas.current);
     manager.addSubjectElement(section.current);
-    manager.registerAnimationCallback("update" + uniqueID, musicAnalyser.update);
-    manager.registerAnimationCallback("render" + uniqueID, musicAnalyser.render);
+    manager.registerAnimationCallback("update" + sectinoID, musicAnalyser.update);
+    manager.registerAnimationCallback("render" + sectinoID, musicAnalyser.render);
     return () => {
       window.removeEventListener("resize", musicAnalyser.resize);
       musicAnalyser.cleanup();
-      manager.removeSubjectID(uniqueID);
-      manager.unregisterAnimationCallback("update" + uniqueID);
-      manager.unregisterAnimationCallback("render" + uniqueID);
+      manager.removeSubjectID(sectinoID);
+      manager.unregisterAnimationCallback("update" + sectinoID);
+      manager.unregisterAnimationCallback("render" + sectinoID);
     };
   }, []);
-  return /* @__PURE__ */ jsxRuntimeExports.jsxs("section", { ref: section, className: "section", id: uniqueID, children: [
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs("section", { ref: section, className: "section", id: sectinoID, children: [
     /* @__PURE__ */ jsxRuntimeExports.jsx("canvas", { ref: canvas, width: min * ratio, height: ratio * min * ratio }),
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { ref: menu, className: "gamemenu", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsx("header", { id: "header", children: /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { children: "MusicAnalyser" }) }),
@@ -28345,7 +28349,7 @@ const createPhysic = function() {
   return this;
 };
 const physic = new createPhysic();
-const CanvasSectionS3 = ({ ratio, min, uniqueID = "SortAlgorithm" }) => {
+const CanvasSectionS3 = ({ ratio, min, sectinoID = "SortAlgorithm" }) => {
   const canvas = reactExports.useRef(null);
   const menu = reactExports.useRef(null);
   const log = reactExports.useRef(null);
@@ -28353,13 +28357,13 @@ const CanvasSectionS3 = ({ ratio, min, uniqueID = "SortAlgorithm" }) => {
   reactExports.useEffect(() => {
     physic.setCanvas(canvas.current, log.current);
     manager.addSubjectElement(section.current);
-    manager.registerAnimationCallback("update" + uniqueID, physic.update);
-    manager.registerAnimationCallback("render" + uniqueID, physic.render);
+    manager.registerAnimationCallback("update" + sectinoID, physic.update);
+    manager.registerAnimationCallback("render" + sectinoID, physic.render);
     return () => {
       physic.cleanup();
-      manager.removeSubjectID(uniqueID);
-      manager.unregisterAnimationCallback("update" + uniqueID);
-      manager.unregisterAnimationCallback("render" + uniqueID);
+      manager.removeSubjectID(sectinoID);
+      manager.unregisterAnimationCallback("update" + sectinoID);
+      manager.unregisterAnimationCallback("render" + sectinoID);
     };
   }, []);
   const [path, setPath] = reactExports.useState({
@@ -28381,7 +28385,7 @@ const CanvasSectionS3 = ({ ratio, min, uniqueID = "SortAlgorithm" }) => {
     const ID = e.target.id;
     physic.start(ID, path);
   }
-  return /* @__PURE__ */ jsxRuntimeExports.jsxs("section", { ref: section, className: "section", id: uniqueID, children: [
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs("section", { ref: section, className: "section", id: sectinoID, children: [
     /* @__PURE__ */ jsxRuntimeExports.jsx("canvas", { ref: canvas, width: min * ratio, height: ratio * min * ratio }),
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { ref: menu, className: "gamemenu", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsx("header", { id: "", children: /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { children: "粒子系統" }) }),
@@ -28648,18 +28652,18 @@ const MESSAGE_MOUSE_READY = "滑鼠可以操作畫面：";
 const MESSAGE_MOUSE_LOCKED = "滑鼠已鎖定！點擊上方按鈕以解鎖";
 const MESSAGE_DRAGGING = "開始拖曳移動畫面";
 const MESSAGE_ZOOMING = "滾輪放大縮小";
-const CanvasSectionS4 = ({ ratio, min, uniqueID = "JuliaSet" }) => {
+const CanvasSectionS4 = ({ ratio, min, sectinoID = "JuliaSet" }) => {
   const canvas = reactExports.useRef(null);
   const section = reactExports.useRef(null);
   reactExports.useEffect(() => {
     manager.addSubjectElement(section.current);
-    manager.registerAnimationCallback("update" + uniqueID, myGLSL.update);
-    manager.registerAnimationCallback("render" + uniqueID, myGLSL.render);
+    manager.registerAnimationCallback("update" + sectinoID, myGLSL.update);
+    manager.registerAnimationCallback("render" + sectinoID, myGLSL.render);
     myGLSL.setCanvas(canvas.current);
     return () => {
       myGLSL.dispose();
-      manager.unregisterAnimationCallback("update" + uniqueID);
-      manager.unregisterAnimationCallback("render" + uniqueID);
+      manager.unregisterAnimationCallback("update" + sectinoID);
+      manager.unregisterAnimationCallback("render" + sectinoID);
     };
   }, []);
   const [isJulia, setIsJulia] = reactExports.useState(true);
@@ -28784,7 +28788,7 @@ const CanvasSectionS4 = ({ ratio, min, uniqueID = "JuliaSet" }) => {
     {
       ref: section,
       className: "section",
-      id: uniqueID,
+      id: sectinoID,
       onMouseMove: handleMouseMove,
       onWheel: handleWheel,
       onMouseUp: handleMouseUp,
@@ -36990,4 +36994,4 @@ function App() {
 const domNode = document.getElementById("root");
 const root = createRoot(domNode);
 root.render(/* @__PURE__ */ jsxRuntimeExports.jsx(App, {}));
-//# sourceMappingURL=index-BKXDXAAL.js.map
+//# sourceMappingURL=index-BkwQcUGW.js.map
