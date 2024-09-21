@@ -10,19 +10,19 @@ const MESSAGE_MOUSE_LOCKED = "滑鼠已鎖定！點擊上方按鈕以解鎖";
 const MESSAGE_DRAGGING = "開始拖曳移動畫面";
 const MESSAGE_ZOOMING = "滾輪放大縮小"
 
-const CanvasSectionS4 = ({ ratio, min, uniqueID = "JuliaSet"}) => {
+const CanvasSectionS4 = ({ ratio, min, sectinoID = "JuliaSet"}) => {
     const canvas = useRef(null);
     const section = useRef(null);
     useEffect(()=>{
         manager.addSubjectElement(section.current);
-        manager.registerAnimationCallback("update" + uniqueID, myGLSL.update);
-        manager.registerAnimationCallback("render" + uniqueID, myGLSL.render);
+        manager.registerAnimationCallback("update" + sectinoID, myGLSL.update);
+        manager.registerAnimationCallback("render" + sectinoID, myGLSL.render);
         myGLSL.setCanvas(canvas.current);
         // myGLSL.update();
         return () => {
             myGLSL.dispose();
-            manager.unregisterAnimationCallback("update" + uniqueID);
-            manager.unregisterAnimationCallback("render" + uniqueID);
+            manager.unregisterAnimationCallback("update" + sectinoID);
+            manager.unregisterAnimationCallback("render" + sectinoID);
         };
     }, []);
     const [isJulia, setIsJulia] = useState(true);
@@ -171,7 +171,7 @@ const CanvasSectionS4 = ({ ratio, min, uniqueID = "JuliaSet"}) => {
         return Math.floor(offset * step) / step;
     }
     return (
-        <section ref={section} className="section" id={uniqueID}
+        <section ref={section} className="section" id={sectinoID}
             onMouseMove={handleMouseMove} onWheel={handleWheel}
             onMouseUp={handleMouseUp} onMouseDown={handleMouseDown}
             onTouchStart={handleTouchStart}

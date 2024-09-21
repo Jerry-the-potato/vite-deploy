@@ -3,7 +3,7 @@ import lokaVolterra from '../js/lokaVolterra.js'
 import manager from "../js/animateManager.js";
 import SlideMenuBtn from "./SlideMenuBtn";
 import RecordBtn from "./RecordBtn.jsx";
-const CanvasSectionS1 = ({ratio, min, uniqueID = "LokaVolterra"}) => {
+const CanvasSectionS1 = ({ratio, min, sectinoID = "LokaVolterra"}) => {
     const canvas = useRef(null);
     const bitmap = useRef(null);
     const section = useRef(null);
@@ -11,14 +11,14 @@ const CanvasSectionS1 = ({ratio, min, uniqueID = "LokaVolterra"}) => {
 		window.addEventListener("resize", lokaVolterra.resize, false);
         lokaVolterra.setCanvas(canvas.current, bitmap.current);
         manager.addSubjectElement(section.current);
-        manager.registerAnimationCallback("update" + uniqueID, lokaVolterra.update);
-        manager.registerAnimationCallback("render" + uniqueID, lokaVolterra.render);
+        manager.registerAnimationCallback("update" + sectinoID, lokaVolterra.update);
+        manager.registerAnimationCallback("render" + sectinoID, lokaVolterra.render);
         return () => {
             window.removeEventListener("resize", lokaVolterra.resize);
             lokaVolterra.cleanup();
-            manager.removeSubjectID(uniqueID);
-            manager.unregisterAnimationCallback("update" + uniqueID);
-            manager.unregisterAnimationCallback("render" + uniqueID);
+            manager.removeSubjectID(sectinoID);
+            manager.unregisterAnimationCallback("update" + sectinoID);
+            manager.unregisterAnimationCallback("render" + sectinoID);
         }
     }, []);
 
@@ -53,9 +53,12 @@ const CanvasSectionS1 = ({ratio, min, uniqueID = "LokaVolterra"}) => {
     const [isMain, setIsMain] = useState(true);
     const [isWorker, setIsWorker] = useState(true);
     function handlePauseMain(){
-        const name = (!isMain ? "resume" : "pause") + "AnimationByName";
-        manager[name]("render" + uniqueID);
-        manager[name]("update" + uniqueID);
+        const methodMap = {
+            true: (name) => manager.publicPauseAnimation(name),
+            false: (name) => manager.publicResumeAnimation(name),
+        };
+        methodMap[isMain]("render" + sectinoID);
+        methodMap[isMain]("update" + sectinoID);
         setIsMain(!isMain);
     }
     function handlePauseWorker(){
@@ -63,7 +66,7 @@ const CanvasSectionS1 = ({ratio, min, uniqueID = "LokaVolterra"}) => {
         setIsWorker(!isWorker);
     }
     return (
-        <section ref={section} className="section" id={uniqueID}>
+        <section ref={section} className="section" id={sectinoID}>
             <canvas value={Math.random()} ref={canvas} width={min * ratio} height={ratio * min * ratio}></canvas>
             <canvas ref={bitmap} width={min * ratio} height={ratio * min * ratio}></canvas>
             <div ref={menu} className="gamemenu">

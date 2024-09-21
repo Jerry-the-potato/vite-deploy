@@ -216,25 +216,25 @@ const handleSort = accessor => {
 ### 內容
 最後的收尾，讓我們把內容完成吧！昨天我們經過搜尋、排序、分頁一系列操作後，得到了 calculatedRows，用來它渲染：
 ```jsx
-    const Content = useMemo(() => {
-        return (
-            <>
-                {calculatedRows.map(row => {
-                    return (
-                        <tr className="tr" key={row.key}>
-                            {columns.map(column =>{
-                                return (
-                                    <td className="td" key={column.accessor}>
-                                        {(column.format) ? column.format(row[column.accessor]) : row[column.accessor]}
-                                    </td>
-                                )
-                            })}
-                        </tr>
-                    )
-                })}
-            </>
-        )
-    }, [columns, calculatedRows]);
+const Content = useMemo(() => {
+    return (
+        <>
+            {calculatedRows.map(row => {
+                return (
+                    <tr className="tr" key={row.key}>
+                        {columns.map(column =>{
+                            return (
+                                <td className="td" key={column.accessor}>
+                                    {(column.format) ? column.format(row[column.accessor]) : row[column.accessor]}
+                                </td>
+                            )
+                        })}
+                    </tr>
+                )
+            })}
+        </>
+    )
+}, [columns, calculatedRows]);
 ```
 * 伏筆回收！只要在 column 對應的欄位設置 format，就可以用來格式化資料，以符號或其他形式輸出，避免列出 true、false 等使用者看不懂的字眼囉！
 
@@ -243,42 +243,48 @@ const handleSort = accessor => {
 恭喜大家撐過以上嵌套地獄，輕鬆的要來啦！Vue 完全可以直接寫在 v-for 模板裡：
 ```vue
 <template>
-    <table class="table">
-        <thead>
-            <tr>
-                <th v-for="column in columns" :key="column.accessor">{{ column.label }}</th>
-            </tr>
-            <tr>
-                <th v-for="column in columns" :key="column.accessor">
-                    <label><input
-                        class="input"
-                        :key="'${column.accessor}-search'"
-                        type="search"
-                        :placeholder="`搜尋${column.label}`"
-                        :value="filters[column.accessor] || ''"
-                        @input="handleSearch($event.target.value, column.accessor)"
-                    /></label>
-                </th>
-            </tr>
-            <tr>
-                <th v-for="column in columns" :key="column.accessor">
-                    <button @click="handleSort(column.accessor)">{{ (column.accessor === sort.orderBy) ? ((sort.order === 'asc') ? '升序🟢': '降序🔴') : '️排序⚪'}}</button>
-                </th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr v-for="row in calculatedRows" :key="row.id">
-                <td v-for="column in columns" :key="column">{{ (column.format) ? column.format(row[column.accessor]) : row[column.accessor] }}</td>
-            </tr>
-        </tbody>
-    </table>
+    <div style="overflow: auto; margin: 0">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th v-for="column in columns" :key="column.accessor">{{ column.label }}</th>
+                </tr>
+                <tr>
+                    <th v-for="column in columns" :key="column.accessor">
+                        <label><input
+                            class="input"
+                            :key="'${column.accessor}-search'"
+                            type="search"
+                            :placeholder="`搜尋${column.label}`"
+                            :value="filters[column.accessor] || ''"
+                            @input="handleSearch($event.target.value, column.accessor)"
+                        /></label>
+                    </th>
+                </tr>
+                <tr>
+                    <th v-for="column in columns" :key="column.accessor">
+                        <button @click="handleSort(column.accessor)">{{ (column.accessor === sort.orderBy) ? ((sort.order === 'asc') ? '升序🟢': '降序🔴') : '️排序⚪'}}</button>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr v-for="row in calculatedRows" :key="row.id">
+                    <td v-for="column in columns" :key="column">{{ (column.format) ? column.format(row[column.accessor]) : row[column.accessor] }}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
 </template>
 ```
-
 很短吧！而且可讀性還蠻高的，接下來的邏輯和 React 完全一致，結合昨天的內容，這樣讓狀態管理就輕鬆解決拉！
 
 ### 總結
 
 恭喜大家！透過本文學習了在 React 和 Vue 中實現一個完整的表格元件，並且具備排序、搜尋和分頁的功能，實作過程中也經歷了許多的挑戰，但最終獲得了成果。
+
+如果感興趣，可以參考 Github 上的原始碼：
+[Table.jsx](https://github.com/Jerry-the-potato/vite-deploy/blob/main/src/component/Table.jsx)
+[Table.vue](https://github.com/Jerry-the-potato/vite-vue/blob/main/src/components/Table.vue)
+[Pagination.vue](https://github.com/Jerry-the-potato/vite-vue/blob/main/src/components/Pagination.vue)
 
 若對本文有興趣或有疑問，歡迎隨時提問喔！

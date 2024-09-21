@@ -4,7 +4,7 @@ import manager from '../js/animateManager';
 import SlideMenuBtn from "./SlideMenuBtn";
 import RecordBtn from "./RecordBtn";
 
-const CanvasSectionS3 = ({ ratio, min, uniqueID = "SortAlgorithm"}) => {
+const CanvasSectionS3 = ({ ratio, min, sectinoID = "SortAlgorithm"}) => {
     const canvas = useRef(null);
     const menu = useRef(null);
     const log = useRef(null);
@@ -12,13 +12,13 @@ const CanvasSectionS3 = ({ ratio, min, uniqueID = "SortAlgorithm"}) => {
     useEffect(()=>{
         physic.setCanvas(canvas.current, log.current);
         manager.addSubjectElement(section.current);
-        manager.registerAnimationCallback("update" + uniqueID, physic.update);
-        manager.registerAnimationCallback("render" + uniqueID, physic.render);
+        manager.registerAnimationCallback("update" + sectinoID, physic.update);
+        manager.registerAnimationCallback("render" + sectinoID, physic.render);
         return () => {
             physic.cleanup();
-            manager.removeSubjectID(uniqueID);
-            manager.unregisterAnimationCallback("update" + uniqueID);
-            manager.unregisterAnimationCallback("render" + uniqueID);
+            manager.removeSubjectID(sectinoID);
+            manager.unregisterAnimationCallback("update" + sectinoID);
+            manager.unregisterAnimationCallback("render" + sectinoID);
         }
     }, []);
     const [path, setPath] = useState({
@@ -39,7 +39,7 @@ const CanvasSectionS3 = ({ ratio, min, uniqueID = "SortAlgorithm"}) => {
         physic.start(ID, path)
     }
     return (
-        <section ref={section} className="section" id={uniqueID}>
+        <section ref={section} className="section" id={sectinoID}>
             <canvas ref={canvas} width={min * ratio} height={ratio * min * ratio}></canvas>
             <div ref={menu} className="gamemenu">
                 <header id=""><h3>粒子系統</h3></header>

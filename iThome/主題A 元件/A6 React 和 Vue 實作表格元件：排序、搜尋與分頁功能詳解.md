@@ -206,8 +206,9 @@ const setActivePage = (page) => {
 ```
 
 ### 結語
-表格元件真的是大工程哪！相較之下，我會推薦用 Vue，因為他有強大的 v-for 模板可以用，下一篇我們就會看出差異囉！
+表格元件真的是大工程哪！相較之下，我會推薦用 Vue，因為他有強大的 v-for 指令可以用，下一篇我們就會看出差異囉！
 
 如果感興趣，可以參考 Github 上的原始碼：
 [Table.jsx](https://github.com/Jerry-the-potato/vite-deploy/blob/main/src/component/Table.jsx)
 [Table.vue](https://github.com/Jerry-the-potato/vite-vue/blob/main/src/components/Table.vue)
+[Pagination.vue](https://github.com/Jerry-the-potato/vite-vue/blob/main/src/components/Pagination.vue)

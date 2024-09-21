@@ -1,34 +1,19 @@
 const managerMaker = function(){
     this.subject = [];
     this.globalKey = "dev";
-    this.lastId = "";
     this.lastRequestName = [];
     this.request = {};
-    // 過度包裝反而不好用，而且命名後難以追蹤、註銷動畫
-    // this.setupAnimation = (subjectElement, callbacks) => {
-    //     this.addSubjectElement(subjectElement);
-    //     const ID = subjectElement.id;
-    //     callbacks.forEach((callback) => {
-    //         const name = callback.name || "#" + Object.keys(this.request).length;
-    //         this.registerAnimationCallback(ID + "_" + name, callback);
-    //     });
-    // }
+
+    // 根據 ID 取得請求
     this.getRequestById = (id) => {
         if(typeof isSomethingHappended !== "undefined") return null;
         // some magic here and BOOM!!
         // ... may be more conplicated
-        const req = [];
-        for(let key in this.request){
-            if(key.includes(id) || key.includes(this.globalKey)) req.push(key);
-        }
+        const req = Object.keys(this.request).filter(key => key.includes(id) || key.includes(this.globalKey));
         return req;
-    }
-    this.cancelRequestAnimation = () => {
-        
     }
     this.updateRequestAnimation = (id) => {
         // 停止舊的動畫
-        this.lastId = id;
         this.lastRequestName.forEach(name => {
             if(!this.request[name]) return;
             cancelAnimationFrame(this.request[name].ID);
@@ -45,35 +30,27 @@ const managerMaker = function(){
             this.request[name].ID = requestAnimationFrame(this.request[name].method);
         })
     }
-    this.pauseAnimationByName = (name) => {
-        cancelAnimationFrame(this.request[name].ID);
-        this.request[name].isPause = true;
-    }
-    this.resumeAnimationByName = (name) => {
-        this.request[name].isPause = false;
-        cancelAnimationFrame(this.request[name].ID);
-        this.request[name].ID = requestAnimationFrame(this.request[name].method);
-    }
-    this.addAnimationCallback = (callback) => {
-        const string = callback.name || "#" + Math.random();
-        // 有空白判定為 bound name，只取後面的函式名稱
-        const name = string.match(" ") ? string.split(" ")[1] : string;
-        this.request[name] = this.request[name] || {};
-        this.request[name].method = function animate(){
+
+    // 建立動畫
+    this.createAnimation = (name, callback) => {
+        const animate = () => {
             callback();
-            this.request[name].ID = requestAnimationFrame(animate.bind(this));
-        }.bind(this)
+            this.request[name].ID = requestAnimationFrame(animate);
+        };
+        this.request[name] = {
+            method: animate,
+            isPause: false,
+        };
+    }
+    // 驗證名稱是否有效
+    this.nameValidation = (name) => {
         const isValid = Object.keys(this.subject).some(ID => name.includes(ID));
         if(!isValid) console.warn("naming issue: " + name + " should include one of following letters: " + this.subject);
     }
+    // 註冊動畫回調
     this.registerAnimationCallback = (name, callback) => {
-        this.request[name] = this.request[name] || {};
-        this.request[name].method = function animate(){
-            callback();
-            this.request[name].ID = requestAnimationFrame(animate.bind(this));
-        }.bind(this)
-        const isValid = Object.keys(this.subject).some(ID => name.includes(ID));
-        if(!isValid) console.warn("naming issue: " + name + " should include one of following letters: " + this.subject);
+        this.createAnimation(name, callback);
+        this.nameValidation(name);
     }
     this.unregisterAnimationCallback = (name) => {
         cancelAnimationFrame(this.request[name].ID);
@@ -89,20 +66,37 @@ const managerMaker = function(){
         });
     });
     this.addSubjectElement = (element) => {
-        // elements.forEach((el) => {
-        //     this.validId.push(el.id);
-        //     this.io.unobserve(el)
-        //     this.io.observe(el);
-        // });
+        if (!element.id) return console.warn("Element must have an ID");
         this.subject[element.id] = element;
         this.io.unobserve(element) // avoid observing one element mutiple time
         this.io.observe(element);
     }
     this.removeSubjectID = (id) => {
+        if (!this.subject[id]) return console.warn("Element ID not found");
         const element = this.subject[id];
         this.io.unobserve(element);
         delete this.subject[id];
     }
+    
+    // 暫停動畫(外部方法)
+    this.publicPauseAnimation = (name) => {
+        if(!this.request[name]) return;
+        cancelAnimationFrame(this.request[name].ID);
+        this.request[name].isPause = true;
+    }
+    // 恢復動畫(外部方法)
+    this.publicResumeAnimation = (name) => {
+        if(!this.request[name]) return;
+        this.request[name].isPause = false;
+        cancelAnimationFrame(this.request[name].ID);
+        this.request[name].ID = requestAnimationFrame(this.request[name].method);
+    }
+    this.publicListAllAnimations = () => {
+        return Object.keys(this.request);
+    };
+    this.publicListLastAnimations = () => {
+        return this.lastRequestName;
+    };
     return this;
 }
 const manager = new managerMaker();
