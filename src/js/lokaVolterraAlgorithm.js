@@ -17,10 +17,14 @@ export default function lokaVolterraAlgorithm(){
 	this.speed = 10;
     this.useMouse = false;
 	this.isTransform = false;
+	this.isGravity = true;
+
+	this.motionType = "default";
 
     this.updateData = (data) => {
         this.useMouse = data.useMouse;
         this.isTransform = data.isTransform;
+        this.isGravity = data.isGravity;
         this.alpha = data.alpha;
         this.beta = data.beta;
         this.gamma = data.gamma;
@@ -81,9 +85,28 @@ export default function lokaVolterraAlgorithm(){
 			const angular2 = d * period2 * 0.1;
 
 			point.r+= Math.PI / 100;
-
-			const newX = width / 2 + d * Math.cos(point.r + angular1);
-			const newY = height / 2 + d * Math.sin(point.r + angular2);
+			
+			let newX;
+			let newY;
+			switch(this.motionType){
+				case "plate":
+					newX = width / 2 + d * Math.cos(point.r + period1);
+        			newY = height / 2 + d * Math.sin(point.r + period2);
+				break;
+				case "hourglass":
+					newX = width / 2 + d * Math.cos(point.r + period1) * Math.sin(point.r + period1);
+        			newY = height / 2 + d * Math.sin(point.r + period1);
+				break;
+				case "cookie":
+					newX = width / 2 + d * Math.cos(point.r + period1) * Math.sin(point.r + period1);
+        			newY = height / 2 + d * Math.sin(point.r + period2);
+				break;
+				case "taro":
+				default:
+					newX = width / 2 + d * Math.cos(point.r + angular1);
+					newY = height / 2 + d * Math.sin(point.r + angular2);
+				break;
+			}
 			
 			point.x += newX - point.fakeX;
 			point.y += newY - point.fakeY;
@@ -93,7 +116,8 @@ export default function lokaVolterraAlgorithm(){
 		})
 		
 		// 物理引擎
-		if(false)
+		if(!this.isGravity) return;
+
 		for (let i = 0; i < this.data.length; i++) {
 			const p1 = this.data[i];
 			let vx1 = 0;

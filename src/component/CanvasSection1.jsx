@@ -28,6 +28,7 @@ const CanvasSectionS1 = ({ratio, min, sectinoID = "LokaVolterra"}) => {
     const state = {
         "useMouse": useState(0),
         "isTransform": useState(0),
+        "isGravity": useState(0),
         "alpha": useState(5),
         "beta": useState(10),
         "gamma": useState(5),
@@ -67,6 +68,10 @@ const CanvasSectionS1 = ({ratio, min, sectinoID = "LokaVolterra"}) => {
         lokaVolterra["pauseWorker"](!isWorker);
         setIsWorker(!isWorker);
     }
+    function handleClick(e){
+        const ID = e.target.id;
+        lokaVolterra.changeType(ID);
+    }
     return (
         <section ref={section} className="section" id={sectinoID}>
             <canvas value={Math.random()} ref={canvas} width={min * ratio} height={ratio * min * ratio}></canvas>
@@ -83,7 +88,12 @@ const CanvasSectionS1 = ({ratio, min, sectinoID = "LokaVolterra"}) => {
                 </div>
                 <div className="controlpanel">
                     <label>★</label>
-                    <button onClick={handleCanvasControl} id="useMouse" value={state.useMouse[0] ? 0 : 1}>{state.useMouse[0] ? "取消跟隨" : "跟隨滑鼠"}</button>
+                    <button onClick={handleClick} id="taro">芋頭</button>
+                    <button onClick={handleClick} id="plate">盤子</button>
+                    <button onClick={handleClick} id="hourglass">沙漏</button>
+                    <button onClick={handleClick} id="cookie">幸運餅乾</button>
+                    <button onClick={handleCanvasControl} id="useMouse" value={state.useMouse[0] ? 0 : 1}>{state.useMouse[0] ? "取消滑鼠控制" : "滑鼠控制參數"}</button>
+                    <button onClick={handleCanvasControl} id="isGravity" value={state.isGravity[0] ? 0 : 1}>{state.isGravity[0] == "1" ? "閉關引力(受影響粒子不可逆)" : "開啟引力(將有不可逆的影響)"}</button>
                     <button onClick={handleCanvasControl} id="isTransform" value={state.isTransform[0] ? 0 : 1}>{state.isTransform[0] == "1" ? "取消縮放" : "加入縮放"}</button>
                     <button onClick={handlePauseMain} id="pauseMain">{isMain ? "停止(左)" : "開始(左)"}</button>
                     <button onClick={handlePauseWorker} id="pauseWorker">{isWorker ? "停止(右)" : "開始(右)"}</button>

@@ -37,7 +37,9 @@ const createLokaVolterra = function(){
 	this.pauseWorker = (isPause) => {
 		this.myWorker.postMessage({"name": isPause ? "requestAnimation" : "cancelAnimation"});
 	}
-	// 用了bind之後 function.name 會變成 bound renderS1，要特別注意
+	this.changeType = (name) => {
+		this.algorithm.motionType = name;
+	}
 	this.render = () => {
 		this.algorithm.render(this.ctx, -0.25);
 	}
