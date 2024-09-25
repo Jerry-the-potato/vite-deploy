@@ -33,12 +33,12 @@ const createMusicAnalyser = function(){
         this.scene.add(this.axis);
 
         // 添加群組到場景
-        this.group1 = new THREE.Group();
-        this.scene.add(this.group1);
         this.buff = new BufferFactory();
         this.ball = makeBall(radius, 60, 30, radius/500);
         // this.ball.rotation.set(-1,0,0);
+        this.group1 = new THREE.Group();
         this.group1.add(this.buff.mesh, this.ball);
+        this.scene.add(this.group1);
     }
     this.cleanup = () => {
         this.firstTime = true;

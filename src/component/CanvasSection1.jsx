@@ -13,12 +13,14 @@ const CanvasSectionS1 = ({ratio, min, sectinoID = "LokaVolterra"}) => {
         manager.addSubjectElement(section.current);
         manager.registerAnimationCallback("update" + sectinoID, lokaVolterra.update);
         manager.registerAnimationCallback("render" + sectinoID, lokaVolterra.render);
+        manager.registerTrigger("worker" + sectinoID, () => lokaVolterra.pauseWorker(true), () => lokaVolterra.pauseWorker(false));
         return () => {
             window.removeEventListener("resize", lokaVolterra.resize);
             lokaVolterra.cleanup();
             manager.removeSubjectID(sectinoID);
             manager.unregisterAnimationCallback("update" + sectinoID);
             manager.unregisterAnimationCallback("render" + sectinoID);
+            manager.unRegisterTrigger("worker" + sectinoID);
         }
     }, []);
 

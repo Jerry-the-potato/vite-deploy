@@ -36,9 +36,7 @@ const createPhysic = function(){
     this.setPath = (path) => {
         // const ID = e.target.id;
         // PathConfig[ID] = e.target.value;
-        PathConfig.leapLinear = path.leapLinear;
-        PathConfig.leapEasein = path.leapEasein;
-        PathConfig.leapEaseout = path.leapEaseout;
+        Object.assign(PathConfig, path);
         PathConfig.resetPath(-1, 0, 2);
     }
 	return this;

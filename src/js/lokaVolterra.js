@@ -39,7 +39,7 @@ const createLokaVolterra = function(){
 	}
 	// 用了bind之後 function.name 會變成 bound renderS1，要特別注意
 	this.render = () => {
-		this.algorithm.render(this.ctx);
+		this.algorithm.render(this.ctx, -0.25);
 	}
 	this.update = () => {
 		this.algorithm.update(this.ctx, this.canvas.width, this.canvas.height);

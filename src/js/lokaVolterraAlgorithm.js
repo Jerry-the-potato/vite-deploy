@@ -1,12 +1,7 @@
 import createPainter from "./createPainter";
 import myMouse from "./myMouse";
 function clearBoard(ctx) {
-	// let color = "rgba(0,0,0, " + document.getElementById("speed").value * 0.025 + ")";
-	ctx.fillStyle = 'black';
-	// this.ctx.fillStyle = color;
-	// ctx.strokestyle = 'black';
-	ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-	// this.ctx.strokeRect(0, 0, width, height);
+	ctx.canvas.width*= 1;
 }
 
 // 粒子引力和動畫演算法
@@ -19,9 +14,9 @@ export default function lokaVolterraAlgorithm(){
 	this.delta = 10;
 	this.dlength = 0.01;
 
-	this.speed = 1;
-    this.useMouse = true;
-	this.isTransform = true;
+	this.speed = 10;
+    this.useMouse = false;
+	this.isTransform = false;
 
     this.updateData = (data) => {
         this.useMouse = data.useMouse;
@@ -40,39 +35,27 @@ export default function lokaVolterraAlgorithm(){
 		const len = 2000;
 		this.data = [];
 		for (let i = 0; i < len; i++) {
-			const mid = 0.5;
-			const pow = 1;
-			const max = 1 + Math.pow(mid, pow);
-			const minus1 = Math.pow(getRandomFloat(mid, 1), pow);
-			const minus2 = Math.pow(getRandomFloat(0, mid), pow);
-
-			const obj = {
-				"d": (max - minus1 - minus2) * width,  // distance
-				"r": getRandomFloat(0, Math.PI * 2), // radian
+			const point = {
+				"d": Math.sqrt(Math.random()) * width / 2, // distance
+				"r": Math.random() * 2 * Math.PI, // radian
 				"fakeX": width/2,
 				"fakeY": height/2,
-				"x": width/2,
-				"y": height/2,
 				"vx": [],
 				"vy": []
 			};
-			obj.x+= obj.d * Math.cos(obj.r);
-			obj.y+= obj.d * Math.sin(obj.r);
+			point.x = width / 2 + point.d * Math.cos(point.r);
+			point.y = height / 2 + point.d * Math.sin(point.r);
 			// 減去下面兩行會有很酷的效果
-			obj.fakeX = obj.x;
-			obj.fakeY = obj.y;
-			this.data.push(obj);
-		}
-
-		function getRandomFloat(min, max) {
-			return Math.random() * (max*100 - min*100 + 1)/100 + min;
+			point.fakeX = point.x;
+			point.fakeY = point.y;
+			this.data.push(point);
 		}
 	}
-	this.render = (ctx) => {
+	this.render = (ctx, offset) => {
 		clearBoard(ctx);
 		ctx.save();
-		ctx.translate(-ctx.canvas.width * 0.25, 0);
-		painter.works.forEach(obj => {painter.draw(obj);});
+		ctx.translate(ctx.canvas.width * offset, 0);
+		painter.works.forEach(point => {painter.draw(point);});
 		painter.works = [];
 		ctx.restore();
 	}
@@ -84,35 +67,41 @@ export default function lokaVolterraAlgorithm(){
 	}
 
 	this.motion = (width, height) => {
-		const list = this.data;
 		// 沿著中心點旋轉
-		for (let i = 0; i < list.length; i++) {
-			const point = list[i];
+		this.data.forEach((point) => {
 			const rad = this.transitionRadian;
-			const p1 = Math.cos(rad)*Math.sin(rad);
-			const p2 = Math.sin(rad);
-			const p3 = Math.sin(rad*2);
-			const d = this.isTransform ? (point.d / 2) : (point.d / 3 * (0.05 + 0.95 * (1 - p3)));
-			const w1 = d * p1 * 0.1;
-			const w2 = d * p2 * 0.1;
-			point.r+= Math.PI / 1000;
-			point.x-= point.fakeX;
-			point.y-= point.fakeY;
-			point.fakeX = width/2 + d * Math.cos(point.r + w2);//w1);
-			point.fakeY = height/2 + d * Math.sin(point.r + w2);
-			point.x+= point.fakeX;
-			point.y+= point.fakeY;
-		}
+			const period1 = Math.cos(rad)*Math.sin(rad);
+			const period2 = Math.sin(rad);
+			const period3 = Math.sin(rad*2);
 
+			const scaleFactor = this.isTransform ? 0.1 + 1.4 * (1 - period3) : 1; 
+    		const d = point.d / 3 * scaleFactor;
+
+			const angular1 = d * period1 * 0.1;
+			const angular2 = d * period2 * 0.1;
+
+			point.r+= Math.PI / 100;
+
+			const newX = width / 2 + d * Math.cos(point.r + angular1);
+			const newY = height / 2 + d * Math.sin(point.r + angular2);
+			
+			point.x += newX - point.fakeX;
+			point.y += newY - point.fakeY;
+			
+			point.fakeX = newX;
+			point.fakeY = newY;
+		})
+		
 		// 物理引擎
-		for (let i = 0; i < list.length; i++) {
-			const p1 = list[i];
+		if(false)
+		for (let i = 0; i < this.data.length; i++) {
+			const p1 = this.data[i];
 			let vx1 = 0;
 			let vx2 = 0;
 			let vy1 = 0;
 			let vy2 = 0;
-			for (let j = i + 1; j < list.length; j++) {
-				const p2 = list[j];
+			for (let j = i + 1; j < this.data.length; j++) {
+				const p2 = this.data[j];
 				const d = getDistance(p1.x, p1.y, p2.x, p2.y);
 				const MAXD = 0;
 				if(d < MAXD){
@@ -153,9 +142,8 @@ export default function lokaVolterraAlgorithm(){
 	}
 	// Lotka Volterra紋理
 	this.addTexture = (width, height, ctx) => {
-		const list = this.data;
-		for (let i = 0; i < list.length; i++) {
-			const point = list[i];
+		for (let i = 0; i < this.data.length; i++) {
+			const point = this.data[i];
 			const x = point.x;
 			const y = point.y;
 			const ex = x / width;
@@ -197,14 +185,14 @@ export default function lokaVolterraAlgorithm(){
 			// console.log(ratio);
 			return this.alpha * x - (1 / ratio * this.alpha * x * y);
 		}
-		return this.alpha * x - (this.beta * x * y);
+		return this.alpha * x - this.beta * x * y;
 	}
 	this.equation2 = (x, y, width) => {
 		if(this.useMouse){
 			const ratio = (myMouse.pointX / width > 0.2) ? myMouse.pointX / width : 0.2;
 			return (1 / ratio * this.gamma * x * y) -  this.gamma * y;
 		}
-		return (this.delta * x * y) -  this.gamma * y;
+		return this.delta * x * y -  this.gamma * y;
 	}
 
 	this.timeBefore = Date.now();

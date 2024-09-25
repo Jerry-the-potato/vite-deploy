@@ -3,6 +3,8 @@ const managerMaker = function(){
     this.globalKey = "dev";
     this.lastRequestName = [];
     this.request = {};
+    this.lastTriggerName = [];
+    this.trigger = {};
 
     // 根據 ID 取得請求
     this.getRequestById = (id) => {
@@ -12,22 +14,36 @@ const managerMaker = function(){
         const req = Object.keys(this.request).filter(key => key.includes(id) || key.includes(this.globalKey));
         return req;
     }
+    this.getTriggerById = (id) => {
+        const req = Object.keys(this.trigger).filter(key => key.includes(id) || key.includes(this.globalKey));
+        return req;
+    }
     this.updateRequestAnimation = (id) => {
         // 停止舊的動畫
         this.lastRequestName.forEach(name => {
             if(!this.request[name]) return;
             cancelAnimationFrame(this.request[name].ID);
         })
+        this.lastTriggerName.forEach(name => {
+            if(!this.trigger[name]) return;
+            this.trigger[name].leave();
+        })
         // 開始新的動畫
         const names = this.getRequestById(id);
+        const triggerNames = this.getTriggerById(id);
         if(names === null) return;
         this.lastRequestName = names;
-        
+        this.lastTriggerName = triggerNames;
+
         names.forEach(name => {
             if(typeof this.request[name] === "undefined") return console.warn("invalid request");
             if(typeof this.request[name].method === "undefined") return console.warn("invalid requestMethod");
             if(this.request[name].isPause) return;
             this.request[name].ID = requestAnimationFrame(this.request[name].method);
+        })
+        triggerNames.forEach(name => {
+            if(typeof this.trigger[name] === "undefined") return console.warn("invalid trigger");
+            this.trigger[name].enter();
         })
     }
 
@@ -57,6 +73,16 @@ const managerMaker = function(){
         this.request[name].method = null;
         delete this.request[name];
     }
+
+    this.registerTrigger = (name, enter, leave) => {
+        this.trigger[name] = {enter, leave};
+        this.nameValidation(name);
+    }
+    this.unRegisterTrigger = (name) => {
+        delete this.trigger[name];
+    }
+
+    // 交互觀測
     this.io = new IntersectionObserver((entries) => {
         entries.forEach((entry) => {
             // 實測大約0.01 ~ 0.05
