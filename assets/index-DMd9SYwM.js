@@ -7033,7 +7033,7 @@ function useWindowSize(margin) {
 }
 function WorkerWrapper(options) {
   return new Worker(
-    "/vite-deploy/assets/worker-C5BdF-Nt.js",
+    "/vite-deploy/assets/worker-D_oxkCaB.js",
     {
       name: options == null ? void 0 : options.name
     }
@@ -7041,12 +7041,6 @@ function WorkerWrapper(options) {
 }
 function createPainter() {
   this.works = [];
-  this.pixelX = window.innerWidth;
-  this.pixelY = window.innerHeight;
-  this.setPixel = function(w2, h) {
-    this.pixelX = w2;
-    this.pixelY = h;
-  };
   this.draw = function(obj) {
     let ctx = obj.ctx;
     let x2 = obj.x;
@@ -7216,8 +7210,7 @@ class Path extends PathConfig {
 }
 const myMouse = new Path();
 function clearBoard(ctx) {
-  ctx.fillStyle = "black";
-  ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+  ctx.canvas.width *= 1;
 }
 function lokaVolterraAlgorithm() {
   const painter = new createPainter();
@@ -7226,9 +7219,9 @@ function lokaVolterraAlgorithm() {
   this.gamma = 5;
   this.delta = 10;
   this.dlength = 0.01;
-  this.speed = 1;
-  this.useMouse = true;
-  this.isTransform = true;
+  this.speed = 10;
+  this.useMouse = false;
+  this.isTransform = false;
   this.updateData = (data) => {
     this.useMouse = data.useMouse;
     this.isTransform = data.isTransform;
@@ -7245,39 +7238,29 @@ function lokaVolterraAlgorithm() {
     const len = 2e3;
     this.data = [];
     for (let i = 0; i < len; i++) {
-      const mid = 0.5;
-      const pow = 1;
-      const max = 1 + Math.pow(mid, pow);
-      const minus1 = Math.pow(getRandomFloat(mid, 1), pow);
-      const minus2 = Math.pow(getRandomFloat(0, mid), pow);
-      const obj = {
-        "d": (max - minus1 - minus2) * width,
+      const point = {
+        "d": Math.sqrt(Math.random()) * width / 2,
         // distance
-        "r": getRandomFloat(0, Math.PI * 2),
+        "r": Math.random() * 2 * Math.PI,
         // radian
         "fakeX": width / 2,
         "fakeY": height / 2,
-        "x": width / 2,
-        "y": height / 2,
         "vx": [],
         "vy": []
       };
-      obj.x += obj.d * Math.cos(obj.r);
-      obj.y += obj.d * Math.sin(obj.r);
-      obj.fakeX = obj.x;
-      obj.fakeY = obj.y;
-      this.data.push(obj);
-    }
-    function getRandomFloat(min, max) {
-      return Math.random() * (max * 100 - min * 100 + 1) / 100 + min;
+      point.x = width / 2 + point.d * Math.cos(point.r);
+      point.y = height / 2 + point.d * Math.sin(point.r);
+      point.fakeX = point.x;
+      point.fakeY = point.y;
+      this.data.push(point);
     }
   };
-  this.render = (ctx) => {
+  this.render = (ctx, offset) => {
     clearBoard(ctx);
     ctx.save();
-    ctx.translate(-ctx.canvas.width * 0.25, 0);
-    painter.works.forEach((obj) => {
-      painter.draw(obj);
+    ctx.translate(ctx.canvas.width * offset, 0);
+    painter.works.forEach((point) => {
+      painter.draw(point);
     });
     painter.works = [];
     ctx.restore();
@@ -7289,73 +7272,27 @@ function lokaVolterraAlgorithm() {
     this.updateFps(width, height, ctx);
   };
   this.motion = (width, height) => {
-    const list = this.data;
-    for (let i = 0; i < list.length; i++) {
-      const point = list[i];
+    this.data.forEach((point) => {
       const rad = this.transitionRadian;
-      const p2 = Math.sin(rad);
-      const p3 = Math.sin(rad * 2);
-      const d = this.isTransform ? point.d / 2 : point.d / 3 * (0.05 + 0.95 * (1 - p3));
-      const w2 = d * p2 * 0.1;
-      point.r += Math.PI / 1e3;
-      point.x -= point.fakeX;
-      point.y -= point.fakeY;
-      point.fakeX = width / 2 + d * Math.cos(point.r + w2);
-      point.fakeY = height / 2 + d * Math.sin(point.r + w2);
-      point.x += point.fakeX;
-      point.y += point.fakeY;
-    }
-    for (let i = 0; i < list.length; i++) {
-      const p1 = list[i];
-      let vx1 = 0;
-      let vx2 = 0;
-      let vy1 = 0;
-      let vy2 = 0;
-      for (let j = i + 1; j < list.length; j++) {
-        const p2 = list[j];
-        const d = getDistance(p1.x, p1.y, p2.x, p2.y);
-        const MAXD = 0;
-        if (d < MAXD) {
-          let force;
-          if (d < MAXD * 0.1) force = -1;
-          if (d < MAXD * 0.55) force = 1 * (d - MAXD * 0.1) / (MAXD * 0.45);
-          if (d < MAXD) force = 1 * (MAXD - d) / (MAXD * 0.45);
-          vx1 += p2.x > p1.x ? 1 : -1 * force;
-          vx2 += p1.x > p2.x ? 1 : -1 * force;
-          vy1 += p2.y > p1.y ? 1 : -1 * force;
-          vy2 += p1.y > p2.y ? 1 : -1 * force;
-        }
-      }
-      p1.x += caluVelocity(p1.vx);
-      p1.y += caluVelocity(p1.vy);
-      const GRAVITY = 100;
-      vx1 += width * 0.5 + GRAVITY / 2 > p1.x ? 1 : -1 * GRAVITY;
-      vx1 -= width * 0.5 - GRAVITY / 2 < p1.x ? 1 : -1 * GRAVITY;
-      vy1 += height / 2 + GRAVITY / 2 > p1.y ? 1 : -1 * GRAVITY;
-      vy1 -= height / 2 - GRAVITY / 2 < p1.y ? 1 : -1 * GRAVITY;
-      addVelocity(p1.vx, vx1);
-      addVelocity(p1.vy, vy1);
-    }
-    function getDistance(x1, y1, x2, y2) {
-      const distance = Math.sqrt(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2));
-      return distance;
-    }
-    function addVelocity(a, v2) {
-      a.splice(1, 0, v2);
-      a.splice(60, 1);
-    }
-    function caluVelocity(a) {
-      let sum = 0;
-      a.forEach((value) => {
-        sum += value / a.length / 20;
-      });
-      return sum;
-    }
+      const period1 = Math.cos(rad) * Math.sin(rad);
+      const period2 = Math.sin(rad);
+      const period3 = Math.sin(rad * 2);
+      const scaleFactor = this.isTransform ? 0.1 + 1.4 * (1 - period3) : 1;
+      const d = point.d / 3 * scaleFactor;
+      const angular1 = d * period1 * 0.1;
+      const angular2 = d * period2 * 0.1;
+      point.r += Math.PI / 100;
+      const newX = width / 2 + d * Math.cos(point.r + angular1);
+      const newY = height / 2 + d * Math.sin(point.r + angular2);
+      point.x += newX - point.fakeX;
+      point.y += newY - point.fakeY;
+      point.fakeX = newX;
+      point.fakeY = newY;
+    });
   };
   this.addTexture = (width, height, ctx) => {
-    const list = this.data;
-    for (let i = 0; i < list.length; i++) {
-      const point = list[i];
+    for (let i = 0; i < this.data.length; i++) {
+      const point = this.data[i];
       const x2 = point.x;
       const y2 = point.y;
       const ex = x2 / width;
@@ -7529,7 +7466,7 @@ const createLokaVolterra = function() {
     this.myWorker.postMessage({ "name": isPause ? "requestAnimation" : "cancelAnimation" });
   };
   this.render = () => {
-    this.algorithm.render(this.ctx);
+    this.algorithm.render(this.ctx, -0.25);
   };
   this.update = () => {
     this.algorithm.update(this.ctx, this.canvas.width, this.canvas.height);
@@ -7542,9 +7479,15 @@ const managerMaker = function() {
   this.globalKey = "dev";
   this.lastRequestName = [];
   this.request = {};
+  this.lastTriggerName = [];
+  this.trigger = {};
   this.getRequestById = (id2) => {
     if (typeof isSomethingHappended !== "undefined") return null;
     const req = Object.keys(this.request).filter((key) => key.includes(id2) || key.includes(this.globalKey));
+    return req;
+  };
+  this.getTriggerById = (id2) => {
+    const req = Object.keys(this.trigger).filter((key) => key.includes(id2) || key.includes(this.globalKey));
     return req;
   };
   this.updateRequestAnimation = (id2) => {
@@ -7552,14 +7495,24 @@ const managerMaker = function() {
       if (!this.request[name]) return;
       cancelAnimationFrame(this.request[name].ID);
     });
+    this.lastTriggerName.forEach((name) => {
+      if (!this.trigger[name]) return;
+      this.trigger[name].leave();
+    });
     const names = this.getRequestById(id2);
+    const triggerNames = this.getTriggerById(id2);
     if (names === null) return;
     this.lastRequestName = names;
+    this.lastTriggerName = triggerNames;
     names.forEach((name) => {
       if (typeof this.request[name] === "undefined") return console.warn("invalid request");
       if (typeof this.request[name].method === "undefined") return console.warn("invalid requestMethod");
       if (this.request[name].isPause) return;
       this.request[name].ID = requestAnimationFrame(this.request[name].method);
+    });
+    triggerNames.forEach((name) => {
+      if (typeof this.trigger[name] === "undefined") return console.warn("invalid trigger");
+      this.trigger[name].enter();
     });
   };
   this.createAnimation = (name, callback) => {
@@ -7584,6 +7537,13 @@ const managerMaker = function() {
     cancelAnimationFrame(this.request[name].ID);
     this.request[name].method = null;
     delete this.request[name];
+  };
+  this.registerTrigger = (name, enter, leave) => {
+    this.trigger[name] = { enter, leave };
+    this.nameValidation(name);
+  };
+  this.unRegisterTrigger = (name) => {
+    delete this.trigger[name];
   };
   this.io = new IntersectionObserver((entries) => {
     entries.forEach((entry) => {
@@ -7686,12 +7646,14 @@ const CanvasSectionS1 = ({ ratio, min, sectinoID = "LokaVolterra" }) => {
     manager.addSubjectElement(section.current);
     manager.registerAnimationCallback("update" + sectinoID, lokaVolterra.update);
     manager.registerAnimationCallback("render" + sectinoID, lokaVolterra.render);
+    manager.registerTrigger("worker" + sectinoID, () => lokaVolterra.pauseWorker(true), () => lokaVolterra.pauseWorker(false));
     return () => {
       window.removeEventListener("resize", lokaVolterra.resize);
       lokaVolterra.cleanup();
       manager.removeSubjectID(sectinoID);
       manager.unregisterAnimationCallback("update" + sectinoID);
       manager.unregisterAnimationCallback("render" + sectinoID);
+      manager.unRegisterTrigger("worker" + sectinoID);
     };
   }, []);
   const menu = reactExports.useRef(null);
@@ -27448,11 +27410,11 @@ const createMusicAnalyser = function() {
     this.controls.target.set(radius / 4, 0, -radius / 3);
     this.axis = new AxesHelper(300);
     this.scene.add(this.axis);
-    this.group1 = new Group();
-    this.scene.add(this.group1);
     this.buff = new BufferFactory();
     this.ball = makeBall(radius, 60, 30, radius / 500);
+    this.group1 = new Group();
     this.group1.add(this.buff.mesh, this.ball);
+    this.scene.add(this.group1);
   };
   this.cleanup = () => {
     this.firstTime = true;
@@ -28341,9 +28303,7 @@ const createPhysic = function() {
     this.system.sort.isStoping = true;
   };
   this.setPath = (path) => {
-    PathConfig.leapLinear = path.leapLinear;
-    PathConfig.leapEasein = path.leapEasein;
-    PathConfig.leapEaseout = path.leapEaseout;
+    Object.assign(PathConfig, path);
     PathConfig.resetPath(-1, 0, 2);
   };
   return this;
@@ -36994,4 +36954,4 @@ function App() {
 const domNode = document.getElementById("root");
 const root = createRoot(domNode);
 root.render(/* @__PURE__ */ jsxRuntimeExports.jsx(App, {}));
-//# sourceMappingURL=index-BkwQcUGW.js.map
+//# sourceMappingURL=index-DMd9SYwM.js.map
