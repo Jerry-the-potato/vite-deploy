@@ -186,9 +186,12 @@ var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "sy
     this.speed = 10;
     this.useMouse = false;
     this.isTransform = false;
+    this.isGravity = true;
+    this.motionType = "default";
     this.updateData = (data) => {
       this.useMouse = data.useMouse;
       this.isTransform = data.isTransform;
+      this.isGravity = data.isGravity;
       this.alpha = data.alpha;
       this.beta = data.beta;
       this.gamma = data.gamma;
@@ -246,13 +249,79 @@ var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "sy
         const angular1 = d * period1 * 0.1;
         const angular2 = d * period2 * 0.1;
         point.r += Math.PI / 100;
-        const newX = width / 2 + d * Math.cos(point.r + angular1);
-        const newY = height / 2 + d * Math.sin(point.r + angular2);
+        let newX;
+        let newY;
+        switch (this.motionType) {
+          case "plate":
+            newX = width / 2 + d * Math.cos(point.r + period1);
+            newY = height / 2 + d * Math.sin(point.r + period2);
+            break;
+          case "hourglass":
+            newX = width / 2 + d * Math.cos(point.r + period1) * Math.sin(point.r + period1);
+            newY = height / 2 + d * Math.sin(point.r + period1);
+            break;
+          case "cookie":
+            newX = width / 2 + d * Math.cos(point.r + period1) * Math.sin(point.r + period1);
+            newY = height / 2 + d * Math.sin(point.r + period2);
+            break;
+          case "taro":
+          default:
+            newX = width / 2 + d * Math.cos(point.r + angular1);
+            newY = height / 2 + d * Math.sin(point.r + angular2);
+            break;
+        }
         point.x += newX - point.fakeX;
         point.y += newY - point.fakeY;
         point.fakeX = newX;
         point.fakeY = newY;
       });
+      if (!this.isGravity) return;
+      for (let i = 0; i < this.data.length; i++) {
+        const p1 = this.data[i];
+        let vx1 = 0;
+        let vx2 = 0;
+        let vy1 = 0;
+        let vy2 = 0;
+        for (let j = i + 1; j < this.data.length; j++) {
+          const p2 = this.data[j];
+          const d = getDistance(p1.x, p1.y, p2.x, p2.y);
+          const MAXD = 0;
+          if (d < MAXD) {
+            let force;
+            if (d < MAXD * 0.1) force = -1;
+            if (d < MAXD * 0.55) force = 1 * (d - MAXD * 0.1) / (MAXD * 0.45);
+            if (d < MAXD) force = 1 * (MAXD - d) / (MAXD * 0.45);
+            vx1 += p2.x > p1.x ? 1 : -1 * force;
+            vx2 += p1.x > p2.x ? 1 : -1 * force;
+            vy1 += p2.y > p1.y ? 1 : -1 * force;
+            vy2 += p1.y > p2.y ? 1 : -1 * force;
+          }
+        }
+        p1.x += caluVelocity(p1.vx);
+        p1.y += caluVelocity(p1.vy);
+        const GRAVITY = 100;
+        vx1 += width * 0.5 + GRAVITY / 2 > p1.x ? 1 : -1 * GRAVITY;
+        vx1 -= width * 0.5 - GRAVITY / 2 < p1.x ? 1 : -1 * GRAVITY;
+        vy1 += height / 2 + GRAVITY / 2 > p1.y ? 1 : -1 * GRAVITY;
+        vy1 -= height / 2 - GRAVITY / 2 < p1.y ? 1 : -1 * GRAVITY;
+        addVelocity(p1.vx, vx1);
+        addVelocity(p1.vy, vy1);
+      }
+      function getDistance(x1, y1, x2, y2) {
+        const distance = Math.sqrt(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2));
+        return distance;
+      }
+      function addVelocity(a, v) {
+        a.splice(1, 0, v);
+        a.splice(60, 1);
+      }
+      function caluVelocity(a) {
+        let sum = 0;
+        a.forEach((value) => {
+          sum += value / a.length / 20;
+        });
+        return sum;
+      }
     };
     this.addTexture = (width, height, ctx2) => {
       for (let i = 0; i < this.data.length; i++) {
@@ -426,4 +495,4 @@ var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "sy
     requestID = requestAnimationFrame(main);
   }
 })();
-//# sourceMappingURL=worker-D_oxkCaB.js.map
+//# sourceMappingURL=worker-Dzj0rZlo.js.map

@@ -7033,7 +7033,7 @@ function useWindowSize(margin) {
 }
 function WorkerWrapper(options) {
   return new Worker(
-    "/vite-deploy/assets/worker-D_oxkCaB.js",
+    "/vite-deploy/assets/worker-Dzj0rZlo.js",
     {
       name: options == null ? void 0 : options.name
     }
@@ -7222,9 +7222,12 @@ function lokaVolterraAlgorithm() {
   this.speed = 10;
   this.useMouse = false;
   this.isTransform = false;
+  this.isGravity = true;
+  this.motionType = "default";
   this.updateData = (data) => {
     this.useMouse = data.useMouse;
     this.isTransform = data.isTransform;
+    this.isGravity = data.isGravity;
     this.alpha = data.alpha;
     this.beta = data.beta;
     this.gamma = data.gamma;
@@ -7282,13 +7285,79 @@ function lokaVolterraAlgorithm() {
       const angular1 = d * period1 * 0.1;
       const angular2 = d * period2 * 0.1;
       point.r += Math.PI / 100;
-      const newX = width / 2 + d * Math.cos(point.r + angular1);
-      const newY = height / 2 + d * Math.sin(point.r + angular2);
+      let newX;
+      let newY;
+      switch (this.motionType) {
+        case "plate":
+          newX = width / 2 + d * Math.cos(point.r + period1);
+          newY = height / 2 + d * Math.sin(point.r + period2);
+          break;
+        case "hourglass":
+          newX = width / 2 + d * Math.cos(point.r + period1) * Math.sin(point.r + period1);
+          newY = height / 2 + d * Math.sin(point.r + period1);
+          break;
+        case "cookie":
+          newX = width / 2 + d * Math.cos(point.r + period1) * Math.sin(point.r + period1);
+          newY = height / 2 + d * Math.sin(point.r + period2);
+          break;
+        case "taro":
+        default:
+          newX = width / 2 + d * Math.cos(point.r + angular1);
+          newY = height / 2 + d * Math.sin(point.r + angular2);
+          break;
+      }
       point.x += newX - point.fakeX;
       point.y += newY - point.fakeY;
       point.fakeX = newX;
       point.fakeY = newY;
     });
+    if (!this.isGravity) return;
+    for (let i = 0; i < this.data.length; i++) {
+      const p1 = this.data[i];
+      let vx1 = 0;
+      let vx2 = 0;
+      let vy1 = 0;
+      let vy2 = 0;
+      for (let j = i + 1; j < this.data.length; j++) {
+        const p2 = this.data[j];
+        const d = getDistance(p1.x, p1.y, p2.x, p2.y);
+        const MAXD = 0;
+        if (d < MAXD) {
+          let force;
+          if (d < MAXD * 0.1) force = -1;
+          if (d < MAXD * 0.55) force = 1 * (d - MAXD * 0.1) / (MAXD * 0.45);
+          if (d < MAXD) force = 1 * (MAXD - d) / (MAXD * 0.45);
+          vx1 += p2.x > p1.x ? 1 : -1 * force;
+          vx2 += p1.x > p2.x ? 1 : -1 * force;
+          vy1 += p2.y > p1.y ? 1 : -1 * force;
+          vy2 += p1.y > p2.y ? 1 : -1 * force;
+        }
+      }
+      p1.x += caluVelocity(p1.vx);
+      p1.y += caluVelocity(p1.vy);
+      const GRAVITY = 100;
+      vx1 += width * 0.5 + GRAVITY / 2 > p1.x ? 1 : -1 * GRAVITY;
+      vx1 -= width * 0.5 - GRAVITY / 2 < p1.x ? 1 : -1 * GRAVITY;
+      vy1 += height / 2 + GRAVITY / 2 > p1.y ? 1 : -1 * GRAVITY;
+      vy1 -= height / 2 - GRAVITY / 2 < p1.y ? 1 : -1 * GRAVITY;
+      addVelocity(p1.vx, vx1);
+      addVelocity(p1.vy, vy1);
+    }
+    function getDistance(x1, y1, x2, y2) {
+      const distance = Math.sqrt(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2));
+      return distance;
+    }
+    function addVelocity(a, v2) {
+      a.splice(1, 0, v2);
+      a.splice(60, 1);
+    }
+    function caluVelocity(a) {
+      let sum = 0;
+      a.forEach((value) => {
+        sum += value / a.length / 20;
+      });
+      return sum;
+    }
   };
   this.addTexture = (width, height, ctx) => {
     for (let i = 0; i < this.data.length; i++) {
@@ -7464,6 +7533,9 @@ const createLokaVolterra = function() {
   };
   this.pauseWorker = (isPause) => {
     this.myWorker.postMessage({ "name": isPause ? "requestAnimation" : "cancelAnimation" });
+  };
+  this.changeType = (name) => {
+    this.algorithm.motionType = name;
   };
   this.render = () => {
     this.algorithm.render(this.ctx, -0.25);
@@ -7660,6 +7732,7 @@ const CanvasSectionS1 = ({ ratio, min, sectinoID = "LokaVolterra" }) => {
   const state = {
     "useMouse": reactExports.useState(0),
     "isTransform": reactExports.useState(0),
+    "isGravity": reactExports.useState(0),
     "alpha": reactExports.useState(5),
     "beta": reactExports.useState(10),
     "gamma": reactExports.useState(5),
@@ -7699,6 +7772,10 @@ const CanvasSectionS1 = ({ ratio, min, sectinoID = "LokaVolterra" }) => {
     lokaVolterra["pauseWorker"](!isWorker);
     setIsWorker(!isWorker);
   }
+  function handleClick(e) {
+    const ID = e.target.id;
+    lokaVolterra.changeType(ID);
+  }
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("section", { ref: section, className: "section", id: sectinoID, children: [
     /* @__PURE__ */ jsxRuntimeExports.jsx("canvas", { value: Math.random(), ref: canvas, width: min * ratio, height: ratio * min * ratio }),
     /* @__PURE__ */ jsxRuntimeExports.jsx("canvas", { ref: bitmap, width: min * ratio, height: ratio * min * ratio }),
@@ -7720,7 +7797,12 @@ const CanvasSectionS1 = ({ ratio, min, sectinoID = "LokaVolterra" }) => {
       ] }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "controlpanel", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx("label", { children: "★" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: handleCanvasControl, id: "useMouse", value: state.useMouse[0] ? 0 : 1, children: state.useMouse[0] ? "取消跟隨" : "跟隨滑鼠" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: handleClick, id: "taro", children: "芋頭" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: handleClick, id: "plate", children: "盤子" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: handleClick, id: "hourglass", children: "沙漏" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: handleClick, id: "cookie", children: "幸運餅乾" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: handleCanvasControl, id: "useMouse", value: state.useMouse[0] ? 0 : 1, children: state.useMouse[0] ? "取消滑鼠控制" : "滑鼠控制參數" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: handleCanvasControl, id: "isGravity", value: state.isGravity[0] ? 0 : 1, children: state.isGravity[0] == "1" ? "閉關引力(受影響粒子不可逆)" : "開啟引力(將有不可逆的影響)" }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: handleCanvasControl, id: "isTransform", value: state.isTransform[0] ? 0 : 1, children: state.isTransform[0] == "1" ? "取消縮放" : "加入縮放" }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: handlePauseMain, id: "pauseMain", children: isMain ? "停止(左)" : "開始(左)" }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: handlePauseWorker, id: "pauseWorker", children: isWorker ? "停止(右)" : "開始(右)" }),
@@ -36954,4 +37036,4 @@ function App() {
 const domNode = document.getElementById("root");
 const root = createRoot(domNode);
 root.render(/* @__PURE__ */ jsxRuntimeExports.jsx(App, {}));
-//# sourceMappingURL=index-DMd9SYwM.js.map
+//# sourceMappingURL=index-DR3mOFHU.js.map
