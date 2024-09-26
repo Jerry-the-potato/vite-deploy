@@ -1,6 +1,6 @@
 import createPainter from "./createPainter";
 import myMouse from "./myMouse";
-function clearBoard(ctx) {
+function clear(ctx) {
 	ctx.canvas.width*= 1;
 }
 
@@ -42,25 +42,24 @@ export default function lokaVolterraAlgorithm(){
 			const point = {
 				"d": Math.sqrt(Math.random()) * width / 2, // distance
 				"r": Math.random() * 2 * Math.PI, // radian
-				"fakeX": width/2,
-				"fakeY": height/2,
-				"vx": [],
-				"vy": []
+				"vx": new Array(60).fill(0),
+				"vy": new Array(60).fill(0)
 			};
 			point.x = width / 2 + point.d * Math.cos(point.r);
 			point.y = height / 2 + point.d * Math.sin(point.r);
-			// 減去下面兩行會有很酷的效果
 			point.fakeX = point.x;
 			point.fakeY = point.y;
+			// 使用下面兩行會有很酷的效果
+			// point.fakeX = width / 2;
+			// point.fakeY = height / 2;
 			this.data.push(point);
 		}
 	}
 	this.render = (ctx, offset) => {
-		clearBoard(ctx);
+		clear(ctx);
 		ctx.save();
 		ctx.translate(ctx.canvas.width * offset, 0);
-		painter.works.forEach(point => {painter.draw(point);});
-		painter.works = [];
+		painter.render();
 		ctx.restore();
 	}
 	this.update = (ctx, width, height) => {
@@ -74,7 +73,7 @@ export default function lokaVolterraAlgorithm(){
 		// 沿著中心點旋轉
 		this.data.forEach((point) => {
 			const rad = this.transitionRadian;
-			const period1 = Math.cos(rad)*Math.sin(rad);
+			const period1 = Math.cos(rad) * Math.sin(rad);
 			const period2 = Math.sin(rad);
 			const period3 = Math.sin(rad*2);
 
@@ -120,11 +119,9 @@ export default function lokaVolterraAlgorithm(){
 
 		for (let i = 0; i < this.data.length; i++) {
 			const p1 = this.data[i];
-			let vx1 = 0;
-			let vx2 = 0;
-			let vy1 = 0;
-			let vy2 = 0;
+			let vx = 0, vy = 0;
 			for (let j = i + 1; j < this.data.length; j++) {
+				break;
 				const p2 = this.data[j];
 				const d = getDistance(p1.x, p1.y, p2.x, p2.y);
 				const MAXD = 0;
@@ -133,41 +130,43 @@ export default function lokaVolterraAlgorithm(){
 					if((d) < MAXD * 0.1) force = -1;
 					if((d) < MAXD * 0.55) force = 1 * ((d)- MAXD * 0.1) / (MAXD * 0.45);
 					if((d) < MAXD) force = 1 * (MAXD - (d)) / (MAXD * 0.45);
-
-					vx1+= (p2.x > p1.x) ? 1 : -1 * force;
-					vx2+= (p1.x > p2.x) ? 1 : -1 * force;
-					vy1+= (p2.y > p1.y) ? 1 : -1 * force;
-					vy2+= (p1.y > p2.y) ? 1 : -1 * force;
+					const directionX = (p2.x > p1.x) ? 1 : -1;
+					const directionY = (p2.y > p1.y) ? 1 : -1;
+					vx+= directionX * force;
+					p2.vx[0]-= directionX * force;
+					vy+= directionY * force;
+					p2.vy[0]-= directionY * force;
 				}
 			}
 			p1.x+= caluVelocity(p1.vx);
 			p1.y+= caluVelocity(p1.vy);
-			const GRAVITY = 100;
-			vx1+= (width*0.5 + GRAVITY/2 > p1.x) ? 1 : -1 * GRAVITY;
-			vx1-= (width*0.5 - GRAVITY/2 < p1.x) ? 1 : -1 * GRAVITY;
-			vy1+= (height/2 + GRAVITY/2 > p1.y) ? 1 : -1 * GRAVITY;
-			vy1-= (height/2 - GRAVITY/2 < p1.y) ? 1 : -1 * GRAVITY;
-			addVelocity(p1.vx, vx1);
-			addVelocity(p1.vy, vy1);
+
+			const GRAVITY = 10;
+			const GAP = 50;
+			vx+= (width * 0.5 + GAP > p1.x) ? 1 : -1 * GRAVITY;
+			vx-= (width * 0.5 - GAP < p1.x) ? 1 : -1 * GRAVITY;
+			vy+= (height * 0.5 + GAP > p1.y) ? 1 : -1 * GRAVITY;
+			vy-= (height * 0.5 - GAP < p1.y) ? 1 : -1 * GRAVITY;
+			
+			addVelocity(p1.vx, vx);
+			addVelocity(p1.vy, vy);
 		}
 		function getDistance(x1, y1, x2, y2){
 			const distance = Math.sqrt(Math.pow(x1-x2, 2) + Math.pow(y1-y2, 2));
 			return distance;
 		}
-		function addVelocity(a, v){
-			a.splice(1, 0, v);
-			a.splice(60, 1);
+		function addVelocity(arr, v){
+			arr.unshift(v); // 在開頭插入 v
+			arr.pop();   // 刪除尾端元素
 		}
-		function caluVelocity(a){
-			let sum = 0;
-			a.forEach(value => {sum+= value/a.length /20;})
-			return sum
+		function caluVelocity(arr) {
+			const avg = arr.reduce((sum, value) => sum + value, 0) / arr.length;
+			return avg;
 		}
 	}
 	// Lotka Volterra紋理
 	this.addTexture = (width, height, ctx) => {
-		for (let i = 0; i < this.data.length; i++) {
-			const point = this.data[i];
+		this.data.forEach((point) => {
 			const x = point.x;
 			const y = point.y;
 			const ex = x / width;
@@ -175,32 +174,18 @@ export default function lokaVolterraAlgorithm(){
 			const dx = this.equation1(ex, ey, height) * width;
 			const dy = this.equation2(ex, ey, width) * height;
 			
-			const blue = y/width * 255;
-			const green = x/width * 255;
-			const red = Math.sin(this.transitionRadian) * 255;
-			const color = "rgb(" + Math.abs(red).toString() + "," + Math.abs(green).toString() + "," + Math.abs(blue).toString() + ")";
+			const x2 = x + this.dlength * dx;
+			const y2 = y + this.dlength * dy;
 			
-			const mypoint = {
-				"name": "point",
-				"ctx": ctx,
-				"size": 2,
-				"x": x,
-				"y": y,
-				"color": color
-			}
-			painter.works.push(mypoint);
-			const myline = {
-				"name": "line",
-				"ctx": ctx,
-				"size": 2,
-				"x": x,
-				"y": y,
-				"x2": x + this.dlength * dx,
-				"y2": y + this.dlength * dy,
-				"color": color
-			}
-			painter.works.push(myline);
-		}
+			const blue = Math.abs( y / width * 255 );
+			const green = Math.abs( x / width * 255 );
+			const red = Math.abs( Math.sin(this.transitionRadian) * 255 );
+			const color = `rgb(${red}, ${green}, ${blue})`;
+			
+			const mypoint = { name: "point", size: 2, ctx, x, y, color };
+			const myline = { name: "line", size: 2, ctx, x, y, color, x2, y2 };
+			painter.addTask(0, myline, mypoint);
+		});
 	}
 	
 	this.equation1 = (x, y, height) => {
@@ -311,7 +296,7 @@ export default function lokaVolterraAlgorithm(){
 			"y": y + size * 13,
 			"color": transitionColor
 		}
-		painter.works.push(circle, crescent1, crescent2, crescent3, text1, text2, text3);
+		painter.addTask(1, circle, crescent1, crescent2, crescent3, text1, text2, text3);
 	}
 	return this;
 }

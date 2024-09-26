@@ -1,32 +1,49 @@
 // 畫筆建構式-管理繪圖方法
 export default function createPainter(){
-	this.works = [];
-	this.draw = function(obj){ // 透過 painter.draw 呼叫其私有函式
-		let ctx = obj.ctx;
-		let x = obj.x;
-		let y = obj.y;
-		let r = obj.r;
-		let x2 = obj.x2;
-		let y2 = obj.y2;
-		let text = obj.text;
-		let size = obj.size;
-		let color = obj.color;
+	this.renderTask = {};
+	this.addTask = (priority = 0, ...tasks) => {
+		this.renderTask[priority] = this.renderTask[priority] || [];
+		this.renderTask[priority].push(...tasks);
+	}
+	this.render = () => {
+		// 取得所有 priority 並排序
+		Object.keys(this.renderTask)
+			.sort((a, b) => a - b)
+			.forEach(priority => {
+				// 取出對應 priority 下的所有任務並渲染
+				this.renderTask[priority].forEach(task => {
+					this.drawTask(task);
+				});
+			});
+		// 刪除任務
+		this.renderTask = {};
+	}
+	this.drawTask = (task) => {
+		if(!task.ctx) return;
 		
-		let a = obj.a;
-		let b = obj.b;
-		let angle = obj.angle;
-		if(ctx)
-			switch(obj.name){
-				case "circle": drawCircle();
-				break;
-				case "point": drawPoint();
-				break;
-				case "line": drawLine();
-				break;
-				case "crescent": drawCrescent();
-				break;
-				case "text": drawText();
-			}
+		// 繪圖上下文
+		const { ctx } = task;
+
+		// 座標類別
+		const { x, y, x2, y2 } = task;
+
+		// 形狀類別
+		const { r, a, b, angle } = task;
+
+		// 文本類別
+		const { text, size } = task;
+
+		// 顏色類別
+		const { color } = task;
+			
+		switch(task.name){
+			case "circle": drawCircle(); break;
+			case "point": drawPoint(); break;
+			case "line": drawLine(); break;
+			case "crescent": drawCrescent(); break;
+			case "text": drawText(); break;
+			default: console.warn(`未定義的繪圖形狀: ${task.name}`);
+		}
 		function drawCircle() {
 			if(x + y + r == "NaN"){
 				console.warn("drawCircle failed: missing parameter");
@@ -65,10 +82,10 @@ export default function createPainter(){
 				console.warn("drawCrescent failed: missing parameter");
 				return;
 			}
-			let c = Math.sqrt(a * a + b * b);
-			let aTan = Math.atan(a / b);
-			let dx = Math.cos(angle + Math.PI / 2) * a * size;
-			let dy = Math.sin(angle + Math.PI / 2) * a * size;
+			const c = Math.sqrt(a * a + b * b);
+			const aTan = Math.atan(a / b);
+			const dx = Math.cos(angle + Math.PI / 2) * a * size;
+			const dy = Math.sin(angle + Math.PI / 2) * a * size;
 			ctx.beginPath();
 			ctx.arc(x, y, b * size, angle, Math.PI + angle, true);
 			ctx.arc(x + dx, y + dy, c * size, Math.PI + angle + aTan, angle - aTan, false); // 順時針 縮小 +-
@@ -76,13 +93,11 @@ export default function createPainter(){
 			ctx.fill(); 
 		}
 		function drawText(){
-			x = Math.round(x);
-			y = Math.round(y);
 			ctx.font = size + "px Comic Sans MS";
 			ctx.textBaseline = "middle";
 			ctx.textAlign = "center";
 			ctx.fillStyle = color;
-			ctx.fillText(text, x, y);
+			ctx.fillText(text, Math.round(x), Math.round(y));
 		}
 	}
 }
