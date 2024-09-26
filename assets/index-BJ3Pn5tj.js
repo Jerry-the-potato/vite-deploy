@@ -7033,44 +7033,52 @@ function useWindowSize(margin) {
 }
 function WorkerWrapper(options) {
   return new Worker(
-    "/vite-deploy/assets/worker-Dzj0rZlo.js",
+    "/vite-deploy/assets/worker-DJzXmVTS.js",
     {
       name: options == null ? void 0 : options.name
     }
   );
 }
 function createPainter() {
-  this.works = [];
-  this.draw = function(obj) {
-    let ctx = obj.ctx;
-    let x2 = obj.x;
-    let y2 = obj.y;
-    let r2 = obj.r;
-    let x22 = obj.x2;
-    let y22 = obj.y2;
-    let text = obj.text;
-    let size = obj.size;
-    let color = obj.color;
-    let a = obj.a;
-    let b = obj.b;
-    let angle = obj.angle;
-    if (ctx)
-      switch (obj.name) {
-        case "circle":
-          drawCircle();
-          break;
-        case "point":
-          drawPoint();
-          break;
-        case "line":
-          drawLine();
-          break;
-        case "crescent":
-          drawCrescent();
-          break;
-        case "text":
-          drawText();
-      }
+  this.renderTask = {};
+  this.addTask = (priority = 0, ...tasks) => {
+    this.renderTask[priority] = this.renderTask[priority] || [];
+    this.renderTask[priority].push(...tasks);
+  };
+  this.render = () => {
+    Object.keys(this.renderTask).sort((a, b) => a - b).forEach((priority) => {
+      this.renderTask[priority].forEach((task) => {
+        this.drawTask(task);
+      });
+    });
+    this.renderTask = {};
+  };
+  this.drawTask = (task) => {
+    if (!task.ctx) return;
+    const { ctx } = task;
+    const { x: x2, y: y2, x2: x22, y2: y22 } = task;
+    const { r: r2, a, b, angle } = task;
+    const { text, size } = task;
+    const { color } = task;
+    switch (task.name) {
+      case "circle":
+        drawCircle();
+        break;
+      case "point":
+        drawPoint();
+        break;
+      case "line":
+        drawLine();
+        break;
+      case "crescent":
+        drawCrescent();
+        break;
+      case "text":
+        drawText();
+        break;
+      default:
+        console.warn(`未定義的繪圖形狀: ${task.name}`);
+    }
     function drawCircle() {
       if (x2 + y2 + r2 == "NaN") {
         console.warn("drawCircle failed: missing parameter");
@@ -7106,10 +7114,10 @@ function createPainter() {
         console.warn("drawCrescent failed: missing parameter");
         return;
       }
-      let c = Math.sqrt(a * a + b * b);
-      let aTan = Math.atan(a / b);
-      let dx = Math.cos(angle + Math.PI / 2) * a * size;
-      let dy = Math.sin(angle + Math.PI / 2) * a * size;
+      const c = Math.sqrt(a * a + b * b);
+      const aTan = Math.atan(a / b);
+      const dx = Math.cos(angle + Math.PI / 2) * a * size;
+      const dy = Math.sin(angle + Math.PI / 2) * a * size;
       ctx.beginPath();
       ctx.arc(x2, y2, b * size, angle, Math.PI + angle, true);
       ctx.arc(x2 + dx, y2 + dy, c * size, Math.PI + angle + aTan, angle - aTan, false);
@@ -7117,13 +7125,11 @@ function createPainter() {
       ctx.fill();
     }
     function drawText() {
-      x2 = Math.round(x2);
-      y2 = Math.round(y2);
       ctx.font = size + "px Comic Sans MS";
       ctx.textBaseline = "middle";
       ctx.textAlign = "center";
       ctx.fillStyle = color;
-      ctx.fillText(text, x2, y2);
+      ctx.fillText(text, Math.round(x2), Math.round(y2));
     }
   };
 }
@@ -7209,7 +7215,7 @@ class Path extends PathConfig {
   }
 }
 const myMouse = new Path();
-function clearBoard(ctx) {
+function clear(ctx) {
   ctx.canvas.width *= 1;
 }
 function lokaVolterraAlgorithm() {
@@ -7246,10 +7252,8 @@ function lokaVolterraAlgorithm() {
         // distance
         "r": Math.random() * 2 * Math.PI,
         // radian
-        "fakeX": width / 2,
-        "fakeY": height / 2,
-        "vx": [],
-        "vy": []
+        "vx": new Array(60).fill(0),
+        "vy": new Array(60).fill(0)
       };
       point.x = width / 2 + point.d * Math.cos(point.r);
       point.y = height / 2 + point.d * Math.sin(point.r);
@@ -7259,13 +7263,10 @@ function lokaVolterraAlgorithm() {
     }
   };
   this.render = (ctx, offset) => {
-    clearBoard(ctx);
+    clear(ctx);
     ctx.save();
     ctx.translate(ctx.canvas.width * offset, 0);
-    painter.works.forEach((point) => {
-      painter.draw(point);
-    });
-    painter.works = [];
+    painter.render();
     ctx.restore();
   };
   this.update = (ctx, width, height) => {
@@ -7314,85 +7315,48 @@ function lokaVolterraAlgorithm() {
     if (!this.isGravity) return;
     for (let i = 0; i < this.data.length; i++) {
       const p1 = this.data[i];
-      let vx1 = 0;
-      let vx2 = 0;
-      let vy1 = 0;
-      let vy2 = 0;
+      let vx = 0, vy = 0;
       for (let j = i + 1; j < this.data.length; j++) {
-        const p2 = this.data[j];
-        const d = getDistance(p1.x, p1.y, p2.x, p2.y);
-        const MAXD = 0;
-        if (d < MAXD) {
-          let force;
-          if (d < MAXD * 0.1) force = -1;
-          if (d < MAXD * 0.55) force = 1 * (d - MAXD * 0.1) / (MAXD * 0.45);
-          if (d < MAXD) force = 1 * (MAXD - d) / (MAXD * 0.45);
-          vx1 += p2.x > p1.x ? 1 : -1 * force;
-          vx2 += p1.x > p2.x ? 1 : -1 * force;
-          vy1 += p2.y > p1.y ? 1 : -1 * force;
-          vy2 += p1.y > p2.y ? 1 : -1 * force;
-        }
+        break;
       }
       p1.x += caluVelocity(p1.vx);
       p1.y += caluVelocity(p1.vy);
-      const GRAVITY = 100;
-      vx1 += width * 0.5 + GRAVITY / 2 > p1.x ? 1 : -1 * GRAVITY;
-      vx1 -= width * 0.5 - GRAVITY / 2 < p1.x ? 1 : -1 * GRAVITY;
-      vy1 += height / 2 + GRAVITY / 2 > p1.y ? 1 : -1 * GRAVITY;
-      vy1 -= height / 2 - GRAVITY / 2 < p1.y ? 1 : -1 * GRAVITY;
-      addVelocity(p1.vx, vx1);
-      addVelocity(p1.vy, vy1);
+      const GRAVITY = 10;
+      const GAP = 50;
+      vx += width * 0.5 + GAP > p1.x ? 1 : -1 * GRAVITY;
+      vx -= width * 0.5 - GAP < p1.x ? 1 : -1 * GRAVITY;
+      vy += height * 0.5 + GAP > p1.y ? 1 : -1 * GRAVITY;
+      vy -= height * 0.5 - GAP < p1.y ? 1 : -1 * GRAVITY;
+      addVelocity(p1.vx, vx);
+      addVelocity(p1.vy, vy);
     }
-    function getDistance(x1, y1, x2, y2) {
-      const distance = Math.sqrt(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2));
-      return distance;
+    function addVelocity(arr, v2) {
+      arr.unshift(v2);
+      arr.pop();
     }
-    function addVelocity(a, v2) {
-      a.splice(1, 0, v2);
-      a.splice(60, 1);
-    }
-    function caluVelocity(a) {
-      let sum = 0;
-      a.forEach((value) => {
-        sum += value / a.length / 20;
-      });
-      return sum;
+    function caluVelocity(arr) {
+      const avg = arr.reduce((sum, value) => sum + value, 0) / arr.length;
+      return avg;
     }
   };
   this.addTexture = (width, height, ctx) => {
-    for (let i = 0; i < this.data.length; i++) {
-      const point = this.data[i];
+    this.data.forEach((point) => {
       const x2 = point.x;
       const y2 = point.y;
       const ex = x2 / width;
       const ey = y2 / height;
       const dx = this.equation1(ex, ey, height) * width;
       const dy = this.equation2(ex, ey, width) * height;
-      const blue = y2 / width * 255;
-      const green = x2 / width * 255;
-      const red = Math.sin(this.transitionRadian) * 255;
-      const color = "rgb(" + Math.abs(red).toString() + "," + Math.abs(green).toString() + "," + Math.abs(blue).toString() + ")";
-      const mypoint = {
-        "name": "point",
-        "ctx": ctx,
-        "size": 2,
-        "x": x2,
-        "y": y2,
-        "color": color
-      };
-      painter.works.push(mypoint);
-      const myline = {
-        "name": "line",
-        "ctx": ctx,
-        "size": 2,
-        "x": x2,
-        "y": y2,
-        "x2": x2 + this.dlength * dx,
-        "y2": y2 + this.dlength * dy,
-        "color": color
-      };
-      painter.works.push(myline);
-    }
+      const x22 = x2 + this.dlength * dx;
+      const y22 = y2 + this.dlength * dy;
+      const blue = Math.abs(y2 / width * 255);
+      const green = Math.abs(x2 / width * 255);
+      const red = Math.abs(Math.sin(this.transitionRadian) * 255);
+      const color = `rgb(${red}, ${green}, ${blue})`;
+      const mypoint = { name: "point", size: 2, ctx, x: x2, y: y2, color };
+      const myline = { name: "line", size: 2, ctx, x: x2, y: y2, color, x2: x22, y2: y22 };
+      painter.addTask(0, myline, mypoint);
+    });
   };
   this.equation1 = (x2, y2, height) => {
     if (this.useMouse) {
@@ -7497,7 +7461,7 @@ function lokaVolterraAlgorithm() {
       "y": y2 + size * 13,
       "color": transitionColor
     };
-    painter.works.push(circle, crescent1, crescent2, crescent3, text1, text2, text3);
+    painter.addTask(1, circle, crescent1, crescent2, crescent3, text1, text2, text3);
   };
   return this;
 }
@@ -37036,4 +37000,4 @@ function App() {
 const domNode = document.getElementById("root");
 const root = createRoot(domNode);
 root.render(/* @__PURE__ */ jsxRuntimeExports.jsx(App, {}));
-//# sourceMappingURL=index-DR3mOFHU.js.map
+//# sourceMappingURL=index-BJ3Pn5tj.js.map
