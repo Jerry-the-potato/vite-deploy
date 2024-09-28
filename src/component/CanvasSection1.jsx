@@ -65,7 +65,7 @@ const CanvasSectionS1 = ({ratio, min, sectinoID = "LokaVolterra"}) => {
         setIsMain(!isMain);
     }
     function handlePauseWorker(){
-        lokaVolterra["pauseWorker"](!isWorker);
+        lokaVolterra.pauseWorker(!isWorker);
         setIsWorker(!isWorker);
     }
     function handleClick(e){

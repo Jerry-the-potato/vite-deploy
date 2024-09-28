@@ -121,7 +121,7 @@ export default function lokaVolterraAlgorithm(){
 			const p1 = this.data[i];
 			let vx = 0, vy = 0;
 			for (let j = i + 1; j < this.data.length; j++) {
-				break;
+				// break;
 				const p2 = this.data[j];
 				const d = getDistance(p1.x, p1.y, p2.x, p2.y);
 				const MAXD = 0;
