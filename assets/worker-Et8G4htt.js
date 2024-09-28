@@ -281,7 +281,21 @@ var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "sy
         const p1 = this.data[i];
         let vx = 0, vy = 0;
         for (let j = i + 1; j < this.data.length; j++) {
-          break;
+          const p2 = this.data[j];
+          const d = getDistance(p1.x, p1.y, p2.x, p2.y);
+          const MAXD = 0;
+          if (d < MAXD) {
+            let force;
+            if (d < MAXD * 0.1) force = -1;
+            if (d < MAXD * 0.55) force = 1 * (d - MAXD * 0.1) / (MAXD * 0.45);
+            if (d < MAXD) force = 1 * (MAXD - d) / (MAXD * 0.45);
+            const directionX = p2.x > p1.x ? 1 : -1;
+            const directionY = p2.y > p1.y ? 1 : -1;
+            vx += directionX * force;
+            p2.vx[0] -= directionX * force;
+            vy += directionY * force;
+            p2.vy[0] -= directionY * force;
+          }
         }
         p1.x += caluVelocity(p1.vx);
         p1.y += caluVelocity(p1.vy);
@@ -293,6 +307,10 @@ var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "sy
         vy -= height * 0.5 - GAP < p1.y ? 1 : -1 * GRAVITY;
         addVelocity(p1.vx, vx);
         addVelocity(p1.vy, vy);
+      }
+      function getDistance(x1, y1, x2, y2) {
+        const distance = Math.sqrt(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2));
+        return distance;
       }
       function addVelocity(arr, v) {
         arr.unshift(v);
@@ -459,4 +477,4 @@ var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "sy
     requestID = requestAnimationFrame(main);
   }
 })();
-//# sourceMappingURL=worker-DJzXmVTS.js.map
+//# sourceMappingURL=worker-Et8G4htt.js.map
