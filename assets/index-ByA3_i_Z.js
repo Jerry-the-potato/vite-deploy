@@ -7654,11 +7654,11 @@ function SlideMenuBtn({ menu, direction = "top" }) {
   return /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: handleClick, className: "slideMenu", children: isOpen ? "收起△" : "展開▽" });
 }
 function downloadMedia(data) {
-  const blob = new Blob(data, { type: "video/mp4" });
+  const blob = new Blob(data, { type: "video/webm" });
   const recording_url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = recording_url;
-  a.download = "video.mp4";
+  a.download = "video.webm";
   a.click();
 }
 const media = {};
@@ -7679,7 +7679,7 @@ function RecordBtn({ canvas, audio }) {
       media.audioStream = media.audio.captureStream();
       media.stream = new MediaStream([...media.stream.getVideoTracks(), ...media.audioStream.getAudioTracks()]);
     }
-    media.recorder = new MediaRecorder(media.stream, { mimeType: "video/mp4; codecs=vp9" });
+    media.recorder = new MediaRecorder(media.stream, { mimeType: "video/webm; codecs=vp9" });
     media.recorder.ondataavailable = (evt) => {
       chunks.push(evt.data);
     };
@@ -27582,6 +27582,10 @@ class SortAlgorithm {
   setLog(element) {
     this.log = element;
   }
+  setStepByStep() {
+    this.isSorting = true;
+    this.isStoping = true;
+  }
   start(name, columns) {
     this.secondColumns = [];
     this.send(name + " is processing");
@@ -27687,25 +27691,26 @@ class SortAlgorithm {
     const len = columns.length;
     const i = this.i;
     const j = this.j;
-    const min = this.minIndex;
+    const minIndex = this.minIndex;
     if (i == len - 1) return true;
     if (j == len) {
       this.i++;
       this.minIndex = this.i;
       this.j = this.i + 1;
-      if (i == this.minIndex) return false;
+      if (i == minIndex) return false;
       const a = columns[i];
-      const b = columns[min];
+      const b = columns[minIndex];
       const frame = 60;
       SortAlgorithm.swapColumn(a, b, frame);
       return false;
     }
-    if (columns[this.minIndex].height > columns[j].height) this.minIndex = j;
+    const min = columns[minIndex].height;
+    const next = columns[j].height;
+    if (next < min) this.minIndex = j;
     this.j++;
   }
   insertionSortSetting(columns) {
     this.i = 1;
-    this.key = columns[1].height;
     this.j = 0;
   }
   insertionSort(columns) {
@@ -27716,12 +27721,10 @@ class SortAlgorithm {
       if (j >= 0 && columns[j].height > columns[j + 1].height) {
         const a = columns[j + 1];
         const b = columns[j];
-        const frame = 30 + Math.ceil((this.timesEveryFrame - this.times) * 20 / this.timesEveryFrame);
-        SortAlgorithm.swapColumn(a, b, frame);
+        SortAlgorithm.swapColumn(a, b, 30);
         this.j--;
       } else {
         this.i++;
-        if (this.i >= len) return true;
         this.j = this.i - 1;
       }
     } else return true;
@@ -27985,10 +27988,12 @@ class SortAlgorithm {
     const j = this.j;
     if (gap > 0) {
       if (i < len) {
-        if (j >= gap && columns[j - gap].height > columns[j].height) {
-          const a = columns[j];
-          const b = columns[j - gap];
-          SortAlgorithm.swapColumn(a, b, 60);
+        const a = columns[j];
+        const b = columns[j - gap];
+        if (j >= gap && b.height > a.height) {
+          const a2 = columns[j];
+          const b2 = columns[j - gap];
+          SortAlgorithm.swapColumn(a2, b2, 60);
           this.j -= gap;
         } else {
           this.i++;
@@ -28082,12 +28087,14 @@ class SortAlgorithm {
     this.timesEveryFrame = 30;
   }
   instantRandomSort(columns) {
-    return this.randomSort(columns, 0);
+    return this.randomSort(columns, 30);
   }
 }
 class ParticleSystem {
-  constructor(x2, y2) {
+  constructor(width, height) {
     this.sort = new SortAlgorithm();
+    const x2 = width / 2;
+    const y2 = height / 2;
     this.x = x2;
     this.y = y2;
     this.slow = 0.999;
@@ -28095,16 +28102,17 @@ class ParticleSystem {
     this.i = 0;
     this.j = 0;
     this.maxValue = 865 * 0.4;
-    const length = Math.floor((x2 - 200) / 4);
-    const width = Math.max(Math.floor(x2 * 2 / length), 0.5);
+    const length = Math.floor((x2 - 200) / 2);
+    const thick = Math.max(Math.floor(x2 * 2 / length), 0.5);
     this.columns = new Array(length).fill().map((v2, i) => {
-      return this.createColumn(x2 - width * length / 2 + width * i, y2 * 1.8, width, (i + 1) / length * this.maxValue);
+      return this.createColumn(x2 - thick * length / 2 + thick * i, y2 * 1.8, thick, (i + 1) / length * this.maxValue);
     });
+    this.secondColumns = [];
     this.walls = new Array(5).fill().map((v2, i) => {
       return this.createWall("arc", x2, y2 - x2 / 2, 865 / 2 / 25 * (1 + i * i), 3, 0 + Math.PI / 16 * (4 - i), Math.PI / 16 * (12 + i), Math.PI / 15 * i, 865 / 2 / 25);
     });
     const ballLen = Math.min(length * 2, 500);
-    const ballSize = 2 + Math.floor(width / 3);
+    const ballSize = 1 + Math.floor(thick / 3);
     this.balls = new Array(ballLen).fill().map(() => {
       const r2 = Math.pow(Math.random(), 0.6) * 865 / 4;
       const theta = Math.random() * 2 * Math.PI;
@@ -28145,7 +28153,7 @@ class ParticleSystem {
     const dist = Math.sqrt(x2 * x2 + y2 * y2);
     return dist;
   }
-  isCollide(target, wall) {
+  getCollide(target, wall) {
     if (wall.type == "arc") {
       const x2 = target.x - wall.x;
       const y2 = target.y - wall.y;
@@ -28163,13 +28171,13 @@ class ParticleSystem {
     anotherBall.y = y2 + (anotherBall.y - y2) / (dist / 2) * anotherBall.r;
     const vx = (ball.vx - anotherBall.vx) / 2;
     const vy = (ball.vy - anotherBall.vy) / 2;
-    const averageVx = (ball.vx + anotherBall.vx) / 2;
-    const averageVy = (ball.vy + anotherBall.vy) / 2;
     const angle = Math.atan((ball.y - y2) / (ball.x - x2));
     const vectorT = -vx * Math.sin(angle) + vy * Math.cos(angle);
     const vectorN = -1 * (vx * Math.cos(angle) + vy * Math.sin(angle));
     const relativeX = -vectorT * Math.sin(angle) + vectorN * Math.cos(angle);
     const relativeY = vectorT * Math.cos(angle) + vectorN * Math.sin(angle);
+    const averageVx = (ball.vx + anotherBall.vx) / 2;
+    const averageVy = (ball.vy + anotherBall.vy) / 2;
     ball.vx = (averageVx + relativeX) * this.friction;
     ball.vy = (averageVy + relativeY) * this.friction;
     anotherBall.vx = (averageVx - relativeX) * this.friction;
@@ -28196,23 +28204,22 @@ class ParticleSystem {
     const columnBottom = column.path.pointY;
     const columnLeft = column.path.pointX - column.width / 2;
     const columnRight = column.path.pointX + column.width / 2;
-    if (ball.x + ball.r > columnLeft && ball.x - ball.r < columnRight && ball.y + ball.r > columnTop && ball.y - ball.r < columnBottom) {
-      const overlapX = Math.min(ball.x + ball.r - columnLeft, columnRight - ball.x + ball.r);
-      const overlapY = Math.min(ball.y + ball.r - columnTop, columnBottom - ball.y + ball.r);
-      if (overlapX < overlapY) {
-        ball.vx = -ball.vx * this.friction;
-        if (ball.x < column.path.pointX) {
-          ball.x = columnLeft - ball.r;
-        } else {
-          ball.x = columnRight + ball.r;
-        }
+    const overlapX = Math.min(ball.x + ball.r - columnLeft, columnRight - ball.x + ball.r);
+    const overlapY = Math.min(ball.y + ball.r - columnTop, columnBottom - ball.y + ball.r);
+    if (overlapX < 0 || overlapY < 0) return;
+    if (overlapX < overlapY) {
+      ball.vx = -ball.vx * this.friction;
+      if (ball.x < column.path.pointX) {
+        ball.x = columnLeft - ball.r;
       } else {
-        ball.vy = -ball.vy * this.friction;
-        if (ball.y < column.path.pointY) {
-          ball.y = columnTop - ball.r;
-        } else {
-          ball.y = columnBottom + ball.r;
-        }
+        ball.x = columnRight + ball.r;
+      }
+    } else {
+      ball.vy = -ball.vy * this.friction;
+      if (ball.y < column.path.pointY) {
+        ball.y = columnTop - ball.r;
+      } else {
+        ball.y = columnBottom + ball.r;
       }
     }
   }
@@ -28238,7 +28245,7 @@ class ParticleSystem {
     }
   }
   update() {
-    this.sort.update(this.columns);
+    this.sort.update(this.columns, this.secondColumns);
     this.texts.log.text = this.sort.log.innerText;
     this.columns.forEach((column) => {
       if (column.path != void 0) {
@@ -28268,7 +28275,7 @@ class ParticleSystem {
         }
       });
       this.walls.forEach((wall) => {
-        const dist = this.isCollide(ball, wall);
+        const dist = this.getCollide(ball, wall);
         if (dist > 0) {
           this.handleWallCollision(ball, wall, dist);
         }
@@ -28335,7 +28342,7 @@ class ParticleSystem {
 const createPhysic = function() {
   new Averager(60);
   this.setCanvas = (canvas, pElement) => {
-    this.system = new ParticleSystem(canvas.width / 2, canvas.height / 2);
+    this.system = new ParticleSystem(canvas.width, canvas.height);
     this.system.sort.setLog(pElement);
     this.ctx = canvas.getContext("2d");
     this.ctx.lineCap = "butt";
@@ -28352,7 +28359,7 @@ const createPhysic = function() {
     this.system.render(this.ctx);
   };
   this.start = (ID, path) => {
-    if (!this.system.sort[ID]) {
+    if (!this.system.sort[ID] && !this.system.sort[ID + "Maker"]) {
       console.warn("invalid function name. Button id " + ID + " is not any of sortFunctions");
       return;
     }
@@ -28363,8 +28370,7 @@ const createPhysic = function() {
     this.system.sort.isSorting = false;
   };
   this.stepByStep = () => {
-    this.system.sort.isSorting = true;
-    this.system.sort.isStoping = true;
+    this.system.sort.setStepByStep();
   };
   this.setPath = (path) => {
     Object.assign(PathConfig, path);
@@ -37018,4 +37024,4 @@ function App() {
 const domNode = document.getElementById("root");
 const root = createRoot(domNode);
 root.render(/* @__PURE__ */ jsxRuntimeExports.jsx(App, {}));
-//# sourceMappingURL=index-DGL6cdqM.js.map
+//# sourceMappingURL=index-ByA3_i_Z.js.map
