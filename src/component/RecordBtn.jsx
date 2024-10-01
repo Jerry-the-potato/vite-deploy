@@ -19,7 +19,7 @@ export default function RecordBtn({canvas, audio}){
             media.audioStream = media.audio.captureStream();
             media.stream = new MediaStream([...media.stream.getVideoTracks(), ...media.audioStream.getAudioTracks()]);
         }
-        media.recorder = new MediaRecorder(media.stream, { mimeType: "video/mp4; codecs=vp9" })
+        media.recorder = new MediaRecorder(media.stream, { mimeType: "video/webm; codecs=vp9" })
         media.recorder.ondataavailable = (evt) => { chunks.push(evt.data); };
         // Provide recorded data when recording stops
         media.recorder.onstop = () => {downloadMedia(chunks);};

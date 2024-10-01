@@ -6,7 +6,7 @@ import Averager from "./averager";
 const createPhysic = function(){
     const frame = new Averager(60);
 	this.setCanvas = (canvas, pElement) => {
-        this.system = new ParticleSystem(canvas.width/2, canvas.height/2);
+        this.system = new ParticleSystem(canvas.width, canvas.height);
         this.system.sort.setLog(pElement);
         this.ctx = canvas.getContext("2d");
         this.ctx.lineCap = 'butt';
@@ -19,7 +19,7 @@ const createPhysic = function(){
     this.update = () => {this.system.update();}
     this.render = () => {this.system.render(this.ctx);}
     this.start = (ID, path) => {
-        if(!this.system.sort[ID]){
+        if(!this.system.sort[ID] && !this.system.sort[ID + "Maker"]){
             console.warn("invalid function name. Button id " + ID + " is not any of sortFunctions");
             return;
         }
@@ -30,8 +30,7 @@ const createPhysic = function(){
         this.system.sort.isSorting = false;
     }
     this.stepByStep = () => {
-        this.system.sort.isSorting = true;
-        this.system.sort.isStoping = true;
+        this.system.sort.setStepByStep();
     }
     this.setPath = (path) => {
         // const ID = e.target.id;

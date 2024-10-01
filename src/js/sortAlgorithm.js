@@ -10,10 +10,17 @@ export class SortAlgorithmIterable{
     setLog(element){
         this.log = element;
     }
+    send(message){
+        this.log.innerText = message;
+    }
+    setStepByStep(){
+        this.isSorting = true;
+        this.isStoping = true;
+    }
     start(name, columns){
         this.secondColumns = []; // 清空上次排序
         this.sortFunction = this[name + "Maker"](columns);
-        this.timesEveryFrame = Math.ceil(columns.length/25);
+        this.timesEveryFrame = Math.ceil(columns.length/50);
         this.isSorting = true;
     }
     update(){
@@ -47,10 +54,61 @@ export class SortAlgorithmIterable{
         }
         yield true;
     }
+    * selectionSortMaker(columns) {
+        const len = columns.length;
+        for (let i = 0; i < len; i++) {
+            let minIndex = i;
+            for (let j = i + 1; j < len; j++) {
+                const min = columns[minIndex].height;
+                const next = columns[j].height;
+                if (next < min) minIndex = j;
+                yield false;
+            }
+            if(minIndex == i) continue;
+            const a = columns[i];
+            const b = columns[minIndex];
+            SortAlgorithm.swapColumn(a, b, 30);
+        }
+        yield true;
+    }
+    * insertionSortMaker(columns) {
+        const len = columns.length;
+        for (let i = 1; i < len; i++) {
+            let key = columns[i].height;
+            let j = i - 1;
+            while (j >= 0 && columns[j].height > key) {
+                const a = columns[j + 1];
+                const b = columns[j];
+                SortAlgorithm.swapColumn(a, b, 30);
+                yield false;
+                j--;
+            }
+        }
+        yield true;
+    }
+    * shellSortMaker(columns) {
+        const len = columns.length;
+        let gap = Math.floor(len / 2);
+
+        while (gap > 0) {
+            for (let i = gap; i < len; i++) {
+                let j = i;
+                while (j >= gap && columns[j - gap].height > columns[j].height) {
+                    const a = columns[j];
+                    const b = columns[j - gap];
+                    SortAlgorithm.swapColumn(a, b, 60);
+                    yield false;
+                    j -= gap;
+                }
+            }
+            gap = Math.floor(gap / 2);
+        }
+        yield true;
+    }
     * quickSortMaker(columns, left = 0, right = columns.length - 1) {
         yield false;
         if (left >= right) return;
-        const pivotIndex = yield* SortAlgorithm.partition(columns, left, right);
+        const pivotIndex = yield* SortAlgorithmIterable.partition(columns, left, right);
         yield* this.quickSortMaker(columns, left, pivotIndex - 1);
         yield* this.quickSortMaker(columns, pivotIndex + 1, right);
         if(left == 0 && right == columns.length - 1) yield true;
@@ -70,6 +128,85 @@ export class SortAlgorithmIterable{
         return i;
     }
 
+    * mergeSortMaker(columns, left = 0, right = columns.length - 1) {
+        if (left >= right) return;
+        const mid = Math.floor((left + right) / 2);
+        yield* this.mergeSortMaker(columns, left, mid);
+        yield* this.mergeSortMaker(columns, mid + 1, right);
+        yield* this.mergeMaker(columns, left, mid, right);
+        if(left == 0 && right == columns.length - 1) yield true;
+    }
+
+    * mergeMaker(columns, left, mid, right) {
+        const secondColumns = JSON.parse(JSON.stringify(columns.slice(left, right + 1)));
+        const heights = secondColumns.map((column)=>{return column.height});
+        const max = Math.max(...heights);
+        // 為每個 column 添加 path 和動畫目標
+        secondColumns.forEach((column) => {
+            column.path = new Path(column.x, column.y);
+            column.path.NewTarget(column.x, column.y - max, 20);
+            column.width /= 3;  // 動畫效果: 將寬度縮小三分之一
+        });
+
+        let i = 0; // 左半部分的索引
+        let j = mid - left + 1; // 右半部分的索引
+        let k = left; // 合併後的索引
+
+        // 合併兩個部分
+        while (i <= mid - left && j <= right - left) {
+            yield false;
+            if (secondColumns[i].height <= secondColumns[j].height) {
+                const a = columns[k];
+                const b = secondColumns[i];
+                SortAlgorithm.swapColumn(a, b, 30);
+                i++;
+            } else {
+                const a = columns[k];
+                const b = secondColumns[j];
+                SortAlgorithm.swapColumn(a, b, 30);
+                j++;
+            }
+            k++;
+        }
+
+        // 如果左邊有剩餘，繼續合併
+        while (i <= mid - left) {
+            yield false;
+            const a = columns[k];
+            const b = secondColumns[i];
+            SortAlgorithm.swapColumn(a, b, 30);
+            i++;
+            k++;
+        }
+
+        // 如果右邊有剩餘，繼續合併
+        while (j <= right - left) {
+            yield false;
+            const a = columns[k];
+            const b = secondColumns[j];
+            SortAlgorithm.swapColumn(a, b, 30);
+            j++;
+            k++;
+        }
+    }
+
+    * randomSortMaker(columns, frames = 60, TEF = 1){
+        this.timesEveryFrame = TEF;
+        const len = columns.length;
+        for(let i = 0; i < len; i = i * i + 1){
+            for(let j = 0; j < len; j = i + j + 1){
+                const a = columns[j];
+                const b = columns[(j*j+1) % len];
+                SortAlgorithm.swapColumn(a, b, frames);
+                yield false;
+            }
+        }
+        yield true;
+    }
+    * instantRandomSortMaker(columns){
+        this.timesEveryFrame = 30;
+        yield* this.randomSortMaker(columns, 30, 30);
+    }
 }
 export class SortAlgorithm{
     constructor(){
@@ -80,6 +217,10 @@ export class SortAlgorithm{
     }
     setLog(element){
         this.log = element;
+    }
+    setStepByStep(){
+        this.isSorting = true;
+        this.isStoping = true;
     }
     start(name, columns){
         this.secondColumns = []; // 清空上次排序
@@ -192,25 +333,26 @@ export class SortAlgorithm{
         const len = columns.length;
         const i = this.i;
         const j = this.j;
-        const min = this.minIndex;
+        const minIndex = this.minIndex;
         if (i == len - 1) return true;
         if (j == len) {
             this.i++;
             this.minIndex = this.i;
             this.j = this.i + 1;
-            if(i == this.minIndex) return false;
+            if(i == minIndex) return false;
             const a = columns[i];
-            const b = columns[min];
+            const b = columns[minIndex];
             const frame = 60;
             SortAlgorithm.swapColumn(a, b, frame);
             return false;
         }
-        if (columns[this.minIndex].height > columns[j].height) this.minIndex = j;
+        const min = columns[minIndex].height;
+        const next = columns[j].height;
+        if (next < min) this.minIndex = j;
         this.j++;
     }
     insertionSortSetting(columns){
         this.i = 1;
-        this.key = columns[1].height;
         this.j = 0;
     }
     insertionSort(columns){
@@ -221,18 +363,13 @@ export class SortAlgorithm{
             if (j >= 0 && columns[j].height > columns[j + 1].height) {
                 const a = columns[j + 1];
                 const b = columns[j];
-                const frame = 30 + Math.ceil((this.timesEveryFrame - this.times) * 20 / this.timesEveryFrame);
-                SortAlgorithm.swapColumn(a, b, frame);
+                SortAlgorithm.swapColumn(a, b, 30);
                 this.j--;
-            }
-            else{
-                
+            } else{
                 this.i++;
-                if(this.i >= len) return true;
                 this.j = this.i - 1;
             }
-        }
-        else return true
+        } else return true;
     }
     quickSortSetting(columns){
         this.stack = [{'left': 0, 'right': columns.length - 1}];
@@ -505,24 +642,23 @@ export class SortAlgorithm{
         const j = this.j;
         if(gap > 0){
             if(i < len){
-                if (j >= gap && columns[j - gap].height > columns[j].height) {
+                const a = columns[j];
+                const b = columns[j - gap];
+                if (j >= gap && b.height > a.height) {
                     const a = columns[j];
                     const b = columns[j - gap];
                     SortAlgorithm.swapColumn(a, b, 60);
                     this.j-= gap;
-                }
-                else{
+                } else{
                     this.i++;
                     this.j = this.i;
                 }
-            }
-            else{
+            } else{
                 this.gap = Math.floor(gap / 2);
                 this.i = this.gap;
                 this.j = this.i;
             }
-        }
-        else return;
+        } else return;
     }
     countingSortSetting(columns){
         const heights = columns.map((column)=>{return column.height})
@@ -606,6 +742,6 @@ export class SortAlgorithm{
         this.timesEveryFrame = 30;
     }
     instantRandomSort(columns){
-        return this.randomSort(columns, 0);
+        return this.randomSort(columns, 30);
     }
 }

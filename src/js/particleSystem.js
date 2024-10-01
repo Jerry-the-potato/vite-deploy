@@ -1,10 +1,11 @@
 import {Path} from './path.js';
-import { SortAlgorithm } from './sortAlgorithm.js';
+import { SortAlgorithm, SortAlgorithmIterable } from './sortAlgorithm.js';
 
 export default class ParticleSystem{
-    constructor(x, y){
+    constructor(width, height){
         this.sort = new SortAlgorithm();
-
+        const x = width / 2;
+        const y = height / 2;
         this.x = x;
         this.y = y;
         this.slow = 0.999;
@@ -12,17 +13,18 @@ export default class ParticleSystem{
         this.i = 0;
         this.j = 0;
         this.maxValue = 865*0.4;
-        const length = Math.floor((x - 200) / 4);
-        const width = Math.max(Math.floor(x*2/length), 0.5);
+        const length = Math.floor((x - 200) / 2);
+        const thick = Math.max(Math.floor(x * 2 / length), 0.5);
         this.columns = new Array(length).fill().map((v,i) => {
-            return this.createColumn(x - width * length/2 + width * i, y * 1.8, width, ((i+1)/length) * this.maxValue);
+            return this.createColumn(x - thick * length/2 + thick * i, y * 1.8, thick, ((i+1)/length) * this.maxValue);
         });
+        this.secondColumns = [];
         this.walls = new Array(5).fill().map((v,i) => {
             return this.createWall("arc", x, y-x/2, 865/2/25 * (1+i*i), 3, 0 + Math.PI/16*(4-i), Math.PI/16*(12+i), Math.PI / 15 * i, 865/2/25)
         });
         // this.walls = [this.createWall("arc", x, y, 865/3)]
-        const ballLen = Math.min(length*2, 500);
-        const ballSize = 2 + Math.floor(width/3);
+        const ballLen = Math.min(length * 2, 500);
+        const ballSize = 1 + Math.floor(thick / 3);
         this.balls = new Array(ballLen).fill().map(() => {
             const r = Math.pow(Math.random(), 0.6) * 865/4;
             const theta = Math.random() * 2 * Math.PI;
@@ -63,7 +65,7 @@ export default class ParticleSystem{
         const dist = Math.sqrt(x*x + y*y);
         return dist;
     }
-    isCollide(target, wall){
+    getCollide(target, wall){
         if(wall.type == "arc"){
             const x = target.x - wall.x;
             const y = target.y - wall.y;
@@ -82,13 +84,11 @@ export default class ParticleSystem{
         anotherBall.x = x + (anotherBall.x - x) / (dist / 2) * anotherBall.r;
         anotherBall.y = y + (anotherBall.y - y) / (dist / 2) * anotherBall.r;
 
-        // 計算速度的變化
+        // 相對速度
         const vx = (ball.vx - anotherBall.vx) / 2;
         const vy = (ball.vy - anotherBall.vy) / 2;
-        const averageVx = (ball.vx + anotherBall.vx) / 2;
-        const averageVy = (ball.vy + anotherBall.vy) / 2;
 
-        // 計算碰撞後的新速度
+        // 計算碰撞後的相對速度
         const angle = Math.atan((ball.y - y) / (ball.x - x));
         const vectorT = -vx * Math.sin(angle) + vy * Math.cos(angle);
         const vectorN = -1 * (vx * Math.cos(angle) + vy * Math.sin(angle));
@@ -96,6 +96,8 @@ export default class ParticleSystem{
         const relativeY = vectorT * Math.cos(angle) + vectorN * Math.sin(angle);
 
         // 更新球的速度
+        const averageVx = (ball.vx + anotherBall.vx) / 2;
+        const averageVy = (ball.vy + anotherBall.vy) / 2;
         ball.vx = (averageVx + relativeX) * this.friction;
         ball.vy = (averageVy + relativeY) * this.friction;
         anotherBall.vx = (averageVx - relativeX) * this.friction;
@@ -131,36 +133,34 @@ export default class ParticleSystem{
         ball.vy = (vectorT * Math.cos(angle) + vectorN * Math.sin(angle)) * this.friction;
     }
     handleColumnCollision(ball, column) {
-        // 檢測球體是否與柱子碰撞
         const columnTop = column.path.pointY - column.height;
         const columnBottom = column.path.pointY;
         const columnLeft = column.path.pointX - column.width / 2;
         const columnRight = column.path.pointX + column.width / 2;
+
+        // 計算球體與柱子邊界的重疊量
+        const overlapX = Math.min(ball.x + ball.r - columnLeft, columnRight - ball.x + ball.r);
+        const overlapY = Math.min(ball.y + ball.r - columnTop, columnBottom - ball.y + ball.r);
         
-        if (ball.x + ball.r > columnLeft && ball.x - ball.r < columnRight &&
-            ball.y + ball.r > columnTop && ball.y - ball.r < columnBottom) {
-            
-            // 計算球體與柱子邊界的重疊量
-            const overlapX = Math.min(ball.x + ball.r - columnLeft, columnRight - ball.x + ball.r);
-            const overlapY = Math.min(ball.y + ball.r - columnTop, columnBottom - ball.y + ball.r);
-            
-            // 確定碰撞位置並計算反彈
-            if (overlapX < overlapY) {
-                // 碰撞發生在左右兩側
-                ball.vx = -ball.vx * this.friction;
-                if (ball.x < column.path.pointX) {
-                    ball.x = columnLeft - ball.r;
-                } else {
-                    ball.x = columnRight + ball.r;
-                }
+        // 重疊量小於 0 表示沒有碰撞
+        if(overlapX < 0 || overlapY < 0) return;
+
+        // 確定碰撞位置並計算反彈
+        if (overlapX < overlapY) {
+            // 碰撞發生在左右兩側
+            ball.vx = -ball.vx * this.friction;
+            if (ball.x < column.path.pointX) {
+                ball.x = columnLeft - ball.r;
             } else {
-                // 碰撞發生在上下兩側
-                ball.vy = -ball.vy * this.friction;
-                if (ball.y < column.path.pointY) {
-                    ball.y = columnTop - ball.r;
-                } else {
-                    ball.y = columnBottom + ball.r;
-                }
+                ball.x = columnRight + ball.r;
+            }
+        } else {
+            // 碰撞發生在上下兩側
+            ball.vy = -ball.vy * this.friction;
+            if (ball.y < column.path.pointY) {
+                ball.y = columnTop - ball.r;
+            } else {
+                ball.y = columnBottom + ball.r;
             }
         }
     }
@@ -193,7 +193,7 @@ export default class ParticleSystem{
         }
     }
     update(){
-        this.sort.update(this.columns);
+        this.sort.update(this.columns, this.secondColumns);
         this.texts.log.text = this.sort.log.innerText;
         this.columns.forEach((column) => {
             if(column.path != undefined){
@@ -230,7 +230,7 @@ export default class ParticleSystem{
 
             // 檢測與牆壁的碰撞
             this.walls.forEach((wall) => {
-                const dist = this.isCollide(ball, wall);
+                const dist = this.getCollide(ball, wall);
                 if (dist > 0) {
                     this.handleWallCollision(ball, wall, dist);
                 }
