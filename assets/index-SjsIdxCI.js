@@ -27571,6 +27571,202 @@ const CanvasSectionS2 = ({ ratio, min, sectinoID = "MusicAnalyser" }) => {
     /* @__PURE__ */ jsxRuntimeExports.jsx("audio", { onPlay: musicAnalyser.getAnalyser, ref: audio, controls: true, id: "myAudio", style: { "position": "absolute", "left": "10px", "bottom": "10px" }, children: /* @__PURE__ */ jsxRuntimeExports.jsx("source", { src: audioUrl }) })
   ] });
 };
+class SortAlgorithmIterable {
+  constructor() {
+    this.secondColumns = [];
+    this.sortFunction = void 0;
+    this.isSorting = false;
+    this.log = document.createElement("div");
+  }
+  setLog(element) {
+    this.log = element;
+  }
+  send(message) {
+    this.log.innerText = message;
+  }
+  setStepByStep() {
+    this.isSorting = true;
+    this.isStoping = true;
+  }
+  start(name, columns) {
+    this.secondColumns = [];
+    this.send(name + " is processing");
+    this.sortFunction = this[name + "Maker"](columns);
+    this.name = name;
+    this.timesEveryFrame = Math.ceil(columns.length / 5e3);
+    this.isSorting = true;
+  }
+  update() {
+    if (!this.isSorting) return;
+    this.times = this.timesEveryFrame;
+    while (this.times--) {
+      const isStoping = this.sortFunction.next().value;
+      if (isStoping === true) {
+        [this.isStoping, this.times] = [true, 0];
+        const message = this.name + " is done.";
+        this.send(message);
+      }
+    }
+    if (this.isStoping) {
+      this.isSorting = false;
+      this.isStoping = false;
+    }
+  }
+  // 迭代生成
+  *bubbleSortMaker(columns) {
+    const len = columns.length;
+    for (let i = 0; i < len - 1; i++) {
+      for (let j = 0; j < len - 1 - i; j++) {
+        const a = columns[j];
+        const b = columns[j + 1];
+        if (a.height > b.height) SortAlgorithm.swapColumn(a, b, 30);
+        yield false;
+      }
+    }
+    yield true;
+  }
+  *selectionSortMaker(columns) {
+    const len = columns.length;
+    for (let i = 0; i < len; i++) {
+      let minIndex = i;
+      for (let j = i + 1; j < len; j++) {
+        const min = columns[minIndex].height;
+        const next = columns[j].height;
+        if (next < min) minIndex = j;
+        yield false;
+      }
+      if (minIndex == i) continue;
+      const a = columns[i];
+      const b = columns[minIndex];
+      SortAlgorithm.swapColumn(a, b, 30);
+    }
+    yield true;
+  }
+  *insertionSortMaker(columns) {
+    const len = columns.length;
+    for (let i = 1; i < len; i++) {
+      let key = columns[i].height;
+      let j = i - 1;
+      while (j >= 0 && columns[j].height > key) {
+        const a = columns[j + 1];
+        const b = columns[j];
+        SortAlgorithm.swapColumn(a, b, 30);
+        yield false;
+        j--;
+      }
+    }
+    yield true;
+  }
+  *shellSortMaker(columns) {
+    const len = columns.length;
+    let gap = Math.floor(len / 2);
+    while (gap > 0) {
+      for (let i = gap; i < len; i++) {
+        let j = i;
+        while (j >= gap && columns[j - gap].height > columns[j].height) {
+          const a = columns[j];
+          const b = columns[j - gap];
+          SortAlgorithm.swapColumn(a, b, 60);
+          yield false;
+          j -= gap;
+        }
+      }
+      gap = Math.floor(gap / 2);
+    }
+    yield true;
+  }
+  *quickSortMaker(columns, left = 0, right = columns.length - 1) {
+    if (left >= right) return;
+    const pivotIndex = yield* SortAlgorithmIterable.partition(columns, left, right);
+    yield* this.quickSortMaker(columns, left, pivotIndex - 1);
+    yield* this.quickSortMaker(columns, pivotIndex + 1, right);
+    if (left == 0 && right == columns.length - 1) yield true;
+  }
+  static *partition(columns, left, right) {
+    const pivot = columns[right];
+    let i = left;
+    for (let j = left; j < right; j++) {
+      yield false;
+      if (columns[j].height < pivot.height) {
+        SortAlgorithm.swapColumn(columns[i], columns[j], 30);
+        i++;
+      }
+    }
+    SortAlgorithm.swapColumn(columns[i], columns[right], 30);
+    return i;
+  }
+  *mergeSortMaker(columns, left = 0, right = columns.length - 1) {
+    if (left >= right) return;
+    const mid = Math.floor((left + right) / 2);
+    yield* this.mergeSortMaker(columns, left, mid);
+    yield* this.mergeSortMaker(columns, mid + 1, right);
+    yield* this.mergeMaker(columns, left, mid, right);
+    if (left == 0 && right == columns.length - 1) yield true;
+  }
+  *mergeMaker(columns, left, mid, right) {
+    const secondColumns = JSON.parse(JSON.stringify(columns.slice(left, right + 1)));
+    const heights = secondColumns.map((column) => {
+      return column.height;
+    });
+    const max = Math.max(...heights);
+    secondColumns.forEach((column) => {
+      column.path = new Path(column.x, column.y);
+      column.path.NewTarget(column.x, column.y - max, 20);
+      column.width /= 3;
+    });
+    let i = 0;
+    let j = mid - left + 1;
+    let k2 = left;
+    while (i <= mid - left && j <= right - left) {
+      yield false;
+      if (secondColumns[i].height <= secondColumns[j].height) {
+        const a = columns[k2];
+        const b = secondColumns[i];
+        SortAlgorithm.swapColumn(a, b, 30);
+        i++;
+      } else {
+        const a = columns[k2];
+        const b = secondColumns[j];
+        SortAlgorithm.swapColumn(a, b, 30);
+        j++;
+      }
+      k2++;
+    }
+    while (i <= mid - left) {
+      yield false;
+      const a = columns[k2];
+      const b = secondColumns[i];
+      SortAlgorithm.swapColumn(a, b, 30);
+      i++;
+      k2++;
+    }
+    while (j <= right - left) {
+      yield false;
+      const a = columns[k2];
+      const b = secondColumns[j];
+      SortAlgorithm.swapColumn(a, b, 30);
+      j++;
+      k2++;
+    }
+  }
+  *randomSortMaker(columns, frames = 60, TEF = 1) {
+    this.timesEveryFrame = TEF;
+    const len = columns.length;
+    for (let i = 0; i < len; i = i * i + 1) {
+      for (let j = 0; j < len; j = i + j + 1) {
+        const a = columns[j];
+        const b = columns[(j * j + 1) % len];
+        SortAlgorithm.swapColumn(a, b, frames);
+        yield false;
+      }
+    }
+    yield true;
+  }
+  *instantRandomSortMaker(columns) {
+    this.timesEveryFrame = 30;
+    yield* this.randomSortMaker(columns, 30, 30);
+  }
+}
 class SortAlgorithm {
   constructor() {
     this.secondColumns = [];
@@ -27590,7 +27786,7 @@ class SortAlgorithm {
     this.secondColumns = [];
     this.send(name + " is processing");
     this.sortFunction = this[name];
-    this.timesEveryFrame = Math.ceil(columns.length / 25);
+    this.timesEveryFrame = Math.ceil(columns.length / 2500);
     this.isSorting = true;
     this[name + "Setting"](columns);
   }
@@ -27732,7 +27928,7 @@ class SortAlgorithm {
   quickSortSetting(columns) {
     this.stack = [{ "left": 0, "right": columns.length - 1 }];
     this.partitionPhase = "0.SetPivot";
-    this.pivot = Math.floor(columns.length - 1);
+    this.pivot = columns.length - 1;
     this.j = 0;
   }
   quickSort(columns) {
@@ -28092,7 +28288,7 @@ class SortAlgorithm {
 }
 class ParticleSystem {
   constructor(width, height) {
-    this.sort = new SortAlgorithm();
+    this.sort = new SortAlgorithmIterable();
     const x2 = width / 2;
     const y2 = height / 2;
     this.x = x2;
@@ -37024,4 +37220,4 @@ function App() {
 const domNode = document.getElementById("root");
 const root = createRoot(domNode);
 root.render(/* @__PURE__ */ jsxRuntimeExports.jsx(App, {}));
-//# sourceMappingURL=index-ByA3_i_Z.js.map
+//# sourceMappingURL=index-SjsIdxCI.js.map
