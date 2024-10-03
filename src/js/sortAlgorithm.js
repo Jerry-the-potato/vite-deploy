@@ -19,8 +19,10 @@ export class SortAlgorithmIterable{
     }
     start(name, columns){
         this.secondColumns = []; // 清空上次排序
+        this.send(name + " is processing");
         this.sortFunction = this[name + "Maker"](columns);
-        this.timesEveryFrame = Math.ceil(columns.length/50);
+        this.name = name;
+        this.timesEveryFrame = Math.ceil(columns.length/5000);
         this.isSorting = true;
     }
     update(){
@@ -31,7 +33,7 @@ export class SortAlgorithmIterable{
             const isStoping = this.sortFunction.next().value;
             if(isStoping === true){
                 [this.isStoping, this.times] = [true, 0];
-                const message = this.sortFunction.name + " is done.";
+                const message = this.name + " is done.";
                 this.send(message);
             }
         }
@@ -106,7 +108,6 @@ export class SortAlgorithmIterable{
         yield true;
     }
     * quickSortMaker(columns, left = 0, right = columns.length - 1) {
-        yield false;
         if (left >= right) return;
         const pivotIndex = yield* SortAlgorithmIterable.partition(columns, left, right);
         yield* this.quickSortMaker(columns, left, pivotIndex - 1);
@@ -226,7 +227,7 @@ export class SortAlgorithm{
         this.secondColumns = []; // 清空上次排序
         this.send(name + " is processing");
         this.sortFunction = this[name];
-        this.timesEveryFrame = Math.ceil(columns.length/25);
+        this.timesEveryFrame = Math.ceil(columns.length/2500);
         this.isSorting = true;
         
         this[name + "Setting"](columns);
@@ -374,7 +375,7 @@ export class SortAlgorithm{
     quickSortSetting(columns){
         this.stack = [{'left': 0, 'right': columns.length - 1}];
         this.partitionPhase = "0.SetPivot";
-        this.pivot = Math.floor(columns.length - 1);
+        this.pivot = columns.length - 1;
         this.j = 0;
     }
     quickSort(columns){

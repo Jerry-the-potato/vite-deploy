@@ -3,7 +3,7 @@ import { SortAlgorithm, SortAlgorithmIterable } from './sortAlgorithm.js';
 
 export default class ParticleSystem{
     constructor(width, height){
-        this.sort = new SortAlgorithm();
+        this.sort = new SortAlgorithmIterable();
         const x = width / 2;
         const y = height / 2;
         this.x = x;
