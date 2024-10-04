@@ -3,7 +3,7 @@ import { SortAlgorithm, SortAlgorithmIterable } from './sortAlgorithm.js';
 
 export default class ParticleSystem{
     constructor(width, height){
-        this.sort = new SortAlgorithmIterable();
+        this.sort = new SortAlgorithm();
         const x = width / 2;
         const y = height / 2;
         this.x = x;
@@ -298,9 +298,9 @@ export default class ParticleSystem{
             ctx.fillStyle = "#FFFFFF";
             ctx.fill();
         });
+
         Object.keys(this.texts).forEach((key) => {
             const text = this.texts[key];
-            ctx.beginPath();
             ctx.fillStyle = "#FFFFFF";
             ctx.font = text.fontpx + 'px IBM Plex Sans'//, 'Noto Sans TC';
             ctx.fillText(text.text, text.x, text.y);

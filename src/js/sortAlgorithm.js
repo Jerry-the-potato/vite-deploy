@@ -131,51 +131,51 @@ export class SortAlgorithmIterable{
 
     * mergeSortMaker(columns, left = 0, right = columns.length - 1) {
         if (left >= right) return;
-        const mid = Math.floor((left + right) / 2);
-        yield* this.mergeSortMaker(columns, left, mid);
-        yield* this.mergeSortMaker(columns, mid + 1, right);
+        const mid = Math.ceil((left + right) / 2);
+        yield* this.mergeSortMaker(columns, left, mid - 1);
+        yield* this.mergeSortMaker(columns, mid, right);
         yield* this.mergeMaker(columns, left, mid, right);
         if(left == 0 && right == columns.length - 1) yield true;
     }
 
     * mergeMaker(columns, left, mid, right) {
-        const secondColumns = JSON.parse(JSON.stringify(columns.slice(left, right + 1)));
-        const heights = secondColumns.map((column)=>{return column.height});
+        this.secondColumns = JSON.parse(JSON.stringify(columns.slice(left, right + 1)));
+        const heights = this.secondColumns.map((column)=>{return column.height});
         const max = Math.max(...heights);
-        // 為每個 column 添加 path 和動畫目標
-        secondColumns.forEach((column) => {
+        // 為每個 column 添加 path 
+        this.secondColumns.forEach((column) => {
             column.path = new Path(column.x, column.y);
             column.path.NewTarget(column.x, column.y - max, 20);
-            column.width /= 3;  // 動畫效果: 將寬度縮小三分之一
+            column.width /= 2; 
         });
 
         let i = 0; // 左半部分的索引
-        let j = mid - left + 1; // 右半部分的索引
+        let j = mid - left; // 右半部分的索引
         let k = left; // 合併後的索引
 
         // 合併兩個部分
-        while (i <= mid - left && j <= right - left) {
+        while (i <= mid - 1 - left && j <= right - left) {
             yield false;
-            if (secondColumns[i].height <= secondColumns[j].height) {
-                const a = columns[k];
-                const b = secondColumns[i];
-                SortAlgorithm.swapColumn(a, b, 30);
+            if (this.secondColumns[i].height <= this.secondColumns[j].height) {
+                var b = this.secondColumns[i];
                 i++;
             } else {
-                const a = columns[k];
-                const b = secondColumns[j];
-                SortAlgorithm.swapColumn(a, b, 30);
+                var b = this.secondColumns[j];
                 j++;
             }
+            const a = columns[k];
+            SortAlgorithm.swapColumn(a, b, 30);
+            b.height = 0;
             k++;
         }
 
         // 如果左邊有剩餘，繼續合併
-        while (i <= mid - left) {
+        while (i <= mid - 1 - left) {
             yield false;
             const a = columns[k];
-            const b = secondColumns[i];
+            const b = this.secondColumns[i];
             SortAlgorithm.swapColumn(a, b, 30);
+            b.height = 0;
             i++;
             k++;
         }
@@ -184,8 +184,9 @@ export class SortAlgorithmIterable{
         while (j <= right - left) {
             yield false;
             const a = columns[k];
-            const b = secondColumns[j];
+            const b = this.secondColumns[j];
             SortAlgorithm.swapColumn(a, b, 30);
+            b.height = 0;
             j++;
             k++;
         }
@@ -492,7 +493,7 @@ export class SortAlgorithm{
                 col.forEach((column, index) => {
                     column.height = columns[min + index].height;
                     column.width = columns[min + index].width/2;
-                    column.path.NewTarget(column.x, column.y - this.height, 0);
+                    column.path.NewTarget(column.x, column.y - this.height, 20);
                 })
                 this.mergePhase = "2.Merge";
                 break;
@@ -513,30 +514,22 @@ export class SortAlgorithm{
                     SortAlgorithm.swapColumn(a, b, frame);
                     a.height = 0;
                     this.i++;
-                    if(this.i > mid - min){
-                        this.i--;
-                        this.j++;
-                    }
-                    if(this.i >= mid - min){
+                    if(this.i > mid - 1 - min){
                         this.mergePhase = "4.MergeRight";
                     }
                 }
                 break;
             case "3.MergeLeft":
-                if(i >= mid - min){
+                if(i > mid - 1 - min){
                     this.i = 0;
                     this.j = 0;
                     this.stack[1].pop();
-                    if(this.stack[1].length == 0){
-                        this.isStoping = true;
-                        return
-                    }
                     this.mergePhase = "1.Copy";
-                    col.forEach((column, index) => {
-                        column.height = columns[min + index].height;
-                        column.path.NewTarget(column.x, column.y - this.height, 20);
-                        column.width/=3;
-                    })
+                    // col.forEach((column, index) => {
+                    //     column.height = columns[min + index].height;
+                    //     column.path.NewTarget(column.x, column.y - this.height, 20);
+                    //     column.width/=3;
+                    // })
                 }
                 else{
                     const a = col[i];
@@ -552,16 +545,12 @@ export class SortAlgorithm{
                     this.i = 0;
                     this.j = 0;
                     this.stack[1].pop();
-                    if(this.stack[1].length == 0){
-                        this.isStoping = true;
-                        return
-                    }
                     this.mergePhase = "1.Copy";
-                    col.forEach((column, index) => {
-                        column.height = columns[min + index].height;
-                        column.path.NewTarget(column.x, column.y - this.height, 20);
-                        column.width/=3;
-                    })
+                    // col.forEach((column, index) => {
+                    //     column.height = columns[min + index].height;
+                    //     column.path.NewTarget(column.x, column.y - this.height, 20);
+                    //     column.width/=3;
+                    // })
                 }
                 else{
                     const a = col[j];
