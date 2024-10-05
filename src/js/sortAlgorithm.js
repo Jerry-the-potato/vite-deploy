@@ -22,7 +22,7 @@ export class SortAlgorithmIterable{
         this.send(name + " is processing");
         this.sortFunction = this[name + "Maker"](columns);
         this.name = name;
-        this.timesEveryFrame = Math.ceil(columns.length/5000);
+        this.timesEveryFrame = Math.ceil(columns.length/50);
         this.isSorting = true;
     }
     update(){
@@ -192,6 +192,35 @@ export class SortAlgorithmIterable{
         }
     }
 
+    * heapSortMaker(columns) {
+        const n = columns.length;
+        for (let i = Math.floor(n / 2) - 1; i >= 0; i--) {
+            yield* this.heapify(columns, n, i);
+        }
+        for (let i = n - 1; i > 0; i--) {
+            const a = columns[0];
+            const b = columns[i];
+            SortAlgorithm.swapColumn(a, b, 60);
+            yield* this.heapify(columns, i, 0);
+        }
+        yield true;
+    }
+    
+    * heapify(columns, n, i) {
+        yield false;
+        let largest = i;
+        let left = 2 * i + 1;
+        let right = 2 * i + 2;
+        if (left < n && columns[left].height > columns[largest].height) largest = left;
+        if (right < n && columns[right].height > columns[largest].height) largest = right;
+        if (largest !== i) {
+            const a = columns[largest];
+            const b = columns[i];
+            SortAlgorithm.swapColumn(a, b, 60);
+            yield* this.heapify(columns, n, largest);
+        }
+    }
+
     * randomSortMaker(columns, frames = 60, TEF = 1){
         this.timesEveryFrame = TEF;
         const len = columns.length;
@@ -228,7 +257,7 @@ export class SortAlgorithm{
         this.secondColumns = []; // 清空上次排序
         this.send(name + " is processing");
         this.sortFunction = this[name];
-        this.timesEveryFrame = Math.ceil(columns.length/2500);
+        this.timesEveryFrame = Math.ceil(columns.length/25);
         this.isSorting = true;
         
         this[name + "Setting"](columns);
