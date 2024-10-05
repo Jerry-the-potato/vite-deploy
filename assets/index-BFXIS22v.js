@@ -27590,7 +27590,7 @@ class SortAlgorithm {
     this.secondColumns = [];
     this.send(name + " is processing");
     this.sortFunction = this[name];
-    this.timesEveryFrame = Math.ceil(columns.length / 2500);
+    this.timesEveryFrame = Math.ceil(columns.length / 25);
     this.isSorting = true;
     this[name + "Setting"](columns);
   }
@@ -37001,4 +37001,4 @@ function App() {
 const domNode = document.getElementById("root");
 const root = createRoot(domNode);
 root.render(/* @__PURE__ */ jsxRuntimeExports.jsx(App, {}));
-//# sourceMappingURL=index-CkO4nskL.js.map
+//# sourceMappingURL=index-BFXIS22v.js.map
