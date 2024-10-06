@@ -18,13 +18,14 @@ gh-pages 線上 Demo: [https://jerry-the-potato.github.io/vite-deploy](https://j
 
 ### 相關文章
 初期研究：
-    * [粒子系統](https://ithelp.ithome.com.tw/articles/10341245)
-    * [Web Worker效能實測](https://ithelp.ithome.com.tw/articles/10341355)
-    * [Three.js](https://ithelp.ithome.com.tw/articles/10341610)
-    * [BuffGemetry](https://ithelp.ithome.com.tw/articles/10341831)
+* [粒子系統](https://ithelp.ithome.com.tw/articles/10341245)
+* [Web Worker效能實測](https://ithelp.ithome.com.tw/articles/10341355)
+* [Three.js](https://ithelp.ithome.com.tw/articles/10341610)
+* [BuffGemetry](https://ithelp.ithome.com.tw/articles/10341831)
+
 完整系列文：
-    * 目錄－[讓演算法起舞：前端特效應用的探索之旅](https://ithelp.ithome.com.tw/users/20135197/ironman/7565)
-    * 主題1－[B4 在旋轉的沙漏中：掠食者與獵物的動態美學](https://ithelp.ithome.com.tw/articles/10358208)
-    * 主題2－[C2 讓排序演算法起舞吧！最小單位：華爾滋](https://ithelp.ithome.com.tw/articles/10361096)
-    * 主題3－
-    * 主題4－
+* 目錄－[讓演算法起舞：前端特效應用的探索之旅](https://ithelp.ithome.com.tw/users/20135197/ironman/7565)
+* 主題1－[B4 在旋轉的沙漏中：掠食者與獵物的動態美學](https://ithelp.ithome.com.tw/articles/10358208)
+* 主題2－[C2 讓排序演算法起舞吧！最小單位：華爾滋](https://ithelp.ithome.com.tw/articles/10361096)
+* 主題3－
+* 主題4－
