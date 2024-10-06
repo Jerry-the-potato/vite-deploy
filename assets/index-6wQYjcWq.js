@@ -8,14 +8,6 @@ var __accessCheck = (obj, member, msg) => member.has(obj) || __typeError("Cannot
 var __privateGet = (obj, member, getter) => (__accessCheck(obj, member, "read from private field"), getter ? getter.call(obj) : member.get(obj));
 var __privateAdd = (obj, member, value) => member.has(obj) ? __typeError("Cannot add the same private member more than once") : member instanceof WeakSet ? member.add(obj) : member.set(obj, value);
 var __privateSet = (obj, member, value, setter) => (__accessCheck(obj, member, "write to private field"), setter ? setter.call(obj, value) : member.set(obj, value), value);
-var __privateWrapper = (obj, member, setter, getter) => ({
-  set _(value) {
-    __privateSet(obj, member, value, setter);
-  },
-  get _() {
-    return __privateGet(obj, member, getter);
-  }
-});
 var _geometry, _vertices, _positionIndex, _material, _factorys, _transitionRadian, _trasitionOmega;
 (function polyfill() {
   const relList = document.createElement("link").relList;
@@ -26245,6 +26237,47 @@ class SphereGeometry extends BufferGeometry {
     return new SphereGeometry(data.radius, data.widthSegments, data.heightSegments, data.phiStart, data.phiLength, data.thetaStart, data.thetaLength);
   }
 }
+class Clock {
+  constructor(autoStart = true) {
+    this.autoStart = autoStart;
+    this.startTime = 0;
+    this.oldTime = 0;
+    this.elapsedTime = 0;
+    this.running = false;
+  }
+  start() {
+    this.startTime = now();
+    this.oldTime = this.startTime;
+    this.elapsedTime = 0;
+    this.running = true;
+  }
+  stop() {
+    this.getElapsedTime();
+    this.running = false;
+    this.autoStart = false;
+  }
+  getElapsedTime() {
+    this.getDelta();
+    return this.elapsedTime;
+  }
+  getDelta() {
+    let diff = 0;
+    if (this.autoStart && !this.running) {
+      this.start();
+      return 0;
+    }
+    if (this.running) {
+      const newTime = now();
+      diff = (newTime - this.oldTime) / 1e3;
+      this.oldTime = newTime;
+      this.elapsedTime += diff;
+    }
+    return diff;
+  }
+}
+function now() {
+  return (typeof performance === "undefined" ? Date : performance).now();
+}
 class Spherical {
   constructor(radius = 1, phi = 0, theta = 0) {
     this.radius = radius;
@@ -26387,7 +26420,7 @@ class BufferFactory {
       vertexColors: true
     }));
     this.mesh = new Group();
-    __privateSet(this, _factorys, new Array(180).fill(0).map(() => this.createFactory()));
+    __privateSet(this, _factorys, new Array(180 * 2).fill(0).map(() => this.createFactory()));
     this.n = 0.5;
   }
   createFactory() {
@@ -26404,27 +26437,17 @@ class BufferFactory {
   transformData(dataArray) {
     const factory = __privateGet(this, _factorys)[0];
     const vector = this.getPosition(dataArray);
-    factory.vertices = new Float32Array(this.getVertices(vector));
+    factory.vertices = this.getVertices(vector);
     factory.attribute = new BufferAttribute(factory.vertices, 3);
     factory.geometry.setAttribute("position", factory.attribute);
     factory.geometry.computeBoundingBox();
-    const colorVertices = new Float32Array(
-      dataArray.reduce(
-        (vertices, data) => vertices.concat(...new Array(6 * 2 * 3).fill(0).map((index) => {
-          const r2 = 0.2 + data / 255 * (0.816 - 0.2);
-          const g = 0.329 + data / 255 * (0.59 - 0.329) * Math.sin(__privateGet(this, _transitionRadian));
-          const b = 0.584 + data / 255 * (0.949 - 0.584);
-          return [b, r2, g];
-        })),
-        []
-      )
-    );
-    const colorAttribute = new BufferAttribute(colorVertices, 3);
+    factory.colorVertices = this.getColorVertices(dataArray, factory.vertices);
+    const colorAttribute = new BufferAttribute(factory.colorVertices, 3);
     factory.geometry.setAttribute("color", colorAttribute);
     __privateGet(this, _factorys).splice(0, 1);
     __privateGet(this, _factorys).push(factory);
   }
-  updataFactorys() {
+  updateFactorys() {
     const len = __privateGet(this, _factorys).length;
     __privateGet(this, _factorys).forEach((factory, index) => {
       factory.mesh.position.set(0, 0, 1 * (index - len));
@@ -26432,203 +26455,299 @@ class BufferFactory {
       factory.geometry.boundingBox.translate(factory.mesh.position);
     });
   }
-  setPosition(position) {
-    __privateGet(this, _geometry).setAttribute(
-      "position",
-      new BufferAttribute(new Float32Array(position), 3)
-    );
-  }
-  addPosition(position) {
-    position.forEach((vertice) => {
-      __privateGet(this, _vertices)[__privateGet(this, _positionIndex)] = vertice;
-      __privateWrapper(this, _positionIndex)._++;
-      if (__privateGet(this, _positionIndex) >= __privateGet(this, _vertices).length) {
-        __privateSet(this, _positionIndex, 0);
-      }
-    });
-    __privateGet(this, _geometry).attributes.position.needsUpdate = "true";
-    const attribute = new BufferAttribute(__privateGet(this, _vertices), 3);
-    attribute.setUsage(DynamicDrawUsage);
-    __privateGet(this, _geometry).setAttribute("position", attribute);
-  }
-  setColor(color) {
-    __privateGet(this, _geometry).setAttribute(
-      "color",
-      new BufferAttribute(new Float32Array(color), 3)
-    );
-  }
-  addColor(color) {
-    const array = __privateGet(this, _geometry).attributes.color.array || [];
-    const col = new Float32Array([...color, ...array]);
-    __privateGet(this, _geometry).setAttribute(
-      "color",
-      new BufferAttribute(new Float32Array(col), 3)
-    );
-  }
-  getBuffer(vector3, euler, translate) {
-    const vertices = [];
-    for (let N2 = 0; N2 < vector3.length; N2++) {
-      if (euler) vector3[N2].applyEuler(euler);
-      if (translate) vector3[N2].add(translate);
-      vertices.push(...vector3[N2]);
-    }
-    return vertices;
-  }
-  getSphereVertices(vector3) {
-    const vertices = [];
-    for (let M2 = 0; M2 < vector3.length - 1; M2++) {
-      const fragment2 = vector3[M2].length;
-      for (let N2 = 0; N2 < fragment2 - 1; N2++) {
-        vertices.push(...vector3[M2][N2]);
-        vertices.push(...vector3[M2 + 1][N2]);
-        vertices.push(...vector3[M2 + 1][N2 + 1]);
-        vertices.push(...vector3[M2][N2]);
-        vertices.push(...vector3[M2 + 1][N2 + 1]);
-        vertices.push(...vector3[M2][N2 + 1]);
-      }
-      vertices.push(...vector3[M2][fragment2 - 1]);
-      vertices.push(...vector3[M2 + 1][fragment2 - 1]);
-      vertices.push(...vector3[M2 + 1][0]);
-      vertices.push(...vector3[M2][fragment2 - 1]);
-      vertices.push(...vector3[M2 + 1][0]);
-      vertices.push(...vector3[M2][0]);
-    }
-    return vertices;
-  }
-  getSpherePosition(width = 100, height = 100) {
-    const vertices = new Array();
-    const colorVertices = new Array();
-    if (typeof Cube_WhichMakeSense !== "undefined") {
-      const euler = [
-        new Euler(0, 0, 0, "XYZ"),
-        new Euler(0, Math.PI / 2, 0, "XYZ"),
-        new Euler(0, Math.PI, 0, "XYZ"),
-        new Euler(0, -Math.PI / 2, 0, "XYZ"),
-        new Euler(Math.PI / 2, 0, 0, "XYZ"),
-        new Euler(-Math.PI / 2, 0, 0, "XYZ")
-      ];
-      const translate = [
-        new Vector3(0, 0, 0),
-        new Vector3(width, 0, 0),
-        new Vector3(width, 0, -width),
-        new Vector3(0, 0, -width),
-        new Vector3(0, 0, -width),
-        new Vector3(0, width, 0)
-      ];
-      for (let N2 = 0; N2 < 6; N2++) {
-        const vectors2 = [];
-        vectors2[0] = new Vector3(0, 0, 0);
-        vectors2[1] = new Vector3(width, 0, 0);
-        vectors2[2] = new Vector3(width, height, 0);
-        vectors2[3] = new Vector3(0, 0, 0);
-        vectors2[4] = new Vector3(width, height, 0);
-        vectors2[5] = new Vector3(0, height, 0);
-        vertices.push(...this.getBuffer(vectors2, euler[N2], translate[N2]));
-        let colors = [];
-        colors = [
-          N2 / 4,
-          0.5,
-          0.5,
-          0.2,
-          N2 / 8 + 0.5,
-          0.5,
-          0.2,
-          0.5,
-          N2 / 8 + 0.5
-        ];
-        colorVertices.push(...colors);
-      }
-    }
-    colorVertices.push(vertices.map((value) => 0.2 + Math.abs(value / 100)));
-    const vectors = [];
-    const fragment2 = 20;
-    for (let M2 = 0; M2 <= fragment2 * 2; M2++) {
-      vectors[M2] = [];
-      const radius = 100;
-      const z2 = Math.sqrt(Math.abs(radius * radius * (M2 / fragment2 - 1))) * (M2 > fragment2 ? -1 : 1);
-      for (let N2 = 0; N2 < fragment2; N2++) {
-        const length = Math.sqrt(radius * radius - z2 * z2);
-        const x2 = length * Math.cos(2 * Math.PI / fragment2 * (N2 + 0.5));
-        const y2 = length * Math.sin(2 * Math.PI / fragment2 * (N2 + 0.5));
-        vectors[M2].push(new Vector3(x2, y2, z2));
-      }
-    }
-    const v2 = this.getSphereVertices(vectors);
-    vertices.push(...v2);
-    colorVertices.push(...v2.map((value) => 0.2 + Math.abs(value / 100) + Math.random() * 0.5));
-    const position = new Float32Array([...vertices]);
-    this.setPosition(position);
-    const color = new Float32Array([...colorVertices]);
-    this.setColor(color);
-  }
-  getMusicData(data) {
-    const vector = this.getPosition(data);
-    const vertices = this.getVertices(vector);
-    vertices.map((value, index) => {
-      if (index % 3 == 2) return 0.2 + value / 50;
-      return 0.2 + Math.random() * 0.5;
-    });
-  }
+  // setPosition(position){
+  //     this.#geometry.setAttribute('position', 
+  //         new THREE.BufferAttribute(new Float32Array(position), 3));
+  // }
+  // addPosition(position){
+  //     position.forEach(vertice => {
+  //         this.#vertices[this.#positionIndex] = vertice
+  //         this.#positionIndex++;
+  //         if(this.#positionIndex >= this.#vertices.length){
+  //             this.#positionIndex = 0;
+  //         }
+  //     });
+  //     this.#geometry.attributes.position.needsUpdate = "true";
+  //     const attribute = new THREE.BufferAttribute(this.#vertices, 3);
+  //     attribute.setUsage( THREE.DynamicDrawUsage );
+  //     this.#geometry.setAttribute('position', attribute);
+  //     // const array = this.#geometry.attributes.position.array || [];
+  //     // const pos = new Float32Array([...position, ...array]);
+  //     // this.#geometry.setAttribute('position', 
+  //     //     new THREE.BufferAttribute(pos, 3));
+  // }
+  // setColor(color){
+  //     this.#geometry.setAttribute('color',
+  //         new THREE.BufferAttribute(new Float32Array(color), 3));
+  // }
+  // addColor(color){
+  //     const array = this.#geometry.attributes.color.array || [];
+  //     const col = new Float32Array([...color, ...array]);
+  //     this.#geometry.setAttribute('color',
+  //         new THREE.BufferAttribute(new Float32Array(col), 3));
+  // }
+  // getBuffer(vector3, euler, translate){
+  //     const vertices = [];
+  //     for(let N=0; N < vector3.length; N++){
+  //         if(euler) vector3[N].applyEuler(euler);
+  //         if(translate) vector3[N].add(translate);
+  //         vertices.push(...vector3[N])
+  //     }
+  //     return vertices;
+  // }
+  // getSphereVertices(vector3){
+  //     const vertices = [];
+  //     // for(let N = 0; N < vector3[0].length-2; N++){
+  //     //     vertices.push(...vector3[0][0]);
+  //     //     vertices.push(...vector3[0][N+1]);
+  //     //     vertices.push(...vector3[0][N+2]);
+  //     // }
+  //     for(let M = 0; M < vector3.length-1;M++){
+  //         const fragment = vector3[M].length;
+  //         for(let N = 0; N < fragment-1; N++){
+  //             vertices.push(...vector3[M][N]);
+  //             vertices.push(...vector3[M+1][N]);
+  //             vertices.push(...vector3[M+1][N+1]);
+  //             vertices.push(...vector3[M][N]);
+  //             vertices.push(...vector3[M+1][N+1]);
+  //             vertices.push(...vector3[M][N+1]);
+  //         }
+  //         vertices.push(...vector3[M][fragment-1]);
+  //         vertices.push(...vector3[M+1][fragment-1]);
+  //         vertices.push(...vector3[M+1][0]);
+  //         vertices.push(...vector3[M][fragment-1]);
+  //         vertices.push(...vector3[M+1][0]);
+  //         vertices.push(...vector3[M][0]);
+  //     }
+  //     // const fragmentXY = vector3.length;
+  //     // for(let N = 0; N < vector3[fragmentXY-1].length-2; N++){
+  //     //     const fragment = vector3[fragmentXY-1].length;
+  //     //     vertices.push(...vector3[fragmentXY-1][0]);
+  //     //     vertices.push(...vector3[fragmentXY-1][N+1]);
+  //     //     vertices.push(...vector3[fragmentXY-1][N+2]);
+  //     // }
+  //     return vertices;
+  // }
+  // getSpherePosition(width=100, height=100){
+  //     const vertices = new Array();
+  //     const colorVertices = new Array();
+  //     if(typeof Cube_WhichMakeSense !== "undefined"){
+  //         const euler = [
+  //             new THREE.Euler( 0, 0, 0, 'XYZ' ),
+  //             new THREE.Euler( 0, Math.PI/2, 0, 'XYZ' ),
+  //             new THREE.Euler( 0, Math.PI, 0, 'XYZ' ),
+  //             new THREE.Euler( 0, -Math.PI/2, 0, 'XYZ' ),
+  //             new THREE.Euler( Math.PI/2, 0, 0, 'XYZ' ),
+  //             new THREE.Euler( -Math.PI/2, 0, 0, 'XYZ' ),
+  //         ];
+  //         const translate = [
+  //             new THREE.Vector3(0,0,0),
+  //             new THREE.Vector3(width,0,0),
+  //             new THREE.Vector3(width,0,-width),
+  //             new THREE.Vector3(0,0,-width),
+  //             new THREE.Vector3(0,0,-width),
+  //             new THREE.Vector3(0,width,0),
+  //         ];
+  //         for(let N=0;N<6;N++){
+  //             const vectors = [];
+  //             vectors[0] = new THREE.Vector3(0,0,0);
+  //             vectors[1] = new THREE.Vector3(width,0,0);
+  //             vectors[2] = new THREE.Vector3(width,height,0);
+  //             vectors[3] = new THREE.Vector3(0,0,0);
+  //             vectors[4] = new THREE.Vector3(width,height,0);
+  //             vectors[5] = new THREE.Vector3(0,height,0);
+  //             vertices.push(...this.getBuffer(vectors, euler[N], translate[N]));
+  //             let colors = [];
+  //             // colors[0] = new THREE.Vector3(N/4,0.5,0.5);
+  //             // colors[1] = new THREE.Vector3(0.5,N/4,0.5);
+  //             // colors[2] = new THREE.Vector3(0.5,0.5,N/4);
+  //             // colorVertices.push(...this.getVertices(colors, euler));
+  //             colors = [
+  //                     N/4,0.5,0.5,
+  //                     0.2,N/8+0.5,0.5,
+  //                     0.2,0.5,N/8+0.5
+  //             ];
+  //             colorVertices.push(...colors);
+  //         }
+  //     }
+  //     colorVertices.push(vertices.map(value => 0.2 + Math.abs(value/100)));
+  //     const vectors = [];
+  //     const fragment = 20;
+  //     for(let M=0;M<=fragment*2;M++){
+  //         vectors[M] = [];
+  //         const radius = 100;
+  //         const z = Math.sqrt(Math.abs(radius * radius * (M / fragment - 1))) * ((M > fragment) ? -1 : 1);
+  //         for(let N=0;N<fragment;N++){
+  //             const length = Math.sqrt(radius*radius - z*z);
+  //             const x = length * Math.cos(2*Math.PI/fragment * (N+0.5));
+  //             const y = length * Math.sin(2*Math.PI/fragment * (N+0.5));
+  //             vectors[M].push(new THREE.Vector3(x,y,z));
+  //         }
+  //     }
+  //     const v = this.getSphereVertices(vectors);
+  //     vertices.push(...v);
+  //     colorVertices.push(...v.map(value => 0.2 + Math.abs(value/100) + Math.random()*0.5));
+  //     const position = new Float32Array([...vertices]);
+  //     this.setPosition(position);
+  //     const color = new Float32Array([...colorVertices]);
+  //     this.setColor(color);
+  //     // myarray = new Float32Array() ;
+  //     // myarray.push = function(){
+  //     //     const push = this.push;
+  //     //     myarray = new Float32Array([...myarray, ...arguments]);
+  //     //     myarray.push = push;
+  //     // };
+  // }
+  // getMusicData(data){
+  //     // const data = new Array(32).fill(0).map((v,i) => Math.random()*1);
+  //     const vector = this.getPosition(data);
+  //     const vertices = this.getVertices(vector);
+  //     const colorVertices = vertices.map((value, index) =>{
+  //         if(index % 3 == 2) return 0.2 + value/50;
+  //         return 0.2 + Math.random() * 0.5;
+  //     });
+  //     // this.setPosition(vertices);
+  //     // this.setColor(colorVertices);
+  // }
   getPosition(data) {
     const t2 = 0;
-    const vectors = [];
+    const vectors = new Array(data.length);
     const width = 2;
     const depth = 1;
     for (let N2 = 0; N2 < data.length; N2++) {
       const height = data[N2] / 3;
-      const vector = [];
-      const push1 = () => vector.push(new Vector3(width * N2, 0, depth * (t2 + 1)));
-      const push2 = () => vector.push(new Vector3(width * (N2 + 1), 0, depth * (t2 + 1)));
-      const push3 = () => vector.push(new Vector3(width * (N2 + 1), height, depth * (t2 + 1)));
-      const push4 = () => vector.push(new Vector3(width * N2, height, depth * (t2 + 1)));
-      const push5 = () => vector.push(new Vector3(width * N2, 0, depth * t2));
-      const push6 = () => vector.push(new Vector3(width * N2, height, depth * t2));
-      const push7 = () => vector.push(new Vector3(width * (N2 + 1), height, depth * t2));
-      const push8 = () => vector.push(new Vector3(width * (N2 + 1), 0, depth * t2));
-      push1();
-      push2();
-      push3();
-      push4();
-      push5();
-      push6();
-      push7();
-      push8();
-      push1();
-      push4();
-      push6();
-      push5();
-      push2();
-      push8();
-      push7();
-      push3();
-      push3();
-      push7();
-      push6();
-      push4();
-      push1();
-      push5();
-      push8();
-      push2();
-      vectors.push(vector);
+      const vector = new Float32Array(24 * 3);
+      let idx = 0;
+      vector[idx++] = width * N2;
+      vector[idx++] = 0;
+      vector[idx++] = depth * (t2 + 1);
+      vector[idx++] = width * (N2 + 1);
+      vector[idx++] = 0;
+      vector[idx++] = depth * (t2 + 1);
+      vector[idx++] = width * (N2 + 1);
+      vector[idx++] = height;
+      vector[idx++] = depth * (t2 + 1);
+      vector[idx++] = width * N2;
+      vector[idx++] = height;
+      vector[idx++] = depth * (t2 + 1);
+      vector[idx++] = width * N2;
+      vector[idx++] = 0;
+      vector[idx++] = depth * t2;
+      vector[idx++] = width * N2;
+      vector[idx++] = height;
+      vector[idx++] = depth * t2;
+      vector[idx++] = width * (N2 + 1);
+      vector[idx++] = height;
+      vector[idx++] = depth * t2;
+      vector[idx++] = width * (N2 + 1);
+      vector[idx++] = 0;
+      vector[idx++] = depth * t2;
+      vector[idx++] = width * N2;
+      vector[idx++] = 0;
+      vector[idx++] = depth * (t2 + 1);
+      vector[idx++] = width * N2;
+      vector[idx++] = height;
+      vector[idx++] = depth * (t2 + 1);
+      vector[idx++] = width * N2;
+      vector[idx++] = height;
+      vector[idx++] = depth * t2;
+      vector[idx++] = width * N2;
+      vector[idx++] = 0;
+      vector[idx++] = depth * t2;
+      vector[idx++] = width * (N2 + 1);
+      vector[idx++] = 0;
+      vector[idx++] = depth * (t2 + 1);
+      vector[idx++] = width * (N2 + 1);
+      vector[idx++] = 0;
+      vector[idx++] = depth * t2;
+      vector[idx++] = width * (N2 + 1);
+      vector[idx++] = height;
+      vector[idx++] = depth * t2;
+      vector[idx++] = width * (N2 + 1);
+      vector[idx++] = height;
+      vector[idx++] = depth * (t2 + 1);
+      vector[idx++] = width * (N2 + 1);
+      vector[idx++] = height;
+      vector[idx++] = depth * (t2 + 1);
+      vector[idx++] = width * (N2 + 1);
+      vector[idx++] = height;
+      vector[idx++] = depth * t2;
+      vector[idx++] = width * N2;
+      vector[idx++] = height;
+      vector[idx++] = depth * t2;
+      vector[idx++] = width * N2;
+      vector[idx++] = height;
+      vector[idx++] = depth * (t2 + 1);
+      vector[idx++] = width * N2;
+      vector[idx++] = 0;
+      vector[idx++] = depth * (t2 + 1);
+      vector[idx++] = width * N2;
+      vector[idx++] = 0;
+      vector[idx++] = depth * t2;
+      vector[idx++] = width * (N2 + 1);
+      vector[idx++] = 0;
+      vector[idx++] = depth * t2;
+      vector[idx++] = width * (N2 + 1);
+      vector[idx++] = 0;
+      vector[idx++] = depth * (t2 + 1);
+      vectors[N2] = vector;
     }
     return vectors;
   }
   getVertices(vector) {
-    const vertices = [];
+    const verticesCount = vector.length * 36;
+    const vertices = new Float32Array(verticesCount);
+    let index = 0;
     for (let M2 = 0; M2 < vector.length; M2++) {
       for (let face = 0; face < 6; face++) {
-        for (let N2 = face * 4; N2 < face * 4 + 2; N2++) {
-          vertices.push(...vector[M2][face * 4]);
-          vertices.push(...vector[M2][N2 + 1]);
-          vertices.push(...vector[M2][N2 + 2]);
-        }
+        const baseIndex = face * 4 * 3;
+        vertices[index++] = vector[M2][baseIndex];
+        vertices[index++] = vector[M2][baseIndex + 1];
+        vertices[index++] = vector[M2][baseIndex + 2];
+        vertices[index++] = vector[M2][baseIndex + 3];
+        vertices[index++] = vector[M2][baseIndex + 4];
+        vertices[index++] = vector[M2][baseIndex + 5];
+        vertices[index++] = vector[M2][baseIndex + 6];
+        vertices[index++] = vector[M2][baseIndex + 7];
+        vertices[index++] = vector[M2][baseIndex + 8];
+        vertices[index++] = vector[M2][baseIndex];
+        vertices[index++] = vector[M2][baseIndex + 1];
+        vertices[index++] = vector[M2][baseIndex + 2];
+        vertices[index++] = vector[M2][baseIndex + 6];
+        vertices[index++] = vector[M2][baseIndex + 7];
+        vertices[index++] = vector[M2][baseIndex + 8];
+        vertices[index++] = vector[M2][baseIndex + 9];
+        vertices[index++] = vector[M2][baseIndex + 10];
+        vertices[index++] = vector[M2][baseIndex + 11];
       }
     }
     return vertices;
   }
+  getColorVertices(data, vertices) {
+    const colorVertices = new Float32Array(data.length * 36 * 3);
+    let colorIndex = 0;
+    const width = 2;
+    for (let i = 0; i < data.length; i++) {
+      const value = data[i];
+      const r2 = 0.2 + value / 255 * (0.816 - 0.2);
+      const g = 0.329 + value / 255 * (0.59 - 0.329) * Math.sin(__privateGet(this, _transitionRadian));
+      const b = 0.584 + value / 255 * (0.949 - 0.584);
+      for (let j = 0; j < 36; j++) {
+        const isLeft = vertices[i * 36 * 3 + j * 3] == i * width;
+        const t2 = isLeft ? 1 : 0;
+        const R2 = r2 + t2 * (0.816 - r2);
+        const G2 = g + t2 * (0.59 - g);
+        const B2 = b + t2 * (0.949 - b);
+        colorVertices[colorIndex++] = B2;
+        colorVertices[colorIndex++] = R2;
+        colorVertices[colorIndex++] = G2;
+      }
+    }
+    return colorVertices;
+  }
   update() {
     __privateSet(this, _transitionRadian, __privateGet(this, _transitionRadian) + __privateGet(this, _trasitionOmega));
-    this.updataFactorys();
+    this.updateFactorys();
   }
 }
 _geometry = new WeakMap();
@@ -27455,7 +27574,8 @@ class OrbitControls extends EventDispatcher {
   }
 }
 const createMusicAnalyser = function() {
-  new Averager(60);
+  const frame = new Averager(60);
+  const clock = new Clock();
   this.firstTime = true;
   this.getAnalyser = (e) => {
     const audio = e.target;
@@ -27530,11 +27650,13 @@ const createMusicAnalyser = function() {
       const bufferLength = this.analyser.frequencyBinCount;
       const dataArray = new Uint8Array(bufferLength);
       this.analyser.getByteFrequencyData(dataArray);
-      const data = [...dataArray].splice(0, 128);
+      const data = [...dataArray].splice(0, 256);
       this.buff.transformData(data);
     }
     this.controls.update();
     this.buff.update();
+    frame.updateValue(clock.getDelta());
+    window.fps = frame.getFPS();
   };
   this.render = () => {
     this.renderer.render(this.scene, this.camera);
@@ -30035,13 +30157,13 @@ function speedometer(samplesCount, min) {
   let firstSampleTS;
   min = min !== void 0 ? min : 1e3;
   return function push(chunkLength) {
-    const now = Date.now();
+    const now2 = Date.now();
     const startedAt = timestamps[tail];
     if (!firstSampleTS) {
-      firstSampleTS = now;
+      firstSampleTS = now2;
     }
     bytes[head] = chunkLength;
-    timestamps[head] = now;
+    timestamps[head] = now2;
     let i = tail;
     let bytesCount = 0;
     while (i !== head) {
@@ -30052,10 +30174,10 @@ function speedometer(samplesCount, min) {
     if (head === tail) {
       tail = (tail + 1) % samplesCount;
     }
-    if (now - firstSampleTS < min) {
+    if (now2 - firstSampleTS < min) {
       return;
     }
-    const passed = startedAt && now - startedAt;
+    const passed = startedAt && now2 - startedAt;
     return passed ? Math.round(bytesCount * 1e3 / passed) : void 0;
   };
 }
@@ -30064,8 +30186,8 @@ function throttle(fn, freq) {
   let threshold = 1e3 / freq;
   let lastArgs;
   let timer;
-  const invoke = (args, now = Date.now()) => {
-    timestamp = now;
+  const invoke = (args, now2 = Date.now()) => {
+    timestamp = now2;
     lastArgs = null;
     if (timer) {
       clearTimeout(timer);
@@ -30074,10 +30196,10 @@ function throttle(fn, freq) {
     fn.apply(null, args);
   };
   const throttled = (...args) => {
-    const now = Date.now();
-    const passed = now - timestamp;
+    const now2 = Date.now();
+    const passed = now2 - timestamp;
     if (passed >= threshold) {
-      invoke(args, now);
+      invoke(args, now2);
     } else {
       lastArgs = args;
       if (!timer) {
@@ -34986,7 +35108,7 @@ lodash.exports;
         }
         return baseOrderBy(collection, baseFlatten(iteratees, 1), []);
       });
-      var now = ctxNow || function() {
+      var now2 = ctxNow || function() {
         return root2.Date.now();
       };
       function after(n2, func) {
@@ -35082,7 +35204,7 @@ lodash.exports;
           return lastCallTime === undefined$1 || timeSinceLastCall >= wait || timeSinceLastCall < 0 || maxing && timeSinceLastInvoke >= maxWait;
         }
         function timerExpired() {
-          var time = now();
+          var time = now2();
           if (shouldInvoke(time)) {
             return trailingEdge(time);
           }
@@ -35104,10 +35226,10 @@ lodash.exports;
           lastArgs = lastCallTime = lastThis = timerId = undefined$1;
         }
         function flush() {
-          return timerId === undefined$1 ? result2 : trailingEdge(now());
+          return timerId === undefined$1 ? result2 : trailingEdge(now2());
         }
         function debounced() {
-          var time = now(), isInvoking = shouldInvoke(time);
+          var time = now2(), isInvoking = shouldInvoke(time);
           lastArgs = arguments;
           lastThis = this;
           lastCallTime = time;
@@ -36477,7 +36599,7 @@ lodash.exports;
       lodash2.nth = nth;
       lodash2.noConflict = noConflict;
       lodash2.noop = noop2;
-      lodash2.now = now;
+      lodash2.now = now2;
       lodash2.pad = pad;
       lodash2.padEnd = padEnd;
       lodash2.padStart = padStart;
@@ -37001,4 +37123,4 @@ function App() {
 const domNode = document.getElementById("root");
 const root = createRoot(domNode);
 root.render(/* @__PURE__ */ jsxRuntimeExports.jsx(App, {}));
-//# sourceMappingURL=index-BFXIS22v.js.map
+//# sourceMappingURL=index-6wQYjcWq.js.map
