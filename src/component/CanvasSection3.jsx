@@ -9,11 +9,16 @@ const CanvasSectionS3 = ({ ratio, min, sectinoID = "SortAlgorithm"}) => {
     const menu = useRef(null);
     const log = useRef(null);
     const section = useRef(null);
+    const [error, setError] = useState();
     useEffect(()=>{
-        physic.setCanvas(canvas.current, log.current);
-        manager.addSubjectElement(section.current);
-        manager.registerAnimationCallback("update" + sectinoID, physic.update);
-        manager.registerAnimationCallback("render" + sectinoID, physic.render);
+        try{
+            physic.setCanvas(canvas.current, log.current);
+            manager.addSubjectElement(section.current);
+            manager.registerAnimationCallback("update" + sectinoID, physic.update);
+            manager.registerAnimationCallback("render" + sectinoID, physic.render);
+        } catch(e){
+            setError(e.message);
+        }
         return () => {
             physic.cleanup();
             manager.removeSubjectID(sectinoID);
@@ -70,7 +75,7 @@ const CanvasSectionS3 = ({ ratio, min, sectinoID = "SortAlgorithm"}) => {
                     <button onClick={physic.cancel} id="cancelSort">取消</button>
                     <button onClick={physic.stepByStep} id="stepByStep">一步一步來</button>
                 </div>
-                <div ref={log} id="sortLog"><p id="">碰撞模擬和重力引擎</p></div>
+                <div ref={log} id="sortLog"><p id="">{error ? error : "碰撞模擬和重力引擎"}</p></div>
                 <SlideMenuBtn menu={menu}></SlideMenuBtn>
             </div>
         </section>

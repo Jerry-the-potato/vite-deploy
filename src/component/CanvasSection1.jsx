@@ -7,13 +7,19 @@ const CanvasSectionS1 = ({ratio, min, sectinoID = "LokaVolterra"}) => {
     const canvas = useRef(null);
     const bitmap = useRef(null);
     const section = useRef(null);
+
+    const [error, setError] = useState();
     useEffect(()=>{
-		window.addEventListener("resize", lokaVolterra.resize, false);
-        lokaVolterra.setCanvas(canvas.current, bitmap.current);
-        manager.addSubjectElement(section.current);
-        manager.registerAnimationCallback("update" + sectinoID, lokaVolterra.update);
-        manager.registerAnimationCallback("render" + sectinoID, lokaVolterra.render);
-        manager.registerTrigger("worker" + sectinoID, () => lokaVolterra.pauseWorker(true), () => lokaVolterra.pauseWorker(false));
+        try{
+            window.addEventListener("resize", lokaVolterra.resize, false);
+            lokaVolterra.setCanvas(canvas.current, bitmap.current);
+            manager.addSubjectElement(section.current);
+            manager.registerAnimationCallback("update" + sectinoID, lokaVolterra.update);
+            manager.registerAnimationCallback("render" + sectinoID, lokaVolterra.render);
+            manager.registerTrigger("worker" + sectinoID, () => lokaVolterra.pauseWorker(true), () => lokaVolterra.pauseWorker(false));
+        } catch(e){
+            setError(e.message);
+        }
         return () => {
             window.removeEventListener("resize", lokaVolterra.resize);
             lokaVolterra.cleanup();
@@ -99,7 +105,7 @@ const CanvasSectionS1 = ({ratio, min, sectinoID = "LokaVolterra"}) => {
                     <button onClick={handlePauseWorker} id="pauseWorker">{isWorker ? "停止(右)" : "開始(右)"}</button>
                     <RecordBtn canvas={canvas}></RecordBtn>
                 </div>
-                <div id="dialogbox"><p id="dialog">∫此微分方程用於描述捕食者和獵物的此消彼長，沿著中心點呈現漩渦紋理</p></div>
+                <div id="dialogbox"><p id="dialog">{(error) ? (error) : "∫此微分方程用於描述捕食者和獵物的此消彼長，沿著中心點呈現漩渦紋理"}</p></div>
                 <SlideMenuBtn menu={menu}></SlideMenuBtn>
             </div>
         </section>

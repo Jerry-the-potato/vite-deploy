@@ -10,12 +10,17 @@ const CanvasSectionS2 = ({ratio, min, sectinoID = "MusicAnalyser"}) => {
     const audio = useRef(null);
     const menu = useRef(null);
     const section = useRef(null);
+    const [error, setError] = useState();
     useEffect(()=>{
-        window.addEventListener('resize', musicAnalyser.resize, false);
-        musicAnalyser.setCanvas(canvas.current);
-        manager.addSubjectElement(section.current);
-        manager.registerAnimationCallback("update" + sectinoID, musicAnalyser.update);
-        manager.registerAnimationCallback("render" + sectinoID, musicAnalyser.render);
+        try{
+            window.addEventListener('resize', musicAnalyser.resize, false);
+            musicAnalyser.setCanvas(canvas.current);
+            manager.addSubjectElement(section.current);
+            manager.registerAnimationCallback("update" + sectinoID, musicAnalyser.update);
+            manager.registerAnimationCallback("render" + sectinoID, musicAnalyser.render);
+        } catch(e){
+            setError(e.message);
+        }
         return () => {
             window.removeEventListener("resize", musicAnalyser.resize);
             musicAnalyser.cleanup();
@@ -33,10 +38,12 @@ const CanvasSectionS2 = ({ratio, min, sectinoID = "MusicAnalyser"}) => {
                     <RecordBtn canvas={canvas} audio={audio}></RecordBtn>
                 </div>
                 <SlideMenuBtn menu={menu}></SlideMenuBtn>
+                <div id="dialogbox"><p id="dialog">{(error) ? (error) : ""}</p></div>
             </div>
             <audio onPlay={musicAnalyser.getAnalyser} ref={audio} controls id="myAudio" style={{"position": "absolute", "left": "10px", "bottom": "10px"}}>
                 <source src={audioUrl}></source>
             </audio>
+
         </section>
     );
 };
