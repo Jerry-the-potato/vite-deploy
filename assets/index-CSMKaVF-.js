@@ -7686,13 +7686,18 @@ const CanvasSectionS1 = ({ ratio, min, sectinoID = "LokaVolterra" }) => {
   const canvas = reactExports.useRef(null);
   const bitmap = reactExports.useRef(null);
   const section = reactExports.useRef(null);
+  const [error, setError] = reactExports.useState();
   reactExports.useEffect(() => {
-    window.addEventListener("resize", lokaVolterra.resize, false);
-    lokaVolterra.setCanvas(canvas.current, bitmap.current);
-    manager.addSubjectElement(section.current);
-    manager.registerAnimationCallback("update" + sectinoID, lokaVolterra.update);
-    manager.registerAnimationCallback("render" + sectinoID, lokaVolterra.render);
-    manager.registerTrigger("worker" + sectinoID, () => lokaVolterra.pauseWorker(true), () => lokaVolterra.pauseWorker(false));
+    try {
+      window.addEventListener("resize", lokaVolterra.resize, false);
+      lokaVolterra.setCanvas(canvas.current, bitmap.current);
+      manager.addSubjectElement(section.current);
+      manager.registerAnimationCallback("update" + sectinoID, lokaVolterra.update);
+      manager.registerAnimationCallback("render" + sectinoID, lokaVolterra.render);
+      manager.registerTrigger("worker" + sectinoID, () => lokaVolterra.pauseWorker(true), () => lokaVolterra.pauseWorker(false));
+    } catch (e) {
+      setError(e.message);
+    }
     return () => {
       window.removeEventListener("resize", lokaVolterra.resize);
       lokaVolterra.cleanup();
@@ -7782,7 +7787,7 @@ const CanvasSectionS1 = ({ ratio, min, sectinoID = "LokaVolterra" }) => {
         /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: handlePauseWorker, id: "pauseWorker", children: isWorker ? "停止(右)" : "開始(右)" }),
         /* @__PURE__ */ jsxRuntimeExports.jsx(RecordBtn, { canvas })
       ] }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { id: "dialogbox", children: /* @__PURE__ */ jsxRuntimeExports.jsx("p", { id: "dialog", children: "∫此微分方程用於描述捕食者和獵物的此消彼長，沿著中心點呈現漩渦紋理" }) }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { id: "dialogbox", children: /* @__PURE__ */ jsxRuntimeExports.jsx("p", { id: "dialog", children: error ? error : "∫此微分方程用於描述捕食者和獵物的此消彼長，沿著中心點呈現漩渦紋理" }) }),
       /* @__PURE__ */ jsxRuntimeExports.jsx(SlideMenuBtn, { menu })
     ] })
   ] });
@@ -27669,12 +27674,17 @@ const CanvasSectionS2 = ({ ratio, min, sectinoID = "MusicAnalyser" }) => {
   const audio = reactExports.useRef(null);
   const menu = reactExports.useRef(null);
   const section = reactExports.useRef(null);
+  const [error, setError] = reactExports.useState();
   reactExports.useEffect(() => {
-    window.addEventListener("resize", musicAnalyser.resize, false);
-    musicAnalyser.setCanvas(canvas.current);
-    manager.addSubjectElement(section.current);
-    manager.registerAnimationCallback("update" + sectinoID, musicAnalyser.update);
-    manager.registerAnimationCallback("render" + sectinoID, musicAnalyser.render);
+    try {
+      window.addEventListener("resize", musicAnalyser.resize, false);
+      musicAnalyser.setCanvas(canvas.current);
+      manager.addSubjectElement(section.current);
+      manager.registerAnimationCallback("update" + sectinoID, musicAnalyser.update);
+      manager.registerAnimationCallback("render" + sectinoID, musicAnalyser.render);
+    } catch (e) {
+      setError(e.message);
+    }
     return () => {
       window.removeEventListener("resize", musicAnalyser.resize);
       musicAnalyser.cleanup();
@@ -27688,7 +27698,8 @@ const CanvasSectionS2 = ({ ratio, min, sectinoID = "MusicAnalyser" }) => {
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { ref: menu, className: "gamemenu", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsx("header", { id: "header", children: /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { children: "MusicAnalyser" }) }),
       /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "controlpanel", children: /* @__PURE__ */ jsxRuntimeExports.jsx(RecordBtn, { canvas, audio }) }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx(SlideMenuBtn, { menu })
+      /* @__PURE__ */ jsxRuntimeExports.jsx(SlideMenuBtn, { menu }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { id: "dialogbox", children: /* @__PURE__ */ jsxRuntimeExports.jsx("p", { id: "dialog", children: error ? error : "" }) })
     ] }),
     /* @__PURE__ */ jsxRuntimeExports.jsx("audio", { onPlay: musicAnalyser.getAnalyser, ref: audio, controls: true, id: "myAudio", style: { "position": "absolute", "left": "10px", "bottom": "10px" }, children: /* @__PURE__ */ jsxRuntimeExports.jsx("source", { src: audioUrl }) })
   ] });
@@ -28483,11 +28494,16 @@ const CanvasSectionS3 = ({ ratio, min, sectinoID = "SortAlgorithm" }) => {
   const menu = reactExports.useRef(null);
   const log = reactExports.useRef(null);
   const section = reactExports.useRef(null);
+  const [error, setError] = reactExports.useState();
   reactExports.useEffect(() => {
-    physic.setCanvas(canvas.current, log.current);
-    manager.addSubjectElement(section.current);
-    manager.registerAnimationCallback("update" + sectinoID, physic.update);
-    manager.registerAnimationCallback("render" + sectinoID, physic.render);
+    try {
+      physic.setCanvas(canvas.current, log.current);
+      manager.addSubjectElement(section.current);
+      manager.registerAnimationCallback("update" + sectinoID, physic.update);
+      manager.registerAnimationCallback("render" + sectinoID, physic.render);
+    } catch (e) {
+      setError(e.message);
+    }
     return () => {
       physic.cleanup();
       manager.removeSubjectID(sectinoID);
@@ -28546,7 +28562,7 @@ const CanvasSectionS3 = ({ ratio, min, sectinoID = "SortAlgorithm" }) => {
         /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: physic.cancel, id: "cancelSort", children: "取消" }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: physic.stepByStep, id: "stepByStep", children: "一步一步來" })
       ] }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { ref: log, id: "sortLog", children: /* @__PURE__ */ jsxRuntimeExports.jsx("p", { id: "", children: "碰撞模擬和重力引擎" }) }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { ref: log, id: "sortLog", children: /* @__PURE__ */ jsxRuntimeExports.jsx("p", { id: "", children: error ? error : "碰撞模擬和重力引擎" }) }),
       /* @__PURE__ */ jsxRuntimeExports.jsx(SlideMenuBtn, { menu })
     ] })
   ] });
@@ -37123,4 +37139,4 @@ function App() {
 const domNode = document.getElementById("root");
 const root = createRoot(domNode);
 root.render(/* @__PURE__ */ jsxRuntimeExports.jsx(App, {}));
-//# sourceMappingURL=index-6wQYjcWq.js.map
+//# sourceMappingURL=index-CSMKaVF-.js.map
