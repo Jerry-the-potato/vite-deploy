@@ -99,13 +99,13 @@ const createMusicAnalyser = function(){
             const bufferLength = this.analyser.frequencyBinCount;
             const dataArray = new Uint8Array(bufferLength);
             this.analyser.getByteFrequencyData(dataArray);
-            const data = [...dataArray].splice(0,128);
+            const data = [...dataArray].splice(0,256);
             this.buff.transformData(data);
         }
         this.controls.update();
         this.buff.update();
-        // frame.updateValue(clock.getDelta());
-        // frame.getFPS();
+        frame.updateValue(clock.getDelta());
+        window.fps = frame.getFPS();
     }
     this.render = () =>{
         this.renderer.render( this.scene, this.camera );
