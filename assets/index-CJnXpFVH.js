@@ -26425,7 +26425,7 @@ class BufferFactory {
       vertexColors: true
     }));
     this.mesh = new Group();
-    __privateSet(this, _factorys, new Array(180 * 2).fill(0).map(() => this.createFactory()));
+    __privateSet(this, _factorys, new Array(180 * 3).fill(0).map(() => this.createFactory()));
     this.n = 0.5;
   }
   createFactory() {
@@ -26439,14 +26439,14 @@ class BufferFactory {
     this.mesh.add(factory.mesh);
     return factory;
   }
-  transformData(dataArray) {
+  transformData(data) {
     const factory = __privateGet(this, _factorys)[0];
-    const vector = this.getPosition(dataArray);
+    const vector = this.getPosition(data);
     factory.vertices = this.getVertices(vector);
     factory.attribute = new BufferAttribute(factory.vertices, 3);
     factory.geometry.setAttribute("position", factory.attribute);
     factory.geometry.computeBoundingBox();
-    factory.colorVertices = this.getColorVertices(dataArray, factory.vertices);
+    factory.colorVertices = this.getColorVertices(data, factory.vertices);
     const colorAttribute = new BufferAttribute(factory.colorVertices, 3);
     factory.geometry.setAttribute("color", colorAttribute);
     __privateGet(this, _factorys).splice(0, 1);
@@ -26780,7 +26780,7 @@ function createAnalyser(audio) {
   gainNode.connect(analyser);
   analyser.connect(audioCtx.destination);
   gainNode.gain.value = 1;
-  analyser.fftSize = 1024;
+  analyser.fftSize = 4096;
   return analyser;
 }
 class Averager {
@@ -27591,9 +27591,8 @@ const createMusicAnalyser = function() {
     this.canvas = canvas;
     this.scene = new Scene();
     this.renderer = new WebGLRenderer({ "alpha": true, "canvas": canvas });
-    this.renderer.setClearColor(0, 0);
     this.camera = new PerspectiveCamera(75, canvas.width / canvas.height, 0.1, 1e3);
-    const radius = 300;
+    const radius = 512;
     this.camera.position.set(radius / 4, radius / 3, radius / 3);
     this.controls = new OrbitControls(this.camera, this.renderer.domElement);
     this.controls.target.set(radius / 4, 0, -radius / 3);
@@ -27655,7 +27654,11 @@ const createMusicAnalyser = function() {
       const bufferLength = this.analyser.frequencyBinCount;
       const dataArray = new Uint8Array(bufferLength);
       this.analyser.getByteFrequencyData(dataArray);
-      const data = [...dataArray].splice(0, 256);
+      this.analyser.frequencyBinCount;
+      const data = new Uint8Array(bufferLength / 2);
+      for (let i = 0; i < bufferLength / 2; i++) {
+        data[i] = dataArray[i];
+      }
       this.buff.transformData(data);
     }
     this.controls.update();
@@ -37139,4 +37142,4 @@ function App() {
 const domNode = document.getElementById("root");
 const root = createRoot(domNode);
 root.render(/* @__PURE__ */ jsxRuntimeExports.jsx(App, {}));
-//# sourceMappingURL=index-CSMKaVF-.js.map
+//# sourceMappingURL=index-CJnXpFVH.js.map
