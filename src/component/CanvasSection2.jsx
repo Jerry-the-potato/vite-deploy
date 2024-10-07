@@ -40,7 +40,7 @@ const CanvasSectionS2 = ({ratio, min, sectinoID = "MusicAnalyser"}) => {
                 <SlideMenuBtn menu={menu}></SlideMenuBtn>
                 <div id="dialogbox"><p id="dialog">{(error) ? (error) : ""}</p></div>
             </div>
-            <audio onPlay={musicAnalyser.getAnalyser} ref={audio} controls id="myAudio" style={{"position": "absolute", "left": "10px", "bottom": "10px"}}>
+            <audio onPlay={(e) => musicAnalyser.getAnalyser(e.target)} ref={audio} controls id="myAudio" style={{"position": "absolute", "left": "10px", "bottom": "10px"}}>
                 <source src={audioUrl}></source>
             </audio>
 

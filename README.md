@@ -7,6 +7,8 @@ gh-pages 線上 Demo: [https://jerry-the-potato.github.io/vite-deploy](https://j
 
 ![https://ithelp.ithome.com.tw/upload/images/20241006/20135197pdqZn30qAR.png](https://ithelp.ithome.com.tw/upload/images/20241006/20135197pdqZn30qAR.png)
 
+![https://ithelp.ithome.com.tw/upload/images/20241007/201351973DBTkRlOJv.png](https://ithelp.ithome.com.tw/upload/images/20241007/201351973DBTkRlOJv.png)
+
 ### 專案目標
 這個專案主要是：
 * 測試與視覺化各類演算法，如排序演算法、粒子系統等。

@@ -9,11 +9,8 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 const createMusicAnalyser = function(){
     const frame = new Averager(60);
     const clock = new THREE.Clock();
-    this.firstTime = true;
-    this.getAnalyser = (e) => {
-        const audio = e.target;
-        if(this.firstTime) this.analyser = createAnalyser(audio);
-        this.firstTime = false;
+    this.getAnalyser = (audio) => {
+        if(!this.analyser) this.analyser = createAnalyser(audio);
     }
     this.setCanvas = (canvas) => {
         this.canvas = canvas;
@@ -41,8 +38,6 @@ const createMusicAnalyser = function(){
         this.scene.add(this.group1);
     }
     this.cleanup = () => {
-        this.firstTime = true;
-
         // 移除場景中的對象
         if (this.scene) {
             this.scene.traverse((object) => {
@@ -100,7 +95,7 @@ const createMusicAnalyser = function(){
             const dataArray = new Uint8Array(bufferLength);
             this.analyser.getByteFrequencyData(dataArray);
             const count = this.analyser.frequencyBinCount;
-            // const data = [...dataArray].splice(0, count / 2);
+            // const data = [...dataArray].slice(0, count / 2);
             const data = new Uint8Array(bufferLength / 2)
             for (let i = 0; i < bufferLength / 2; i++) {
                 data[i] = dataArray[i];
