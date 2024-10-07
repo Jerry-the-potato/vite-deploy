@@ -18,7 +18,7 @@ export default class BufferFactory{
             vertexColors: true,
         });
         this.mesh = new THREE.Group();
-        this.#factorys = new Array(180 * 2).fill(0).map(()=>this.createFactory())
+        this.#factorys = new Array(180 * 3).fill(0).map(()=>this.createFactory())
         this.n = 0.5;
         // this.update();
         // this.getSpherePosition();
@@ -34,28 +34,18 @@ export default class BufferFactory{
         this.mesh.add(factory.mesh);
         return factory;
     }
-    transformData(dataArray){
+    transformData(data){
         const factory = this.#factorys[0];
-        const vector = this.getPosition(dataArray);
+        const vector = this.getPosition(data);
         factory.vertices = this.getVertices(vector);
         factory.attribute = new THREE.BufferAttribute(factory.vertices, 3);
         factory.geometry.setAttribute('position', factory.attribute);
 
         factory.geometry.computeBoundingBox();
-        // factory.boxHelper = new THREE.Box3Helper(factory.geometry.boundingBox, 0xcccc00);
+        // factory.boxHelper = new THREE.Box3Helper(factory.geometry.boundingBox, 0xcccc77);
         // this.mesh.add(factory.boxHelper);
 
-        // const colorVertices = new Float32Array(
-        //     dataArray.reduce(
-        //         (vertices, data) => vertices.concat(...new Array(6*2*3).fill(0).map((index) => {
-        //             const r = 0.200 + data/255*(0.816 - 0.200);
-        //             const g = 0.329 + data/255*(0.590 - 0.329) * Math.sin(this.#transitionRadian);
-        //             const b = 0.584 + data/255*(0.949 - 0.584);
-        //             return [b, r, g] // 測試出來是這個順序
-        //     })), [])
-        // );
-
-        factory.colorVertices = this.getColorVertices(dataArray, factory.vertices);
+        factory.colorVertices = this.getColorVertices(data, factory.vertices);
         const colorAttribute = new THREE.BufferAttribute(factory.colorVertices, 3)
         factory.geometry.setAttribute('color', colorAttribute);
 

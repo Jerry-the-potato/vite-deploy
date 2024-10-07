@@ -19,10 +19,10 @@ const createMusicAnalyser = function(){
         this.canvas = canvas;
         this.scene = new THREE.Scene();
         this.renderer = new THREE.WebGLRenderer({"alpha": true, "canvas": canvas});
-        this.renderer.setClearColor(0x000000, 0);
+        // this.renderer.setClearColor(0x000000, 0);
         // 設置鏡頭
         this.camera = new THREE.PerspectiveCamera( 75, canvas.width / canvas.height, 0.1, 1000 );
-        const radius = 300;
+        const radius = 512;
         this.camera.position.set(radius/4, radius/3, radius/3);
         // this.camera.rotation.set(0, 0, 0);
 
@@ -99,7 +99,12 @@ const createMusicAnalyser = function(){
             const bufferLength = this.analyser.frequencyBinCount;
             const dataArray = new Uint8Array(bufferLength);
             this.analyser.getByteFrequencyData(dataArray);
-            const data = [...dataArray].splice(0,256);
+            const count = this.analyser.frequencyBinCount;
+            // const data = [...dataArray].splice(0, count / 2);
+            const data = new Uint8Array(bufferLength / 2)
+            for (let i = 0; i < bufferLength / 2; i++) {
+                data[i] = dataArray[i];
+            }
             this.buff.transformData(data);
         }
         this.controls.update();

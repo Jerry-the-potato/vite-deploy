@@ -13,6 +13,6 @@ export default function createAnalyser(audio){
     analyser.connect(audioCtx.destination);
     // 對每個節點進行設定
     gainNode.gain.value = 1;
-    analyser.fftSize = 1024;
+    analyser.fftSize = 4096;
     return analyser;
 }
