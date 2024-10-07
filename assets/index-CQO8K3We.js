@@ -27581,11 +27581,8 @@ class OrbitControls extends EventDispatcher {
 const createMusicAnalyser = function() {
   const frame = new Averager(60);
   const clock = new Clock();
-  this.firstTime = true;
-  this.getAnalyser = (e) => {
-    const audio = e.target;
-    if (this.firstTime) this.analyser = createAnalyser(audio);
-    this.firstTime = false;
+  this.getAnalyser = (audio) => {
+    if (!this.analyser) this.analyser = createAnalyser(audio);
   };
   this.setCanvas = (canvas) => {
     this.canvas = canvas;
@@ -27605,7 +27602,6 @@ const createMusicAnalyser = function() {
     this.scene.add(this.group1);
   };
   this.cleanup = () => {
-    this.firstTime = true;
     if (this.scene) {
       this.scene.traverse((object) => {
         if (object instanceof Mesh) {
@@ -27704,7 +27700,7 @@ const CanvasSectionS2 = ({ ratio, min, sectinoID = "MusicAnalyser" }) => {
       /* @__PURE__ */ jsxRuntimeExports.jsx(SlideMenuBtn, { menu }),
       /* @__PURE__ */ jsxRuntimeExports.jsx("div", { id: "dialogbox", children: /* @__PURE__ */ jsxRuntimeExports.jsx("p", { id: "dialog", children: error ? error : "" }) })
     ] }),
-    /* @__PURE__ */ jsxRuntimeExports.jsx("audio", { onPlay: musicAnalyser.getAnalyser, ref: audio, controls: true, id: "myAudio", style: { "position": "absolute", "left": "10px", "bottom": "10px" }, children: /* @__PURE__ */ jsxRuntimeExports.jsx("source", { src: audioUrl }) })
+    /* @__PURE__ */ jsxRuntimeExports.jsx("audio", { onPlay: (e) => musicAnalyser.getAnalyser(e.target), ref: audio, controls: true, id: "myAudio", style: { "position": "absolute", "left": "10px", "bottom": "10px" }, children: /* @__PURE__ */ jsxRuntimeExports.jsx("source", { src: audioUrl }) })
   ] });
 };
 class SortAlgorithm {
@@ -37142,4 +37138,4 @@ function App() {
 const domNode = document.getElementById("root");
 const root = createRoot(domNode);
 root.render(/* @__PURE__ */ jsxRuntimeExports.jsx(App, {}));
-//# sourceMappingURL=index-CJnXpFVH.js.map
+//# sourceMappingURL=index-CQO8K3We.js.map
