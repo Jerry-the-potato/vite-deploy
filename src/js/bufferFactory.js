@@ -1,32 +1,25 @@
 import * as THREE from 'three'
 
 export default class BufferFactory{
-    #geometry;
-    #vertices = new Float32Array(new Array(6 * 2 * 1000).fill(0).map(()=>0.4 + Math.random() * 0.6));
-    #positionIndex = 0;
+    // #geometry;
+    // #vertices = new Float32Array(new Array(6 * 2 * 1000).fill(0).map(()=>0.4 + Math.random() * 0.6));
     #material;
     #factorys;
+    #depth = 2;
     #transitionRadian = 0;
     #trasitionOmega = Math.PI / 300;
     constructor(){
-        this.#geometry = new THREE.BufferGeometry();
-        const attribute = new THREE.BufferAttribute(this.#vertices, 3);
-        attribute.setUsage( THREE.DynamicDrawUsage );
-        this.#geometry.setAttribute('position', attribute);
-        this.#geometry.setAttribute('color', attribute);
+        // this.#geometry = new THREE.BufferGeometry();
         this.#material = new THREE.MeshBasicMaterial({
             vertexColors: true,
         });
         this.mesh = new THREE.Group();
-        this.#factorys = new Array(180 * 3).fill(0).map(()=>this.createFactory())
-        this.n = 0.5;
+        this.#factorys = new Array(360).fill(0).map(()=>this.createFactory())
         // this.update();
         // this.getSpherePosition();
     }
     createFactory(){
         const factory = {
-            'vertices': new Float32Array(),
-            'attribute': new THREE.BufferAttribute(new Float32Array(),3),
             'geometry': new THREE.BufferGeometry(),
             'mesh': null
         };
@@ -35,27 +28,27 @@ export default class BufferFactory{
         return factory;
     }
     transformData(data){
-        const factory = this.#factorys[0];
+        const factory = this.#factorys.shift();
+        this.#factorys.push(factory);
+
         const vector = this.getPosition(data);
-        factory.vertices = this.getVertices(vector);
-        factory.attribute = new THREE.BufferAttribute(factory.vertices, 3);
-        factory.geometry.setAttribute('position', factory.attribute);
+
+        const vertices = this.getVertices(vector);
+        const attribute = new THREE.BufferAttribute(vertices, 3);
+        factory.geometry.setAttribute('position', attribute);
 
         factory.geometry.computeBoundingBox();
         // factory.boxHelper = new THREE.Box3Helper(factory.geometry.boundingBox, 0xcccc77);
         // this.mesh.add(factory.boxHelper);
 
-        factory.colorVertices = this.getColorVertices(data, factory.vertices);
-        const colorAttribute = new THREE.BufferAttribute(factory.colorVertices, 3)
+        const colorVertices = this.getColorVertices(data, vertices);
+        const colorAttribute = new THREE.BufferAttribute(colorVertices, 3)
         factory.geometry.setAttribute('color', colorAttribute);
-
-        this.#factorys.splice(0, 1);
-        this.#factorys.push(factory);
     }
     updateFactorys(){
         const len = this.#factorys.length;
         this.#factorys.forEach((factory, index)=>{
-            factory.mesh.position.set(0,0,1 * (index - len));
+            factory.mesh.position.set(0, 0, this.#depth * (index - len));
             factory.geometry.computeBoundingBox();
             factory.geometry.boundingBox.translate(factory.mesh.position);
         })
@@ -227,7 +220,7 @@ export default class BufferFactory{
         const t = 0//(Date.now() - this.#timestamp)/100;
         const vectors = new Array(data.length);
         const width = 2;
-        const depth = 1;
+        const depth = this.#depth;
         // camera.position.set(16,30,depth * (t+120));
         for(let N=0; N<data.length; N++){
             const height = data[N] / 3;

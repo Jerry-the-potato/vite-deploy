@@ -124,6 +124,7 @@ this.setCanvas = (canvas) => {
     this.camera.position.set(radius/4, radius/3, radius/3);
     this.controls = new OrbitControls(this.camera, this.renderer.domElement);
     this.controls.target.set(radius/4, 0, -radius/3);
+    this.controls.update();
     this.axis = new THREE.AxesHelper(300);
     this.scene.add(this.axis);
 }

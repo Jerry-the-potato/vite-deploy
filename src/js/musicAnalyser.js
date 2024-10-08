@@ -23,9 +23,14 @@ const createMusicAnalyser = function(){
         this.camera.position.set(radius/4, radius/3, radius/3);
         // this.camera.rotation.set(0, 0, 0);
 
+        // 光
+        // const light = new THREE.AmbientLight( 0xffffff );
+        // this.scene.add( light );
+
         // 添加控制和座標軸
         this.controls = new OrbitControls(this.camera, this.renderer.domElement);
         this.controls.target.set(radius/4, 0, -radius/3);
+        this.controls.update();
         this.axis = new THREE.AxesHelper(300);
         this.scene.add(this.axis);
 
@@ -102,7 +107,6 @@ const createMusicAnalyser = function(){
             }
             this.buff.transformData(data);
         }
-        this.controls.update();
         this.buff.update();
         frame.updateValue(clock.getDelta());
         window.fps = frame.getFPS();
