@@ -8,7 +8,7 @@ var __accessCheck = (obj, member, msg) => member.has(obj) || __typeError("Cannot
 var __privateGet = (obj, member, getter) => (__accessCheck(obj, member, "read from private field"), getter ? getter.call(obj) : member.get(obj));
 var __privateAdd = (obj, member, value) => member.has(obj) ? __typeError("Cannot add the same private member more than once") : member instanceof WeakSet ? member.add(obj) : member.set(obj, value);
 var __privateSet = (obj, member, value, setter) => (__accessCheck(obj, member, "write to private field"), setter ? setter.call(obj, value) : member.set(obj, value), value);
-var _geometry, _vertices, _positionIndex, _material, _factorys, _transitionRadian, _trasitionOmega;
+var _material, _factorys, _depth, _transitionRadian, _trasitionOmega;
 (function polyfill() {
   const relList = document.createElement("link").relList;
   if (relList && relList.supports && relList.supports("modulepreload")) {
@@ -7950,7 +7950,6 @@ const NotEqualCompare = 517;
 const GreaterEqualCompare = 518;
 const AlwaysCompare = 519;
 const StaticDrawUsage = 35044;
-const DynamicDrawUsage = 35048;
 const GLSL3 = "300 es";
 const WebGLCoordinateSystem = 2e3;
 const WebGPUCoordinateSystem = 2001;
@@ -26409,29 +26408,21 @@ if (typeof window !== "undefined") {
 }
 class BufferFactory {
   constructor() {
-    __privateAdd(this, _geometry);
-    __privateAdd(this, _vertices, new Float32Array(new Array(6 * 2 * 1e3).fill(0).map(() => 0.4 + Math.random() * 0.6)));
-    __privateAdd(this, _positionIndex, 0);
+    // #geometry;
+    // #vertices = new Float32Array(new Array(6 * 2 * 1000).fill(0).map(()=>0.4 + Math.random() * 0.6));
     __privateAdd(this, _material);
     __privateAdd(this, _factorys);
+    __privateAdd(this, _depth, 2);
     __privateAdd(this, _transitionRadian, 0);
     __privateAdd(this, _trasitionOmega, Math.PI / 300);
-    __privateSet(this, _geometry, new BufferGeometry());
-    const attribute = new BufferAttribute(__privateGet(this, _vertices), 3);
-    attribute.setUsage(DynamicDrawUsage);
-    __privateGet(this, _geometry).setAttribute("position", attribute);
-    __privateGet(this, _geometry).setAttribute("color", attribute);
     __privateSet(this, _material, new MeshBasicMaterial({
       vertexColors: true
     }));
     this.mesh = new Group();
-    __privateSet(this, _factorys, new Array(180 * 3).fill(0).map(() => this.createFactory()));
-    this.n = 0.5;
+    __privateSet(this, _factorys, new Array(360).fill(0).map(() => this.createFactory()));
   }
   createFactory() {
     const factory = {
-      "vertices": new Float32Array(),
-      "attribute": new BufferAttribute(new Float32Array(), 3),
       "geometry": new BufferGeometry(),
       "mesh": null
     };
@@ -26440,22 +26431,21 @@ class BufferFactory {
     return factory;
   }
   transformData(data) {
-    const factory = __privateGet(this, _factorys)[0];
-    const vector = this.getPosition(data);
-    factory.vertices = this.getVertices(vector);
-    factory.attribute = new BufferAttribute(factory.vertices, 3);
-    factory.geometry.setAttribute("position", factory.attribute);
-    factory.geometry.computeBoundingBox();
-    factory.colorVertices = this.getColorVertices(data, factory.vertices);
-    const colorAttribute = new BufferAttribute(factory.colorVertices, 3);
-    factory.geometry.setAttribute("color", colorAttribute);
-    __privateGet(this, _factorys).splice(0, 1);
+    const factory = __privateGet(this, _factorys).shift();
     __privateGet(this, _factorys).push(factory);
+    const vector = this.getPosition(data);
+    const vertices = this.getVertices(vector);
+    const attribute = new BufferAttribute(vertices, 3);
+    factory.geometry.setAttribute("position", attribute);
+    factory.geometry.computeBoundingBox();
+    const colorVertices = this.getColorVertices(data, vertices);
+    const colorAttribute = new BufferAttribute(colorVertices, 3);
+    factory.geometry.setAttribute("color", colorAttribute);
   }
   updateFactorys() {
     const len = __privateGet(this, _factorys).length;
     __privateGet(this, _factorys).forEach((factory, index) => {
-      factory.mesh.position.set(0, 0, 1 * (index - len));
+      factory.mesh.position.set(0, 0, __privateGet(this, _depth) * (index - len));
       factory.geometry.computeBoundingBox();
       factory.geometry.boundingBox.translate(factory.mesh.position);
     });
@@ -26618,7 +26608,7 @@ class BufferFactory {
     const t2 = 0;
     const vectors = new Array(data.length);
     const width = 2;
-    const depth = 1;
+    const depth = __privateGet(this, _depth);
     for (let N2 = 0; N2 < data.length; N2++) {
       const height = data[N2] / 3;
       const vector = new Float32Array(24 * 3);
@@ -26755,11 +26745,9 @@ class BufferFactory {
     this.updateFactorys();
   }
 }
-_geometry = new WeakMap();
-_vertices = new WeakMap();
-_positionIndex = new WeakMap();
 _material = new WeakMap();
 _factorys = new WeakMap();
+_depth = new WeakMap();
 _transitionRadian = new WeakMap();
 _trasitionOmega = new WeakMap();
 const particleGeo = new BufferGeometry();
@@ -27593,6 +27581,7 @@ const createMusicAnalyser = function() {
     this.camera.position.set(radius / 4, radius / 3, radius / 3);
     this.controls = new OrbitControls(this.camera, this.renderer.domElement);
     this.controls.target.set(radius / 4, 0, -radius / 3);
+    this.controls.update();
     this.axis = new AxesHelper(300);
     this.scene.add(this.axis);
     this.buff = new BufferFactory();
@@ -27657,7 +27646,6 @@ const createMusicAnalyser = function() {
       }
       this.buff.transformData(data);
     }
-    this.controls.update();
     this.buff.update();
     frame.updateValue(clock.getDelta());
     window.fps = frame.getFPS();
@@ -37138,4 +37126,4 @@ function App() {
 const domNode = document.getElementById("root");
 const root = createRoot(domNode);
 root.render(/* @__PURE__ */ jsxRuntimeExports.jsx(App, {}));
-//# sourceMappingURL=index-CQO8K3We.js.map
+//# sourceMappingURL=index-BIaPhKaJ.js.map
