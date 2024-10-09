@@ -217,158 +217,160 @@ export default class BufferFactory{
     //     // this.setColor(colorVertices);
     // }
     getPosition(data){
-        const t = 0//(Date.now() - this.#timestamp)/100;
         const vectors = new Array(data.length);
         const width = 2;
         const depth = this.#depth;
-        // camera.position.set(16,30,depth * (t+120));
-        for(let N=0; N<data.length; N++){
+        for(let N = 0; N < data.length; N++){
             const height = data[N] / 3;
             // if(height < 1) continue;
             const vector = new Float32Array(24 * 3);
-            // const push1 = () => { return new THREE.Vector3(width*N,0,depth * (t+1)) };
-            // const push2 = () => { return new THREE.Vector3(width*(N+1),0,depth * (t+1)) };
-            // const push3 = () => { return new THREE.Vector3(width*(N+1),height,depth * (t+1)) };
-            // const push4 = () => { return new THREE.Vector3(width*N,height,depth * (t+1)) };
-            // const push5 = () => { return new THREE.Vector3(width*N,0,depth * t) };
-            // const push6 = () => { return new THREE.Vector3(width*N,height,depth * t) };
-            // const push7 = () => { return new THREE.Vector3(width*(N+1),height,depth * t) };
-            // const push8 = () => { return new THREE.Vector3(width*(N+1),0,depth * t) };
-            // 正面
-            // vector[0] = new THREE.Vector3(width * N, 0, depth * (t+1));
-            // vector[1] = new THREE.Vector3(width * (N+1), 0, depth * (t+1));
-            // vector[2] = new THREE.Vector3(width * (N+1), height, depth * (t+1));
-            // vector[3] = new THREE.Vector3(width * N, height, depth * (t+1));
-
-            // // 背面
-            // vector[4] = new THREE.Vector3(width * N, 0, depth * t);
-            // vector[5] = new THREE.Vector3(width * N, height, depth * t);
-            // vector[6] = new THREE.Vector3(width * (N+1), height, depth * t);
-            // vector[7] = new THREE.Vector3(width * (N+1), 0, depth * t);
-
-            // // 左面
-            // vector[8] = new THREE.Vector3(width * N, 0, depth * (t+1));
-            // vector[9] = new THREE.Vector3(width * N, height, depth * (t+1));
-            // vector[10] = new THREE.Vector3(width * N, height, depth * t);
-            // vector[11] = new THREE.Vector3(width * N, 0, depth * t);
-
-            // // 右面
-            // vector[12] = new THREE.Vector3(width * (N+1), 0, depth * (t+1));
-            // vector[13] = new THREE.Vector3(width * (N+1), 0, depth * t);
-            // vector[14] = new THREE.Vector3(width * (N+1), height, depth * t);
-            // vector[15] = new THREE.Vector3(width * (N+1), height, depth * (t+1));
-
-            // // 上面
-            // vector[16] = new THREE.Vector3(width * (N+1), height, depth * (t+1));
-            // vector[17] = new THREE.Vector3(width * (N+1), height, depth * t);
-            // vector[18] = new THREE.Vector3(width * N, height, depth * t);
-            // vector[19] = new THREE.Vector3(width * N, height, depth * (t+1));
-
-            // // 下面
-            // vector[20] = new THREE.Vector3(width * N, 0, depth * (t+1));
-            // vector[21] = new THREE.Vector3(width * N, 0, depth * t);
-            // vector[22] = new THREE.Vector3(width * (N+1), 0, depth * t);
-            // vector[23] = new THREE.Vector3(width * (N+1), 0, depth * (t+1));
-
+            
             let idx = 0;
-            vector[idx++] = width * N;        vector[idx++] = 0;        vector[idx++] = depth * (t+1);
-            vector[idx++] = width * (N+1);    vector[idx++] = 0;        vector[idx++] = depth * (t+1);
-            vector[idx++] = width * (N+1);    vector[idx++] = height;   vector[idx++] = depth * (t+1);
-            vector[idx++] = width * N;        vector[idx++] = height;   vector[idx++] = depth * (t+1);
-    
+            const push = (x, y, z) => {
+                vector[idx++] = x;
+                vector[idx++] = y;
+                vector[idx++] = z;
+            }
+            const push1 = () => { push(width * N    , 0     , depth) };
+            const push2 = () => { push(width * (N+1), 0     , depth) };
+            const push3 = () => { push(width * (N+1), height, depth) };
+            const push4 = () => { push(width * N    , height, depth) };
+            const push5 = () => { push(width * N    , 0     , 0) };
+            const push6 = () => { push(width * N    , height, 0) };
+            const push7 = () => { push(width * (N+1), height, 0) };
+            const push8 = () => { push(width * (N+1), 0     , 0) };
+            // 正面
+            push1();
+            push2();
+            push3();
+            push4(); 
+            
             // 背面
-            vector[idx++] = width * N;        vector[idx++] = 0;        vector[idx++] = depth * t;
-            vector[idx++] = width * N;        vector[idx++] = height;   vector[idx++] = depth * t;
-            vector[idx++] = width * (N+1);    vector[idx++] = height;   vector[idx++] = depth * t;
-            vector[idx++] = width * (N+1);    vector[idx++] = 0;        vector[idx++] = depth * t;
-    
+            push5();
+            push6();
+            push7();
+            push8(); 
+
             // 左面
-            vector[idx++] = width * N;        vector[idx++] = 0;        vector[idx++] = depth * (t+1);
-            vector[idx++] = width * N;        vector[idx++] = height;   vector[idx++] = depth * (t+1);
-            vector[idx++] = width * N;        vector[idx++] = height;   vector[idx++] = depth * t;
-            vector[idx++] = width * N;        vector[idx++] = 0;        vector[idx++] = depth * t;
-    
+            push1();
+            push4();
+            push6();
+            push5();
+            
             // 右面
-            vector[idx++] = width * (N+1);    vector[idx++] = 0;        vector[idx++] = depth * (t+1);
-            vector[idx++] = width * (N+1);    vector[idx++] = 0;        vector[idx++] = depth * t;
-            vector[idx++] = width * (N+1);    vector[idx++] = height;   vector[idx++] = depth * t;
-            vector[idx++] = width * (N+1);    vector[idx++] = height;   vector[idx++] = depth * (t+1);
-    
+            push2();
+            push8();
+            push7();
+            push3();
+            
             // 上面
-            vector[idx++] = width * (N+1);    vector[idx++] = height;   vector[idx++] = depth * (t+1);
-            vector[idx++] = width * (N+1);    vector[idx++] = height;   vector[idx++] = depth * t;
-            vector[idx++] = width * N;        vector[idx++] = height;   vector[idx++] = depth * t;
-            vector[idx++] = width * N;        vector[idx++] = height;   vector[idx++] = depth * (t+1);
-    
+            push3();
+            push7();
+            push6();
+            push4(); 
+            
             // 下面
-            vector[idx++] = width * N;        vector[idx++] = 0;        vector[idx++] = depth * (t+1);
-            vector[idx++] = width * N;        vector[idx++] = 0;        vector[idx++] = depth * t;
-            vector[idx++] = width * (N+1);    vector[idx++] = 0;        vector[idx++] = depth * t;
-            vector[idx++] = width * (N+1);    vector[idx++] = 0;        vector[idx++] = depth * (t+1);
+            push1();
+            push5();
+            push8();
+            push2(); 
+
+            // let idx = 0;
+            // // 前面
+            // vector[idx++] = width * N;        vector[idx++] = 0;        vector[idx++] = depth;
+            // vector[idx++] = width * (N + 1);  vector[idx++] = 0;        vector[idx++] = depth;
+            // vector[idx++] = width * (N + 1);  vector[idx++] = height;   vector[idx++] = depth;
+            // vector[idx++] = width * N;        vector[idx++] = height;   vector[idx++] = depth;
+            
+            // // 背面
+            // vector[idx++] = width * N;        vector[idx++] = 0;        vector[idx++] = 0;
+            // vector[idx++] = width * N;        vector[idx++] = height;   vector[idx++] = 0;
+            // vector[idx++] = width * (N + 1);  vector[idx++] = height;   vector[idx++] = 0;
+            // vector[idx++] = width * (N + 1);  vector[idx++] = 0;        vector[idx++] = 0;
+            
+            // // 左面
+            // vector[idx++] = width * N;        vector[idx++] = 0;        vector[idx++] = depth;
+            // vector[idx++] = width * N;        vector[idx++] = height;   vector[idx++] = depth;
+            // vector[idx++] = width * N;        vector[idx++] = height;   vector[idx++] = 0;
+            // vector[idx++] = width * N;        vector[idx++] = 0;        vector[idx++] = 0;
+            
+            // // 右面
+            // vector[idx++] = width * (N + 1);  vector[idx++] = 0;        vector[idx++] = depth;
+            // vector[idx++] = width * (N + 1);  vector[idx++] = 0;        vector[idx++] = 0;
+            // vector[idx++] = width * (N + 1);  vector[idx++] = height;   vector[idx++] = 0;
+            // vector[idx++] = width * (N + 1);  vector[idx++] = height;   vector[idx++] = depth;
+            
+            // // 上面
+            // vector[idx++] = width * (N + 1);  vector[idx++] = height;   vector[idx++] = depth;
+            // vector[idx++] = width * (N + 1);  vector[idx++] = height;   vector[idx++] = 0;
+            // vector[idx++] = width * N;        vector[idx++] = height;   vector[idx++] = 0;
+            // vector[idx++] = width * N;        vector[idx++] = height;   vector[idx++] = depth;
+            
+            // // 下面
+            // vector[idx++] = width * N;        vector[idx++] = 0;        vector[idx++] = depth;
+            // vector[idx++] = width * N;        vector[idx++] = 0;        vector[idx++] = 0;
+            // vector[idx++] = width * (N + 1);  vector[idx++] = 0;        vector[idx++] = 0;
+            // vector[idx++] = width * (N + 1);  vector[idx++] = 0;        vector[idx++] = depth;
+            
 
             vectors[N] = vector;  // 將填充完的 vector 插入 vectors 陣列
         }
         return vectors;
     }
-    getVertices(vector){
-        const verticesCount = vector.length * 36;  // 每個立方體 36 個頂點 (6 面 * 2 三角形/面 * 3 頂點/三角形)
+    getVertices(vector, totalFace = 6, totalPoint = 4){
+        const totalFrament = totalPoint - 2;
+        const verticesCount = vector.length * totalFace * totalFrament * 3;  // 每個立方體 36 個頂點 (6 面 * 2 三角形/面 * 3 頂點/三角形)
         const vertices = new Float32Array(verticesCount);
         let index = 0;
-        for(let M = 0; M < vector.length;M++){
+        for(let M = 0; M < vector.length; M++){
             // 每個立方體有 6 個面，每個面有 4 個頂點 (共 24 個頂點)
-            for(let face = 0; face < 6; face++){
-                const baseIndex = face * 4 * 3;  // 每個面的起始索引
+            for(let face = 0; face < totalFace; face++){
+                const baseIndex = face * totalPoint * 3;  // 每個面的起始索引
+                for(let N = 0; N < 3 * totalFrament; N+=3){
+                    vertices[index++] = vector[M][baseIndex];      // 第 0 點的 x
+                    vertices[index++] = vector[M][baseIndex + 1];  // 第 0 點的 y
+                    vertices[index++] = vector[M][baseIndex + 2];  // 第 0 點的 z
 
-                // 第一個三角形 (點 0, 點 1, 點 2)
-                vertices[index++] = vector[M][baseIndex];  // 第 0 點的 x
-                vertices[index++] = vector[M][baseIndex + 1];  // 第 0 點的 y
-                vertices[index++] = vector[M][baseIndex + 2];  // 第 0 點的 z
-    
-                vertices[index++] = vector[M][baseIndex + 3];  // 第 1 點的 x
-                vertices[index++] = vector[M][baseIndex + 4];  // 第 1 點的 y
-                vertices[index++] = vector[M][baseIndex + 5];  // 第 1 點的 z
-    
-                vertices[index++] = vector[M][baseIndex + 6];  // 第 2 點的 x
-                vertices[index++] = vector[M][baseIndex + 7];  // 第 2 點的 y
-                vertices[index++] = vector[M][baseIndex + 8];  // 第 2 點的 z
-    
-                // 第二個三角形 (點 0, 點 2, 點 3)
-                vertices[index++] = vector[M][baseIndex];  // 第 0 點的 x
-                vertices[index++] = vector[M][baseIndex + 1];  // 第 0 點的 y
-                vertices[index++] = vector[M][baseIndex + 2];  // 第 0 點的 z
-    
-                vertices[index++] = vector[M][baseIndex + 6];  // 第 2 點的 x
-                vertices[index++] = vector[M][baseIndex + 7];  // 第 2 點的 y
-                vertices[index++] = vector[M][baseIndex + 8];  // 第 2 點的 z
-    
-                vertices[index++] = vector[M][baseIndex + 9];  // 第 3 點的 x
-                vertices[index++] = vector[M][baseIndex + 10];  // 第 3 點的 y
-                vertices[index++] = vector[M][baseIndex + 11];  // 第 3 點的 z
+                    vertices[index++] = vector[M][baseIndex + 3 + N];  // 第 N+1 點的 x
+                    vertices[index++] = vector[M][baseIndex + 4 + N];  // 第 N+1 點的 y
+                    vertices[index++] = vector[M][baseIndex + 5 + N];  // 第 N+1 點的 z
+
+                    vertices[index++] = vector[M][baseIndex + 6 + N];  // 第 N+2 點的 x
+                    vertices[index++] = vector[M][baseIndex + 7 + N];  // 第 N+2 點的 y
+                    vertices[index++] = vector[M][baseIndex + 8 + N];  // 第 N+2 點的 z
+                }
             }
         }
-        // console.log(vector.length, vertices.length);
         return vertices;
     }
     getColorVertices(data, vertices){
-        const colorVertices = new Float32Array(data.length * 36 * 3);  // 為每個立方體 36 個頂點的顏色分配空間
+        // data.length * 36 * 3
+        const colorVertices = new Float32Array(vertices.length);
         let colorIndex = 0;
         const width = 2;
         for (let i = 0; i < data.length; i++) {
             const value = data[i];
             
+            const tran = Math.sin(this.#transitionRadian);
             // 計算每個立方體的顏色
             const r = 0.200 + value / 255 * (0.816 - 0.200);
-            const g = 0.329 + value / 255 * (0.590 - 0.329) * Math.sin(this.#transitionRadian);
+            const g = 0.329 + value / 255 * (0.590 - 0.329) * tran;
             const b = 0.584 + value / 255 * (0.949 - 0.584);
         
             // 為每個立方體的 36 個頂點賦予相同的顏色
             for (let j = 0; j < 36; j++) {
-                const isLeft = (vertices[i * 36 * 3 + j * 3] == i * width);  // 立方體的上面 18 個頂點
+                // 立方體的左側 18 個頂點
+                const x = vertices[i * 36 * 3 + j * 3];
+                const y = vertices[i * 36 * 3 + j * 3 + 1];
+                const z = vertices[i * 36 * 3 + j * 3 + 2];
+                const isLeft = (x == i * width);
+                const isTop = (y == value);
                 const t = isLeft ? 1 : 0;
+                const t2 = isTop ? 1 : 0;
 
-                const R = r + t * (0.816 - r);
-                const G = g + t * (0.590 - g);
-                const B = b + t * (0.949 - b);
+                const R = r + (t + t2) / 2 * (0.816 - r);
+                const G = g + (t + t2) / 2 * (0.590 - g) * tran;
+                const B = b + (t + t2) / 2 * (0.949 - b);
 
                 colorVertices[colorIndex++] = B;  // B
                 colorVertices[colorIndex++] = R;  // R

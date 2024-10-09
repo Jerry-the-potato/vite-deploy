@@ -1,6 +1,8 @@
 ### 引言
 在 3D 圖形渲染和資料視覺化中，效能是關鍵問題之一。隨著資料量的增大，若繼續使用高階語言提供的內建陣列和資料結構，雖然靈活方便，通常會造成效能瓶頸。為了處理大量同質性的數據，JavaScript 提供了 TypedArray，使得我們能夠更高效地管理和操作數據。
 
+今天，將延續昨天的架構，繼續講解如何在 Three.js 中自定義 3D 長條圖。
+
 ### TypedArray
 如果有學過 C++ 或其他低階語言，就會知道在定義變數時，通常會先定義型別，同理陣列也一樣，由於提前分配固定的記憶體空間，並且密集排列，存取就能更加高效。
 
@@ -74,7 +76,6 @@ const createMusicAnalyser = function(){
 * 可以看到，我們已經將 mesh 群組添加到場景中，接下來就要逐禎更新音訊數據。
 
 #### 將音訊資料轉換成頂點和幾何體
-
 在構築幾何體時，需要提供對應的頂點和屬性（明天會詳細說明），於是我們分成三步驟，先按照直覺，準備長條圖六個面的向量數據（vector），再將其轉換為頂點數據（vertices），最後包裝成三個座標一組的屬性（attribute）。
 ```javascript
 class BufferFactory{
@@ -97,8 +98,10 @@ class BufferFactory{
 * THREE.BufferAttribute：透過它，我們能夠將自定義頂點數據傳遞到 WebGL 中，進行高效渲染。
 * setAttribute：這實際上和 WebGL 傳遞變數的方式有關，因為 position、color 變數不存在 Javascript 環境中，所以用這個方式將數據綁定到 WebGL 繪圖上下文。
 
-[gif]
 #### 長條圖的流動效果
+> Youtube 影片
+[![Yes](https://img.youtube.com/vi/X7remQEUWAU/0.jpg)](https://youtu.be/X7remQEUWAU)
+
 當添加新的圖形時，我們希望它像水一樣，不斷流下去，直到中斷處消失。為達成這個效果，我們才將首個元素放入末尾，並且更新覆蓋它的圖形。接著，在每次更新時根據索引值來分配Ｚ軸座標，就能實現不斷循環更新的長條圖了。
 
 ```javascript
@@ -120,5 +123,5 @@ class BufferFactory{
 本文探討了 TypedArray 在 3D 圖形渲染中的應用，特別是如何使用 Three.js 結合 Float32Array 高效地生成和更新長條圖。透過簡單的工廠設計模式，我們成功構建了一個能夠處理實時資料的圖形渲染系統。明天，我們將詳細探討頂點和圖形的關係，你將學會如何利用頂點繪製圖形，並且完整演算法的封裝。
 
 如果感興趣，可以參考 Github 上的原始碼：
-[musicAnalyser.js](https://github.com/Jerry-the-potato/vite-deploy/blob/main/src/js/musicAnalyser.js)
-[bufferFactory.js](https://github.com/Jerry-the-potato/vite-deploy/blob/main/src/js/bufferFactory.js)
+* [musicAnalyser.js](https://github.com/Jerry-the-potato/vite-deploy/blob/main/src/js/musicAnalyser.js)
+* [bufferFactory.js](https://github.com/Jerry-the-potato/vite-deploy/blob/main/src/js/bufferFactory.js)
