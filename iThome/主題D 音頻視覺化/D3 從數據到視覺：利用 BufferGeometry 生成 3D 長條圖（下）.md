@@ -133,14 +133,14 @@ getPosition(data){
 演算法有點太長，會有排版問題，所以這邊用截圖的方式哦！
 #### 長方體的六個面
 先一次性把所有座標秀出來給大家看看，以便更好地理解。並且每個面的四個點都以逆時針依序排列：
-[圖]
+![https://ithelp.ithome.com.tw/upload/images/20241009/20135197EleCXiwTU7.png](https://ithelp.ithome.com.tw/upload/images/20241009/20135197EleCXiwTU7.png)
 
-雖然這樣看起來很工整，但是！怎麼分得出來一個面是由那些座標組成的！
+* 雖然這樣看起來很工整，但是！怎麼分得出來一個面是由那些座標組成的！
 #### 簡化邏輯－封裝八個點座標
 所以，我其實是這樣做的，先把八個點封裝成 push 函式，來組織程式碼：
-[圖]
+![https://ithelp.ithome.com.tw/upload/images/20241009/20135197ZjYbgDQciV.png](https://ithelp.ithome.com.tw/upload/images/20241009/20135197ZjYbgDQciV.png)
 
-這樣做更容易理解，並且可以專注在點與點之間的關係，而不是座標本身
+* 這樣做更容易理解，並且可以專注在點與點之間的關係，而不是座標本身
 
 ### 利用頂點添加顏色
 接著我們同樣透過頻譜分析的數據 data，來決定長條圖的顏色，同時我們希望加入一些漸層效果，所以透過剛剛計算好的頂點位置 vertices，來設定相對的顏色，
@@ -199,7 +199,13 @@ getColorVertices(data, vertices){
 * 108個座標中，j*3, j*3 + 1, j*3 + 2 分別表示 x, y 和 z。 
 
 來比較一下有漸層和無漸層的差別吧：
+![https://ithelp.ithome.com.tw/upload/images/20241009/20135197xjHQbrJ3ZP.png](https://ithelp.ithome.com.tw/upload/images/20241009/20135197xjHQbrJ3ZP.png)
 
+* 無漸層雖然缺乏細節，但是由於音訊不斷更新流動的特性，仍可以看到相對平滑的長條圖。
+
+![https://ithelp.ithome.com.tw/upload/images/20241009/20135197ZC6HcW40aw.png](https://ithelp.ithome.com.tw/upload/images/20241009/20135197ZC6HcW40aw.png)
+
+* 有了漸層後，特徵更加清晰，較容易看出長條圖的高度和變化。
 
 ### 結論
 本文詳細介紹了如何使用頂點來控制 3D 場景中的圖形渲染與顏色表現。通過理解頂點的作用，我們不僅能夠定義圖形的幾何形狀，還能結合音訊數據動態改變顏色，進一步豐富視覺效果。

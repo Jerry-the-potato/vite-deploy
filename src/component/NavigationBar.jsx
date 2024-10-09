@@ -6,7 +6,9 @@ function GetHyperLink({divRef}){
         const sections = divRef.current.getElementsByTagName("section");
         setHyperlink(Object.keys(sections).map((key) => {
             const ID = sections[key].id;
-            return <a key={ID} className="list" href={"#"+ID} id={"to"+ID}>{ID}</a>
+            return <a key={ID} className="list" href={"#"+ID} id={"to"+ID}
+                        onClick={(e) => document.getElementById(ID).scrollIntoView({ behavior: 'smooth' })}
+                    >{ID}</a>
         }));
     }, []);
     return hyperlink;

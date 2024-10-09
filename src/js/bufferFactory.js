@@ -18,33 +18,72 @@ export default class BufferFactory{
         // this.update();
         // this.getSpherePosition();
     }
+
+    // 方法二：直接修改 BufferAttribute 頂點數據
     createFactory(){
         const factory = {
             'geometry': new THREE.BufferGeometry(),
-            'mesh': null
+            'attribute': new THREE.BufferAttribute(new Float32Array(),3),
+            'mesh': null,
+            'needSet': true
         };
-        factory.mesh = new THREE.Mesh( factory.geometry, this.#material )
+        factory.mesh = new THREE.Mesh( factory.geometry, this.#material );
         this.mesh.add(factory.mesh);
         return factory;
+    }
+    setAttribute(factory){
+        if(factory.needSet != true) return
+        const attribute = new THREE.BufferAttribute(new Float32Array(1024 * 36), 3);
+        const attribute2 = new THREE.BufferAttribute(new Float32Array(1024 * 36), 3);
+        factory.geometry.setAttribute('position', attribute);
+        factory.geometry.setAttribute('color', attribute2);
+        factory.needSet = false;
     }
     transformData(data){
         const factory = this.#factorys.shift();
         this.#factorys.push(factory);
+        this.setAttribute(factory);
 
         const vector = this.getPosition(data);
-
         const vertices = this.getVertices(vector);
-        const attribute = new THREE.BufferAttribute(vertices, 3);
-        factory.geometry.setAttribute('position', attribute);
-
-        factory.geometry.computeBoundingBox();
-        // factory.boxHelper = new THREE.Box3Helper(factory.geometry.boundingBox, 0xcccc77);
-        // this.mesh.add(factory.boxHelper);
+        
+        factory.geometry.attributes.position.needsUpdate = true;
+        factory.geometry.attributes.position.array = vertices;
 
         const colorVertices = this.getColorVertices(data, vertices);
-        const colorAttribute = new THREE.BufferAttribute(colorVertices, 3)
-        factory.geometry.setAttribute('color', colorAttribute);
+
+        factory.geometry.attributes.color.needsUpdate = true;
+        factory.geometry.attributes.color.array = colorVertices;
     }
+
+    // 方法一：每次重建新的頂點數據
+    // createFactory(){
+    //     const factory = {
+    //         'geometry': new THREE.BufferGeometry(),
+    //         'mesh': null
+    //     };
+    //     factory.mesh = new THREE.Mesh( factory.geometry, this.#material )
+    //     this.mesh.add(factory.mesh);
+    //     return factory;
+    // }
+    // transformData(data){
+    //     const factory = this.#factorys.shift();
+    //     this.#factorys.push(factory);
+
+    //     const vector = this.getPosition(data);
+    //     window.d = data;
+    //     const vertices = this.getVertices(vector);
+    //     const attribute = new THREE.BufferAttribute(vertices, 3);
+    //     factory.geometry.setAttribute('position', attribute);
+    //     // factory.geometry.computeBoundingBox();
+    //     // factory.boxHelper = new THREE.Box3Helper(factory.geometry.boundingBox, 0xcccc77);
+    //     // this.mesh.add(factory.boxHelper);
+
+    //     const colorVertices = this.getColorVertices(data, vertices);
+    //     const colorAttribute = new THREE.BufferAttribute(colorVertices, 3)
+    //     factory.geometry.setAttribute('color', colorAttribute);
+    // }
+
     updateFactorys(){
         const len = this.#factorys.length;
         this.#factorys.forEach((factory, index)=>{
