@@ -26605,7 +26605,6 @@ class BufferFactory {
   //     // this.setColor(colorVertices);
   // }
   getPosition(data) {
-    const t2 = 0;
     const vectors = new Array(data.length);
     const width = 2;
     const depth = __privateGet(this, _depth);
@@ -26613,126 +26612,107 @@ class BufferFactory {
       const height = data[N2] / 3;
       const vector = new Float32Array(24 * 3);
       let idx = 0;
-      vector[idx++] = width * N2;
-      vector[idx++] = 0;
-      vector[idx++] = depth * (t2 + 1);
-      vector[idx++] = width * (N2 + 1);
-      vector[idx++] = 0;
-      vector[idx++] = depth * (t2 + 1);
-      vector[idx++] = width * (N2 + 1);
-      vector[idx++] = height;
-      vector[idx++] = depth * (t2 + 1);
-      vector[idx++] = width * N2;
-      vector[idx++] = height;
-      vector[idx++] = depth * (t2 + 1);
-      vector[idx++] = width * N2;
-      vector[idx++] = 0;
-      vector[idx++] = depth * t2;
-      vector[idx++] = width * N2;
-      vector[idx++] = height;
-      vector[idx++] = depth * t2;
-      vector[idx++] = width * (N2 + 1);
-      vector[idx++] = height;
-      vector[idx++] = depth * t2;
-      vector[idx++] = width * (N2 + 1);
-      vector[idx++] = 0;
-      vector[idx++] = depth * t2;
-      vector[idx++] = width * N2;
-      vector[idx++] = 0;
-      vector[idx++] = depth * (t2 + 1);
-      vector[idx++] = width * N2;
-      vector[idx++] = height;
-      vector[idx++] = depth * (t2 + 1);
-      vector[idx++] = width * N2;
-      vector[idx++] = height;
-      vector[idx++] = depth * t2;
-      vector[idx++] = width * N2;
-      vector[idx++] = 0;
-      vector[idx++] = depth * t2;
-      vector[idx++] = width * (N2 + 1);
-      vector[idx++] = 0;
-      vector[idx++] = depth * (t2 + 1);
-      vector[idx++] = width * (N2 + 1);
-      vector[idx++] = 0;
-      vector[idx++] = depth * t2;
-      vector[idx++] = width * (N2 + 1);
-      vector[idx++] = height;
-      vector[idx++] = depth * t2;
-      vector[idx++] = width * (N2 + 1);
-      vector[idx++] = height;
-      vector[idx++] = depth * (t2 + 1);
-      vector[idx++] = width * (N2 + 1);
-      vector[idx++] = height;
-      vector[idx++] = depth * (t2 + 1);
-      vector[idx++] = width * (N2 + 1);
-      vector[idx++] = height;
-      vector[idx++] = depth * t2;
-      vector[idx++] = width * N2;
-      vector[idx++] = height;
-      vector[idx++] = depth * t2;
-      vector[idx++] = width * N2;
-      vector[idx++] = height;
-      vector[idx++] = depth * (t2 + 1);
-      vector[idx++] = width * N2;
-      vector[idx++] = 0;
-      vector[idx++] = depth * (t2 + 1);
-      vector[idx++] = width * N2;
-      vector[idx++] = 0;
-      vector[idx++] = depth * t2;
-      vector[idx++] = width * (N2 + 1);
-      vector[idx++] = 0;
-      vector[idx++] = depth * t2;
-      vector[idx++] = width * (N2 + 1);
-      vector[idx++] = 0;
-      vector[idx++] = depth * (t2 + 1);
+      const push = (x2, y2, z2) => {
+        vector[idx++] = x2;
+        vector[idx++] = y2;
+        vector[idx++] = z2;
+      };
+      const push1 = () => {
+        push(width * N2, 0, depth);
+      };
+      const push2 = () => {
+        push(width * (N2 + 1), 0, depth);
+      };
+      const push3 = () => {
+        push(width * (N2 + 1), height, depth);
+      };
+      const push4 = () => {
+        push(width * N2, height, depth);
+      };
+      const push5 = () => {
+        push(width * N2, 0, 0);
+      };
+      const push6 = () => {
+        push(width * N2, height, 0);
+      };
+      const push7 = () => {
+        push(width * (N2 + 1), height, 0);
+      };
+      const push8 = () => {
+        push(width * (N2 + 1), 0, 0);
+      };
+      push1();
+      push2();
+      push3();
+      push4();
+      push5();
+      push6();
+      push7();
+      push8();
+      push1();
+      push4();
+      push6();
+      push5();
+      push2();
+      push8();
+      push7();
+      push3();
+      push3();
+      push7();
+      push6();
+      push4();
+      push1();
+      push5();
+      push8();
+      push2();
       vectors[N2] = vector;
     }
     return vectors;
   }
-  getVertices(vector) {
-    const verticesCount = vector.length * 36;
+  getVertices(vector, totalFace = 6, totalPoint = 4) {
+    const totalFrament = totalPoint - 2;
+    const verticesCount = vector.length * totalFace * totalFrament * 3;
     const vertices = new Float32Array(verticesCount);
     let index = 0;
     for (let M2 = 0; M2 < vector.length; M2++) {
-      for (let face = 0; face < 6; face++) {
-        const baseIndex = face * 4 * 3;
-        vertices[index++] = vector[M2][baseIndex];
-        vertices[index++] = vector[M2][baseIndex + 1];
-        vertices[index++] = vector[M2][baseIndex + 2];
-        vertices[index++] = vector[M2][baseIndex + 3];
-        vertices[index++] = vector[M2][baseIndex + 4];
-        vertices[index++] = vector[M2][baseIndex + 5];
-        vertices[index++] = vector[M2][baseIndex + 6];
-        vertices[index++] = vector[M2][baseIndex + 7];
-        vertices[index++] = vector[M2][baseIndex + 8];
-        vertices[index++] = vector[M2][baseIndex];
-        vertices[index++] = vector[M2][baseIndex + 1];
-        vertices[index++] = vector[M2][baseIndex + 2];
-        vertices[index++] = vector[M2][baseIndex + 6];
-        vertices[index++] = vector[M2][baseIndex + 7];
-        vertices[index++] = vector[M2][baseIndex + 8];
-        vertices[index++] = vector[M2][baseIndex + 9];
-        vertices[index++] = vector[M2][baseIndex + 10];
-        vertices[index++] = vector[M2][baseIndex + 11];
+      for (let face = 0; face < totalFace; face++) {
+        const baseIndex = face * totalPoint * 3;
+        for (let N2 = 0; N2 < 3 * totalFrament; N2 += 3) {
+          vertices[index++] = vector[M2][baseIndex];
+          vertices[index++] = vector[M2][baseIndex + 1];
+          vertices[index++] = vector[M2][baseIndex + 2];
+          vertices[index++] = vector[M2][baseIndex + 3 + N2];
+          vertices[index++] = vector[M2][baseIndex + 4 + N2];
+          vertices[index++] = vector[M2][baseIndex + 5 + N2];
+          vertices[index++] = vector[M2][baseIndex + 6 + N2];
+          vertices[index++] = vector[M2][baseIndex + 7 + N2];
+          vertices[index++] = vector[M2][baseIndex + 8 + N2];
+        }
       }
     }
     return vertices;
   }
   getColorVertices(data, vertices) {
-    const colorVertices = new Float32Array(data.length * 36 * 3);
+    const colorVertices = new Float32Array(vertices.length);
     let colorIndex = 0;
     const width = 2;
     for (let i = 0; i < data.length; i++) {
       const value = data[i];
+      const tran = Math.sin(__privateGet(this, _transitionRadian));
       const r2 = 0.2 + value / 255 * (0.816 - 0.2);
-      const g = 0.329 + value / 255 * (0.59 - 0.329) * Math.sin(__privateGet(this, _transitionRadian));
+      const g = 0.329 + value / 255 * (0.59 - 0.329) * tran;
       const b = 0.584 + value / 255 * (0.949 - 0.584);
       for (let j = 0; j < 36; j++) {
-        const isLeft = vertices[i * 36 * 3 + j * 3] == i * width;
+        const x2 = vertices[i * 36 * 3 + j * 3];
+        const y2 = vertices[i * 36 * 3 + j * 3 + 1];
+        vertices[i * 36 * 3 + j * 3 + 2];
+        const isLeft = x2 == i * width;
+        const isTop = y2 == value;
         const t2 = isLeft ? 1 : 0;
-        const R2 = r2 + t2 * (0.816 - r2);
-        const G2 = g + t2 * (0.59 - g);
-        const B2 = b + t2 * (0.949 - b);
+        const t22 = isTop ? 1 : 0;
+        const R2 = r2 + (t2 + t22) / 2 * (0.816 - r2);
+        const G2 = g + (t2 + t22) / 2 * (0.59 - g) * tran;
+        const B2 = b + (t2 + t22) / 2 * (0.949 - b);
         colorVertices[colorIndex++] = B2;
         colorVertices[colorIndex++] = R2;
         colorVertices[colorIndex++] = G2;
@@ -37126,4 +37106,4 @@ function App() {
 const domNode = document.getElementById("root");
 const root = createRoot(domNode);
 root.render(/* @__PURE__ */ jsxRuntimeExports.jsx(App, {}));
-//# sourceMappingURL=index-BIaPhKaJ.js.map
+//# sourceMappingURL=index-Bb0osWxY.js.map
