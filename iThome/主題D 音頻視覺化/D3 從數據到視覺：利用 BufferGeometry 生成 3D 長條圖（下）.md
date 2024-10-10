@@ -41,8 +41,8 @@ getVertices(vector){
 然而簡短的代價是對效能的負擔，因此我們實際上需要用型別化陣列來處理，並且避免用二維陣列來額外儲存座標，以下我們先把迴圈拆開，清楚看到兩個三角形：
 ```javascript
 getVertices(vector){
-    // 每個立方體 36 個頂點 (6 面 * 2 三角形/面 * 3 頂點/三角形)
-    const verticesCount = vector.length * 36;
+    // 每個立方體 36 個頂點 (6 面 * 2 三角形/面 * 3 頂點/三角形 * 3 座標/頂點)
+    const verticesCount = vector.length * 36 * 3;
     const vertices = new Float32Array(verticesCount);
     let index = 0;
     for(let M = 0; M < vector.length;M++){
@@ -88,8 +88,8 @@ getVertices(vector){
 ```javascript
 getVertices(vector, totalFace = 6, totalPoint = 4){
     const totalFrament = totalPoint - 2;
-    // 每個立方體 36 個頂點 (6 面 * 2 三角形/面 * 3 頂點/三角形)
-    const verticesCount = vector.length * totalFace * totalFrament * 3; 
+    // 每個立方體 36 個頂點 (6 面 * 2 三角形/面 * 3 頂點/三角形 * 3 座標/頂點)
+    const verticesCount = vector.length * totalFace * totalFrament * 3 * 3; 
     const vertices = new Float32Array(verticesCount);
     let index = 0;
     for(let M = 0; M < vector.length; M++){

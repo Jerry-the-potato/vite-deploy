@@ -68,14 +68,14 @@ function createAnalyser(audio){
     analyser.connect(audioCtx.destination);
     // 對每個節點進行設定
     gainNode.gain.value = 1;
-    analyser.fftSize = 1024; // frequencyBinCount = 512
+    analyser.fftSize = 4096; // frequencyBinCount = 2048
     return analyser;
 }
 ```
 * createMediaElementSource：創建來源，用來連結 video 或 audio 元素
 * connect：將節點輸入輸出連接起來，可以想像成電路，透過串聯和並聯就能混音，達到不同的效果。
 * fftSize：設定音頻數據的采樣數，值要設定成２的Ｎ次方，這個值越大就能捕捉到更細的頻率變化，屆時我們取得的陣列也越大。這裡也是性能考量的重點之一。
-* frequencyBinCount：採樣設置為 1024 時，我們會得到其一半數量 512 條頻譜條。
+* frequencyBinCount：採樣設置為 4096 時，我們會得到其一半數量 2048 條頻譜條。
 
 #### 可視化
 Three 場景可以容納各種物體，方便渲染，這裡我們將長條圖演算法封裝在 BufferFactory 內部，從音訊接口取得資料後，在交由 buff 去轉換成對應的圖形。
@@ -91,8 +91,8 @@ this.update = () => {
         const dataArray = new Uint8Array(bufferLength);
         this.analyser.getByteFrequencyData(dataArray);
 
-        const data = new Uint8Array(bufferLength / 2)
-        for (let i = 0; i < bufferLength / 2; i++) {
+        const data = new Uint8Array(bufferLength / 8)
+        for (let i = 0; i < bufferLength / 8; i++) {
             data[i] = dataArray[i];
         }
         this.buff.transformData(data);
@@ -103,12 +103,12 @@ this.update = () => {
 * scene：用視覺化介面來比喻的話，就想像它是 Photoshop、PPT、Figma 中的圖層，可以合併不同圖片、用父子結構一層一層包裹，最後再一口氣放進場景。
 * mesh：3D 物體的實體，包含幾何形狀和材質、材質貼圖等等資訊。將其交給渲染器就能幫你將圖形渲染在畫布上。
 * Uint8Array：它是一種型別化陣列，符合傳統陣列數據密集特性的結構，內存和分配相對高效。8位元意味著它是 0 ~ 255 的整數（無正負），適合處理音頻數據
-* data：由於中高頻在 mp3 影響力較小，我個人習慣只取前面一半的陣列數，減低系統負擔
+* data：由於中高頻在 mp3 影響力較小，我個人習慣只取前面一部分的陣列數，減低系統負擔
 
 #### 效能優化
 要注意的一個小細節是，為求效能我們會避免用到 ES6 的陣列操作，比如把陣列切割成一半，你可能會優先想到 slice，然後試著用一行去完成它：
 ```javascript
-const data = [...dataArray].slice(0, count / 2);
+const data = [...dataArray].slice(0, bufferLength / 8);
 ```
 簡潔是簡潔，但是光是轉換型別為普通陣列，就增加了不必要的開銷，對動畫的效能負擔，我只能說是＂肉眼可見＂。
 
