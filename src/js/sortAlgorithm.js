@@ -257,7 +257,7 @@ export class SortAlgorithm{
         this.secondColumns = []; // 清空上次排序
         this.send(name + " is processing");
         this.sortFunction = this[name];
-        this.timesEveryFrame = Math.ceil(columns.length/25);
+        this.timesEveryFrame = Math.ceil(columns.length/50);
         this.isSorting = true;
         
         this[name + "Setting"](columns);

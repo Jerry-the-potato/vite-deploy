@@ -1,27 +1,21 @@
 import * as THREE from 'three';
-import BufferFactory from './BufferFactory';
-import { makeBall, makeParticleMaterial } from './customGeometry';
-import createAnalyser from './createAnalyser';
 import Averager from './averager';
+import ParticleSystem3D from './particleSystem3D';
+import { makeBall } from './customGeometry';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 
 // Three 事件管理員
-const createMusicAnalyser = function(){
+const createThreeParticle = function(){
     const frame = new Averager(60);
     const clock = new THREE.Clock();
-    this.getAnalyser = (audio) => {
-        if(!this.analyser) this.analyser = createAnalyser(audio);
-    }
     this.setCanvas = (canvas) => {
         this.canvas = canvas;
         this.scene = new THREE.Scene();
         this.renderer = new THREE.WebGLRenderer({"alpha": true, "canvas": canvas});
-        // this.renderer.setClearColor(0x000000, 0);
         // 設置鏡頭
         this.camera = new THREE.PerspectiveCamera( 75, canvas.width / canvas.height, 0.1, 1000 );
         const radius = 512;
         this.camera.position.set(radius/4, radius/3, radius/3);
-        // this.camera.rotation.set(0, 0, 0);
 
         // 光
         // const light = new THREE.AmbientLight( 0xffffff );
@@ -35,12 +29,12 @@ const createMusicAnalyser = function(){
         this.scene.add(this.axis);
 
         // 添加群組到場景
-        this.buff = new BufferFactory();
-        this.ball = makeBall(radius, 60, 30, radius/500);
-        // this.ball.rotation.set(-1,0,0);
-        this.group1 = new THREE.Group();
-        this.group1.add(this.buff.mesh, this.ball);
-        this.scene.add(this.group1);
+        this.system = new ParticleSystem3D();
+        const mesh = this.system.getMesh();
+        const ball = makeBall(radius, 60, 30, radius/500);
+        const group = new THREE.Group();
+        group.add(ball, mesh);
+        this.scene.add(group);
     }
     this.cleanup = () => {
         // 移除場景中的對象
@@ -80,13 +74,11 @@ const createMusicAnalyser = function(){
             this.renderer.dispose();
         }
         
-        this.buff = null;
         this.canvas = null;
         this.scene = null;
         this.camera = null;
         this.renderer = null;
         this.axis = null;
-        this.analyser = null;
     }
     this.resize = () => {
         const [w, h] = [this.canvas.width, this.canvas.height];
@@ -94,20 +86,15 @@ const createMusicAnalyser = function(){
         this.camera.aspect = w/h;
         this.camera.updateProjectionMatrix();
     }
-    this.update = () => {
-        if(this.analyser){
-            const bufferLength = this.analyser.frequencyBinCount;
-            const dataArray = new Uint8Array(bufferLength);
-            this.analyser.getByteFrequencyData(dataArray);
-            const count = this.analyser.frequencyBinCount;
-            // const data = [...dataArray].slice(0, count / 2);
-            const data = new Uint8Array(bufferLength / 2)
-            for (let i = 0; i < bufferLength / 2; i++) {
-                data[i] = dataArray[i];
-            }
-            this.buff.transformData(data);
+    this.start = (ID) => {
+        if(!this.system.sort[ID] && !this.system.sort[ID + "Maker"]){
+            console.warn("invalid function name. Button id " + ID + " is not any of sortFunctions");
+            return;
         }
-        this.buff.update();
+        this.system.sort.start(ID, this.system.getSortData());
+    }
+    this.update = () => {
+        this.system.update();
         frame.updateValue(clock.getDelta());
         window.fps = frame.getFPS();
     }
@@ -116,5 +103,5 @@ const createMusicAnalyser = function(){
     }
 	return this;
 }
-const musicAnalyser = new createMusicAnalyser();
-export default musicAnalyser;
+const threeParticle = new createThreeParticle();
+export default threeParticle;

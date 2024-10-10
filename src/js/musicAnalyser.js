@@ -99,10 +99,9 @@ const createMusicAnalyser = function(){
             const bufferLength = this.analyser.frequencyBinCount;
             const dataArray = new Uint8Array(bufferLength);
             this.analyser.getByteFrequencyData(dataArray);
-            const count = this.analyser.frequencyBinCount;
-            // const data = [...dataArray].slice(0, count / 2);
-            const data = new Uint8Array(bufferLength / 2)
-            for (let i = 0; i < bufferLength / 2; i++) {
+            // const data = [...dataArray].slice(0, bufferLength / 2);
+            const data = new Uint8Array(bufferLength / 8)
+            for (let i = 0; i < bufferLength / 8; i++) {
                 data[i] = dataArray[i];
             }
             this.buff.transformData(data);

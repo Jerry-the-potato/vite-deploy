@@ -18,7 +18,6 @@ export default class ParticleSystem{
         this.columns = new Array(length).fill().map((v,i) => {
             return this.createColumn(x - thick * length/2 + thick * i, y * 1.8, thick, ((i+1)/length) * this.maxValue);
         });
-        this.secondColumns = [];
         this.walls = new Array(5).fill().map((v,i) => {
             return this.createWall("arc", x, y-x/2, 865/2/25 * (1+i*i), 3, 0 + Math.PI/16*(4-i), Math.PI/16*(12+i), Math.PI / 15 * i, 865/2/25)
         });
@@ -65,12 +64,14 @@ export default class ParticleSystem{
         const dist = Math.sqrt(x*x + y*y);
         return dist;
     }
-    getCollide(target, wall){
-        if(wall.type == "arc"){
-            const x = target.x - wall.x;
-            const y = target.y - wall.y;
-            const dist = Math.sqrt(x*x + y*y);
-            return (dist + target.r >= wall.length - wall.thick && dist < wall.length + wall.thick) ? dist : 0; 
+    getCollide(target, wall) {
+        if (wall.type === "arc") {
+            const dist = this.getDist(target, wall); // 使用 getDist 計算距離
+            const outerBound = wall.length + wall.thick;
+            const innerBound = wall.length - wall.thick;
+    
+            // 確認目標是否在牆的厚度範圍內
+            return (dist + target.r >= innerBound && dist <= outerBound) ? dist : 0; 
         }
         return 0;
     }
@@ -193,7 +194,7 @@ export default class ParticleSystem{
         }
     }
     update(){
-        this.sort.update(this.columns, this.secondColumns);
+        this.sort.update(this.columns);
         this.texts.log.text = this.sort.log.innerText;
         this.columns.forEach((column) => {
             if(column.path != undefined){

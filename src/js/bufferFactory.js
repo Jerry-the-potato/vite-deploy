@@ -23,7 +23,6 @@ export default class BufferFactory{
     createFactory(){
         const factory = {
             'geometry': new THREE.BufferGeometry(),
-            'attribute': new THREE.BufferAttribute(new Float32Array(),3),
             'mesh': null,
             'needSet': true
         };
@@ -31,18 +30,21 @@ export default class BufferFactory{
         this.mesh.add(factory.mesh);
         return factory;
     }
-    setAttribute(factory){
+    setAttribute(factory, length){
         if(factory.needSet != true) return
-        const attribute = new THREE.BufferAttribute(new Float32Array(1024 * 36), 3);
-        const attribute2 = new THREE.BufferAttribute(new Float32Array(1024 * 36), 3);
+        const attribute = new THREE.BufferAttribute(new Float32Array(length * 36 * 3), 3);
+        const attribute2 = new THREE.BufferAttribute(new Float32Array(length * 36 * 3), 3);
         factory.geometry.setAttribute('position', attribute);
         factory.geometry.setAttribute('color', attribute2);
+        // factory.geometry.attributes.position.dynamic = true;
+        // factory.geometry.attributes.color.dynamic = true;
+
         factory.needSet = false;
     }
     transformData(data){
         const factory = this.#factorys.shift();
         this.#factorys.push(factory);
-        this.setAttribute(factory);
+        this.setAttribute(factory, data.length);
 
         const vector = this.getPosition(data);
         const vertices = this.getVertices(vector);
@@ -358,7 +360,7 @@ export default class BufferFactory{
     }
     getVertices(vector, totalFace = 6, totalPoint = 4){
         const totalFrament = totalPoint - 2;
-        const verticesCount = vector.length * totalFace * totalFrament * 3;  // 每個立方體 36 個頂點 (6 面 * 2 三角形/面 * 3 頂點/三角形)
+        const verticesCount = vector.length * totalFace * totalFrament * 3 * 3;  // 每個立方體 108 個頂點數據 (6 面 * 2 三角形/面 * 3 頂點/三角形 * 3 座標/頂點)
         const vertices = new Float32Array(verticesCount);
         let index = 0;
         for(let M = 0; M < vector.length; M++){

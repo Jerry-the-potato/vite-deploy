@@ -2,6 +2,7 @@ import { useEffect, useState, useRef } from 'react';
 import useWindowSize from '../customHook/useWindowSize.js';
 import CanvasSection1 from './CanvasSection1.jsx';
 import CanvasSection2 from './CanvasSection2.jsx';
+import CanvasSection2A from './CanvasSection2A.jsx';
 import CanvasSection3 from './CanvasSection3.jsx';
 import CanvasSection4 from './CanvasSection4.jsx';
 import CookieTable from './CookieTable.jsx';
@@ -46,8 +47,9 @@ function Playground({margin}){
         <>
             <div id="playground" ref={divRef} onMouseMoveCapture={handleMouseMove} onTouchMoveCapture={handleTouchMove} onTouchStartCapture={handleTouchMove}
                 style={getStyle()}>
-                <CanvasSection4 ratio={ratio} min={min}/>
+                {/* <CanvasSection4 ratio={ratio} min={min}/> */}
                 <CanvasSection1 ratio={ratio} min={min}/>
+                <CanvasSection2A ratio={ratio} min={min}/>
                 <CanvasSection2 ratio={ratio} min={min}/>
                 <CanvasSection3 ratio={ratio} min={min}/>
                 <CookieTable></CookieTable>
