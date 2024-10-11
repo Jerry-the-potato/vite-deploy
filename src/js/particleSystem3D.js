@@ -11,9 +11,19 @@ export default class ParticleSystem3D{
         this.slow = 0.999;
         this.friction = 0.997;
         this.maxValue = 865*0.4;
-        const length = 256, width = 2, height = 1;
-        this.columns = this.createColumn(length, width, height);
-        this.mesh.add(this.columns.mesh);
+
+        this.parameter = {
+            length: 32,
+            maxHeight: 255,
+            radius: 150,
+            depth: 10,
+            
+        };
+        const {length, maxHeight, radius, depth} = this.parameter;
+
+        this.column = this.createColumn(length, maxHeight, radius, depth);
+
+        this.mesh.add(this.column.mesh);
         this.walls = [];
         this.balls = [];
 
@@ -42,8 +52,196 @@ export default class ParticleSystem3D{
         return this.mesh;
     }
     getSortData(){
-        return this.columns.geometryData;
+        return this.column.geometryData;
     }
+    setParameter = (id, value) => {
+        switch(id){
+            case "length":
+                this.expandVertices(this.column, value);
+                
+                // this.column.geometryData.forEach((data, index) => {
+                //     const angle = (index / value) * Math.PI * 2; 
+                //     data.x = radius * Math.cos(angle);
+                //     data.y = radius * Math.sin(angle);
+                //     data.height = data.height * length / value;
+                //     data.path.NewTarget(data.x, data.y, 120);
+                //     // this.column.updateVertices(index);
+                // });
+
+                
+                break;
+            default :
+                this.column[id] = value;
+                
+        }
+    }
+    expandVertices(column, newLength){
+        const {length, radius, maxHeight} = column;
+        const vertices = column.geometry.attributes.position.array;
+        const color = column.geometry.attributes.color.array;
+        const len = vertices.length;
+
+        const newVertices = new Float32Array(newLength * 36 * 3);
+        const colorVertices = new Float32Array(newLength * 36 * 3);
+        for(let N = 0; N < newLength * 36 * 3 && N < len; N ++){
+            newVertices[N] = vertices[N];
+            colorVertices[N] = color[N];
+        }
+
+        const attribute = new THREE.BufferAttribute(newVertices, 3);
+        const colorAttribute = new THREE.BufferAttribute(colorVertices, 3);
+        column.geometry.setAttribute('position', attribute);
+        column.geometry.setAttribute('color', colorAttribute);
+
+        column.length = newLength;
+        // 如果新長度較長，迭代建立新的幾何資料
+        for(let N = 0; N < length; N++){
+            if(N >= newLength){
+                column.geometryData.pop();
+                continue;
+            }
+            const data = column.geometryData[N];
+            const angle = (N / newLength) * Math.PI * 2; 
+            data.x = radius * Math.cos(angle);
+            data.y = radius * Math.sin(angle);
+            data.height = data.height * length / newLength;
+            if(data.height > maxHeight) data.height = maxHeight;
+            data.path.ResetTo(data.x, data.y);
+            // data.path.NewTarget(data.x, data.y, 30);
+            column.updateVertices(N);
+        }
+        for(let N = length; N < newLength; N++){
+            column.geometryData[N] = this.createGeometryData(column, N);
+            column.updateVertices(N);
+        }
+    }
+    // 建立 3D 實體和幾何體
+    createColumn(length, maxHeight, radius, depth){
+        // const vector = this.getPosition(data, width, 10);
+        // const vertices = this.getVertices(vector);
+        // const colorVertices = this.getColorVertices(data, vertices);
+
+        // const attribute = new THREE.BufferAttribute(vertices, 3);
+        // const colorAttribute = new THREE.BufferAttribute(colorVertices, 3);
+        const attribute = new THREE.BufferAttribute(new Float32Array(length * 36 * 3), 3);
+        const colorAttribute = new THREE.BufferAttribute(new Float32Array(length * 36 * 3), 3);
+
+        const column = {length, radius, depth, maxHeight};
+        Object.defineProperty(column, 'unitHeight', {
+            get() {
+                return column.maxHeight / column.length;
+            }
+        }); 
+
+        column.geometry = new THREE.BufferGeometry();
+        column.geometry.setAttribute('position', attribute);
+        column.geometry.setAttribute('color', colorAttribute);
+        
+        const material = new THREE.MeshBasicMaterial({ 'vertexColors': true });
+        column.mesh = new THREE.Mesh( column.geometry, material ); 
+
+        column.updateVertices = (index) => {
+            const cubeVertexCount = 36;  // 每個立方體的頂點數量
+            const vertexIndex = index * cubeVertexCount * 3; // 乘以 3 是因為每個頂點有 x, y, z
+
+            const vertices = column.geometry.attributes.position.array;
+            const color = column.geometry.attributes.color.array;
+            const startAngle = (index / column.length) * Math.PI * 2;
+            const endAngle = ((index + 1) / column.length) * Math.PI * 2;
+            const height = column.geometryData[index].height;
+            const path = column.geometryData[index].path;
+            const {pointX, pointY, z, timer, period} = path;
+            const x = pointX - z * Math.cos(startAngle);
+            const y = pointY - z * Math.sin(startAngle);
+            
+            const transition = 1 - timer / period;
+            const [newVertices, colorVertices] = this.getColumnVerticesByAngle(
+                x, y, z * 0.1, 
+                column.radius, column.depth, 
+                height, column.unitHeight, 
+                startAngle, endAngle, transition
+            );
+
+            for(let N = 0; N < cubeVertexCount * 3; N ++){
+                vertices[vertexIndex + N] = newVertices[N];
+            }
+            for(let N = 0; N < cubeVertexCount * 3; N ++){
+                color[vertexIndex + N] = colorVertices[N];
+            }
+
+            column.geometry.attributes.position.needsUpdate = true;
+            column.geometry.attributes.color.needsUpdate = true;
+        }
+
+        column.geometryData = new Array(length).fill().map((v, index) => {
+            return this.createGeometryData(column, index);
+        });
+        column.geometryData.forEach((data, index) => {
+            column.updateVertices(index);
+        })
+
+        return column;
+    }
+    createGeometryData(column, index){
+        const {length, radius, unitHeight} = column;
+        // const x = index * width;
+        const angle = (index / length) * Math.PI * 2;
+        const x = radius * Math.cos(angle);
+        const y = radius * Math.sin(angle);
+        const height = index * unitHeight;
+        const path = new Path(x, y);
+        const geometryData = {x, y, height, path};
+
+        // 初始化內部變數
+        let _timer = path.timer;
+        Object.defineProperty(path, 'timer', {
+            get() {
+                return _timer;
+            },
+            set(newT) {
+                _timer = newT;
+                column.updateVertices(index);
+            }
+        });
+        // let _pointX = path.pointX;
+        // let _pointY = path.pointY;
+        // let isUpdating = false;
+        // Object.defineProperty(path, 'pointX', {
+        //     get() {
+        //         return _pointX;
+        //     },
+        //     set(newX) {
+        //         if (_pointX !== newX) {
+        //             _pointX = newX;
+        //             if (isUpdating) return; // 如果正在更新，則直接返回
+        //             isUpdating = true; // 設置為正在更新
+        //             requestAnimationFrame(() => {
+        //                 column.update(index, path);
+        //                 isUpdating = false; // 更新結束
+        //             });
+        //         }
+        //     }
+        // });
+        // Object.defineProperty(path, 'pointY', {
+        //     get() {
+        //         return _pointY;
+        //     },
+        //     set(newY) {
+        //         if (_pointY !== newY) {
+        //             _pointY = newY;
+        //             if (isUpdating) return; // 如果正在更新，則直接返回
+        //             isUpdating = true; // 設置為正在更新
+        //             requestAnimationFrame(() => {
+        //                 column.update(index, path);
+        //                 isUpdating = false; // 更新結束
+        //             });
+        //         }
+        //     }
+        // });
+
+        return geometryData;
+    }
+    // 幾何體頂點計算
     getVector(N, width, height, depth){
         // if(height < 1) continue;
         const vector = new Float32Array(24 * 3);
@@ -247,7 +445,7 @@ export default class ParticleSystem3D{
 
         return vertices; // 返回長方體的 36 個頂點坐標
     }
-    getColumnVerticesByAngle(centerX, centerY, z, r, depth, height, startAngle, endAngle) {
+    getColumnVerticesByAngle(centerX, centerY, z, r, depth, height, unitHeight, startAngle, endAngle, transition) {
         const vertices = new Float32Array(36 * 3);
         let idx = 0;
         const push = (x, y, z) => {
@@ -256,8 +454,8 @@ export default class ParticleSystem3D{
             vertices[idx++] = y;
         }
         const getXY = (radius, angle) => {
-            const x = centerX + radius * Math.cos(angle);
-            const y = centerY + radius * Math.sin(angle);
+            const x = centerX + radius * Math.cos(angle) - r * Math.cos(startAngle);
+            const y = centerY + radius * Math.sin(angle) - r * Math.sin(startAngle);
             return [x, y];
         }
         const [x1, y1] = getXY(r - depth, startAngle);
@@ -266,10 +464,11 @@ export default class ParticleSystem3D{
         const [x4, y4] = getXY(r, startAngle);
 
         const addPoint = {};
-        addPoint[1] = () => { push(x1, y1, z + height) }; // 上面左側
-        addPoint[2] = () => { push(x2, y2, z + height) }; // 上面右側
-        addPoint[3] = () => { push(x3, y3, z + height) }; // 上面右側外側
-        addPoint[4] = () => { push(x4, y4, z + height) }; // 上面左側外側
+        const h = unitHeight / 2; 
+        addPoint[1] = () => { push(x1, y1, z + height - h + 10) }; // 上面左側
+        addPoint[2] = () => { push(x2, y2, z + height + h + 10) }; // 上面右側
+        addPoint[3] = () => { push(x3, y3, z + height + h) }; // 上面右側外側
+        addPoint[4] = () => { push(x4, y4, z + height - h) }; // 上面左側外側
         addPoint[5] = () => { push(x1, y1, z) }; // 下面左側
         addPoint[6] = () => { push(x4, y4, z) }; // 下面左側外側
         addPoint[7] = () => { push(x3, y3, z) }; // 下面右側外側
@@ -288,19 +487,19 @@ export default class ParticleSystem3D{
         const g1 = 0.329 + height / 255 * (0.590 - 0.329) * tran;
         const b1 = 0.584 + height / 255 * (0.949 - 0.584);
 
-        const r2 = 0.816;
-        const g2 = 0.590 * tran;
-        const b2 = 0.949;
+        const r2 = 0.200 + transition * (0.816 - 0.200);
+        const g2 = 0.329 + transition * (0.590 - 0.329);
+        const b2 = 0.584 + transition * (0.949 - 0.584);
 
         const addColor = {};
         addColor[1] = () => { pushBRG(b2, r2, g2) }; // 上面左側
         addColor[2] = () => { pushBRG(b1, r1, g1) }; // 上面右側
-        addColor[3] = () => { pushBRG(b2, r2, g2) }; // 上面右側外側
-        addColor[4] = () => { pushBRG(b2, r2, g2) }; // 上面左側外側
+        addColor[3] = () => { pushBRG(b1, r1, g1) }; // 上面右側外側
+        addColor[4] = () => { pushBRG(b1, r1, g1) }; // 上面左側外側
         addColor[5] = () => { pushBRG(b2, r2, g2) }; // 下面左側
         addColor[6] = () => { pushBRG(b2, r2, g2) }; // 下面左側外側
         addColor[7] = () => { pushBRG(b1, r1, g1) }; // 下面右側外側
-        addColor[8] = () => { pushBRG(b1, r1, g1) }; // 下面右側
+        addColor[8] = () => { pushBRG(b2, r2, g2) }; // 下面右側
 
         const indices = new Uint8Array([
             // 前面
@@ -329,103 +528,9 @@ export default class ParticleSystem3D{
 
         return [vertices, colorVertices]; // 返回圓餅切片－長方體的 36 個頂點坐標
     }
-    createColumn(length, width, unitHeight){
-        
-        const data = new Array(length).fill().map((v, index) => { return index * unitHeight });
-        
-        const vector = this.getPosition(data, width, 10);
-        const vertices = this.getVertices(vector);
-        const colorVertices = this.getColorVertices(data, vertices);
-
-        const attribute = new THREE.BufferAttribute(vertices, 3);
-        const colorAttribute = new THREE.BufferAttribute(colorVertices, 3);
-
-        const column = {};
-        column.geometry = new THREE.BufferGeometry();
-        column.geometry.setAttribute('position', attribute);
-        column.geometry.setAttribute('color', colorAttribute);
-        
-        const material = new THREE.MeshBasicMaterial({ 'vertexColors': true });
-        column.mesh = new THREE.Mesh( column.geometry, material ); 
-
-        column.update = (index, height, x, y) => {
-            const cubeVertexCount = 36;  // 每個立方體的頂點數量
-            const vertexIndex = index * cubeVertexCount * 3; // 乘以 3 是因為每個頂點有 x, y, z
-
-
-            const vertices = column.geometry.attributes.position.array;
-            const color = column.geometry.attributes.color.array;
-            // const height = column.geometryData[index].height;
-            const startAngle = (index / length) * Math.PI * 2;
-            const endAngle = ((index + 1) / length) * Math.PI * 2;
-            const [newVertices, colorVertices] = this.getColumnVerticesByAngle(x, y, 0, 100, 30, height, startAngle, endAngle);
-            // const newVertices = this.getColumnVertices(x, 0, y, width, height, 10);
-            // const colorVertices = this.getColorVertices([height], newVertices);
-
-            for(let N = 0; N < cubeVertexCount * 3; N ++){
-                vertices[vertexIndex + N] = newVertices[N];
-            }
-            for(let N = 0; N < cubeVertexCount * 3; N ++){
-                color[vertexIndex + N] = colorVertices[N];
-            }
-
-            column.geometry.attributes.position.needsUpdate = true;
-            column.geometry.attributes.color.needsUpdate = true;
-        }
-
-        column.geometryData = new Array(length).fill().map((v, index) => {
-            // const x = index * width;
-            const radius = 150;
-            const angle = (index / length) * Math.PI * 2;  
-            const x = radius * Math.cos(angle);
-            const y = radius * Math.sin(angle);
-            const height = data[index];
-            const path = new Path(x, y);
-            const geometryData = {x, y, height, path};
-            column.update(index, height, x, y);
-
-            // 初始化內部變數
-            let _pointX = path.pointX;
-            let _pointY = path.pointY;
-            let isUpdating = false;
-            Object.defineProperty(path, 'pointX', {
-                get() {
-                    return _pointX;
-                },
-                set(newX) {
-                    if (_pointX !== newX) {
-                        _pointX = newX;
-                        if (isUpdating) return; // 如果正在更新，則直接返回
-                        isUpdating = true; // 設置為正在更新
-                        requestAnimationFrame(() => {
-                            column.update(index, height, _pointX, _pointY);
-                            isUpdating = false; // 更新結束
-                        });
-                    }
-                }
-            });
-            Object.defineProperty(path, 'pointY', {
-                get() {
-                    return _pointY;
-                },
-                set(newY) {
-                    if (_pointY !== newY) {
-                        _pointY = newY;
-                        if (isUpdating) return; // 如果正在更新，則直接返回
-                        isUpdating = true; // 設置為正在更新
-                        requestAnimationFrame(() => {
-                            column.update(index, height, _pointX, _pointY);
-                            isUpdating = false; // 更新結束
-                        });
-                    }
-                }
-            });
-            
-            return geometryData;
-        });
-        return column;
-    }
     
+
+    // 物理
     getDist(a, b) {
         return Math.hypot(a.x - b.x, a.y - b.y, a.z - b.z); // 包含 z 軸的距離計算
     }
@@ -600,7 +705,7 @@ export default class ParticleSystem3D{
     
     update(){
         this.#transitionRadian+= this.#trasitionOmega;
-        this.sort.update(this.columns.geometryData);
+        this.sort.update(this.column.geometryData);
 
         this.walls.forEach((wall) =>{
             wall.period+= 0.25 *  2 * Math.PI / 60;

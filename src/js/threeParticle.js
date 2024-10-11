@@ -3,6 +3,7 @@ import Averager from './averager';
 import ParticleSystem3D from './particleSystem3D';
 import { makeBall } from './customGeometry';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
+import { PathConfig } from './path';
 
 // Three 事件管理員
 const createThreeParticle = function(){
@@ -14,8 +15,8 @@ const createThreeParticle = function(){
         this.renderer = new THREE.WebGLRenderer({"alpha": true, "canvas": canvas});
         // 設置鏡頭
         this.camera = new THREE.PerspectiveCamera( 75, canvas.width / canvas.height, 0.1, 1000 );
-        const radius = 512;
-        this.camera.position.set(radius/4, radius/3, radius/3);
+        const radius = 1024;
+        this.camera.position.set(radius * 0.1, radius * 0.4, radius * 0.4);
 
         // 光
         // const light = new THREE.AmbientLight( 0xffffff );
@@ -23,10 +24,11 @@ const createThreeParticle = function(){
 
         // 添加控制和座標軸
         this.controls = new OrbitControls(this.camera, this.renderer.domElement);
-        this.controls.target.set(radius/4, 0, -radius/3);
+        this.controls.target.set(0, -radius * 0.1, -radius * 0.2);
         this.controls.update();
-        this.axis = new THREE.AxesHelper(300);
-        this.scene.add(this.axis);
+        window.c = this.controls;
+        // this.axis = new THREE.AxesHelper(300);
+        // this.scene.add(this.axis);
 
         // 添加群組到場景
         this.system = new ParticleSystem3D();
@@ -87,6 +89,7 @@ const createThreeParticle = function(){
         this.camera.updateProjectionMatrix();
     }
     this.start = (ID) => {
+        PathConfig.resetPath(0.5, 0, 0.5);
         if(!this.system.sort[ID] && !this.system.sort[ID + "Maker"]){
             console.warn("invalid function name. Button id " + ID + " is not any of sortFunctions");
             return;

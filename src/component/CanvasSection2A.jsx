@@ -33,11 +33,24 @@ const CanvasSectionS2A = ({ratio, min, sectinoID = "Sort3D"}) => {
         const ID = e.target.id;
         threeParticle.start(ID)
     }
+    function handleParameterChange(e){
+        const id = e.target.id;
+        const value = e.target.value * 1;
+        threeParticle.system.setParameter(id, value);
+    }
     return (
         <section ref={section} className="section" id={sectinoID}>
             <canvas ref={canvas} width={min * ratio} height={ratio * min * ratio}></canvas>
             <div ref={menu} className="gamemenu">
                 <header id="header"><h3>threeParticle</h3></header>
+                <div className="parameter">
+                    <label>長度</label><input onChange={handleParameterChange} type="number" id="length" defaultValue="32"></input>
+                    <label>Beta</label><input onChange={handleParameterChange} type="number" id="" defaultValue="10"></input>
+                    <label>Gamma</label><input onChange={handleParameterChange} type="number" id="" defaultValue="10"></input>
+                    <label>Delta</label><input onChange={handleParameterChange} type="number" id="" defaultValue="10"></input>
+                    <label>Vector Size</label><input onChange={handleParameterChange} type="number" id="" defaultValue="10"></input>
+                    <label>Transform Speed</label><input onChange={handleParameterChange} type="number" id="" defaultValue="10"></input>
+                </div>
                 <div className="controlpanel">
                     <RecordBtn canvas={canvas} audio={audio}></RecordBtn>
                     <button onClick={handleClick} id="bubbleSort">泡沫排序</button>

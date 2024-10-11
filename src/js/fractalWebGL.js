@@ -100,7 +100,6 @@ const createGLSL = function(){
 
     }
     this.updateData = (data) => {
-        PathConfig.resetLeap(0, 0, 0);
         PathConfig.resetPath(0.4, 0, 0.6);
         this.useMouse = data.useMouse;
         const frames = 30;

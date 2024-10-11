@@ -287,9 +287,9 @@ export class SortAlgorithm{
     static swapColumn(a, b, frame){
         [a.path.pointX, b.path.pointX] = [b.path.pointX, a.path.pointX];
         [a.path.pointY, b.path.pointY] = [b.path.pointY, a.path.pointY];
+        [a.height, b.height] = [b.height, a.height];
         a.path.NewTarget(a.x, a.y, frame);
         b.path.NewTarget(b.x, b.y, frame);
-        [a.height, b.height] = [b.height, a.height];
     }
     bubbleSortSetting(columns){
         this.i = 0;

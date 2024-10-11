@@ -32,7 +32,8 @@ class Path extends PathConfig{
         super();
         this.pointX = x;
         this.pointY = y;
-    
+        this.z = 0;
+
         this.originX = x;
         this.originY = y;
 
@@ -48,6 +49,7 @@ class Path extends PathConfig{
         this.targetY = targetY;
         this.originX = this.pointX;
         this.originY = this.pointY;
+        this.z = 0;
         this.timer = (frames >= 10) ? frames : 0;
         this.period = (frames >= 10) ? frames : 1;
         cancelAnimationFrame(this.ID);
@@ -69,6 +71,8 @@ class Path extends PathConfig{
         if(this.timer <= 0){
             this.pointX = this.targetX;
             this.pointY = this.targetY;
+            this.z = 0;
+            this.timer = 0;
             return;
         }
 
@@ -83,8 +87,8 @@ class Path extends PathConfig{
         const [a, b, c] = this.getPath();
         const [d, e, f] = this.getLeap();
         this.pointX+= (a * linear + b * easein + c * easeout) * dX;
-        this.pointY+= (a * linear + b * easein + c * easeout) * dY
-            + (d * linear + e * easein + f * easeout) * ((-dX/5 + 10 * -dX/Math.abs(dX==0 ? 1 : dX)));
+        this.pointY+= (a * linear + b * easein + c * easeout) * dY;
+        // if(dX + dY != 0) this.z+= (d * linear + e * easein + f * easeout) * (-(dX + dY)/5 + 10 * -(dX + dY)/Math.abs(dX + dY));
         this.ID = requestAnimationFrame(this.NextFrame);  
     }.bind(this);
 }
