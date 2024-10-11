@@ -131,6 +131,7 @@ var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "sy
         this.targetY = targetY;
         this.originX = this.pointX;
         this.originY = this.pointY;
+        this.z = 0;
         this.timer = frames >= 10 ? frames : 0;
         this.period = frames >= 10 ? frames : 1;
         cancelAnimationFrame(this.ID);
@@ -145,6 +146,8 @@ var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "sy
         if (this.timer <= 0) {
           this.pointX = this.targetX;
           this.pointY = this.targetY;
+          this.z = 0;
+          this.timer = 0;
           return;
         }
         this.timer--;
@@ -156,13 +159,14 @@ var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "sy
         const easeout = Math.pow((t + 1) / p, 2) - Math.pow(t / p, 2);
         const easein = Math.pow(1 - (t - 1) / p, 2) - Math.pow(1 - t / p, 2);
         const [a, b, c] = this.getPath();
-        const [d, e, f] = this.getLeap();
+        this.getLeap();
         this.pointX += (a * linear + b * easein + c * easeout) * dX;
-        this.pointY += (a * linear + b * easein + c * easeout) * dY + (d * linear + e * easein + f * easeout) * (-dX / 5 + 10 * -dX / Math.abs(dX == 0 ? 1 : dX));
+        this.pointY += (a * linear + b * easein + c * easeout) * dY;
         this.ID = requestAnimationFrame(this.NextFrame);
       }).bind(this));
       this.pointX = x;
       this.pointY = y;
+      this.z = 0;
       this.originX = x;
       this.originY = y;
       this.targetX = x;
@@ -477,4 +481,4 @@ var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "sy
     requestID = requestAnimationFrame(main);
   }
 })();
-//# sourceMappingURL=worker-Et8G4htt.js.map
+//# sourceMappingURL=worker-DaG30cOA.js.map

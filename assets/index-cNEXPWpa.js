@@ -8,7 +8,7 @@ var __accessCheck = (obj, member, msg) => member.has(obj) || __typeError("Cannot
 var __privateGet = (obj, member, getter) => (__accessCheck(obj, member, "read from private field"), getter ? getter.call(obj) : member.get(obj));
 var __privateAdd = (obj, member, value) => member.has(obj) ? __typeError("Cannot add the same private member more than once") : member instanceof WeakSet ? member.add(obj) : member.set(obj, value);
 var __privateSet = (obj, member, value, setter) => (__accessCheck(obj, member, "write to private field"), setter ? setter.call(obj, value) : member.set(obj, value), value);
-var _material, _factorys, _depth, _transitionRadian, _trasitionOmega;
+var _material, _factorys, _depth, _transitionRadian, _trasitionOmega, _transitionRadian2, _trasitionOmega2;
 (function polyfill() {
   const relList = document.createElement("link").relList;
   if (relList && relList.supports && relList.supports("modulepreload")) {
@@ -7025,7 +7025,7 @@ function useWindowSize(margin) {
 }
 function WorkerWrapper(options) {
   return new Worker(
-    "/vite-deploy/assets/worker-Et8G4htt.js",
+    "/vite-deploy/assets/worker-DaG30cOA.js",
     {
       name: options == null ? void 0 : options.name
     }
@@ -7159,6 +7159,7 @@ class Path extends PathConfig {
       this.targetY = targetY;
       this.originX = this.pointX;
       this.originY = this.pointY;
+      this.z = 0;
       this.timer = frames >= 10 ? frames : 0;
       this.period = frames >= 10 ? frames : 1;
       cancelAnimationFrame(this.ID);
@@ -7173,6 +7174,8 @@ class Path extends PathConfig {
       if (this.timer <= 0) {
         this.pointX = this.targetX;
         this.pointY = this.targetY;
+        this.z = 0;
+        this.timer = 0;
         return;
       }
       this.timer--;
@@ -7184,13 +7187,14 @@ class Path extends PathConfig {
       const easeout = Math.pow((t2 + 1) / p2, 2) - Math.pow(t2 / p2, 2);
       const easein = Math.pow(1 - (t2 - 1) / p2, 2) - Math.pow(1 - t2 / p2, 2);
       const [a, b, c] = this.getPath();
-      const [d, e, f2] = this.getLeap();
+      this.getLeap();
       this.pointX += (a * linear + b * easein + c * easeout) * dX;
-      this.pointY += (a * linear + b * easein + c * easeout) * dY + (d * linear + e * easein + f2 * easeout) * (-dX / 5 + 10 * -dX / Math.abs(dX == 0 ? 1 : dX));
+      this.pointY += (a * linear + b * easein + c * easeout) * dY;
       this.ID = requestAnimationFrame(this.NextFrame);
     }).bind(this));
     this.pointX = x2;
     this.pointY = y2;
+    this.z = 0;
     this.originX = x2;
     this.originY = y2;
     this.targetX = x2;
@@ -7233,21 +7237,21 @@ function lokaVolterraAlgorithm() {
     this.dlength = data.dlength * 1e-3;
     this.speed = data.speed;
   };
-  this.reset = (width, height) => {
+  this.reset = (width2, height) => {
     this.transitionRadian = 0;
     this.trasitionOmega = Math.PI / 1e4;
     const len = 2e3;
     this.data = [];
     for (let i = 0; i < len; i++) {
       const point = {
-        "d": Math.sqrt(Math.random()) * width / 2,
+        "d": Math.sqrt(Math.random()) * width2 / 2,
         // distance
         "r": Math.random() * 2 * Math.PI,
         // radian
         "vx": new Array(60).fill(0),
         "vy": new Array(60).fill(0)
       };
-      point.x = width / 2 + point.d * Math.cos(point.r);
+      point.x = width2 / 2 + point.d * Math.cos(point.r);
       point.y = height / 2 + point.d * Math.sin(point.r);
       point.fakeX = point.x;
       point.fakeY = point.y;
@@ -7261,13 +7265,13 @@ function lokaVolterraAlgorithm() {
     painter.render();
     ctx.restore();
   };
-  this.update = (ctx, width, height) => {
+  this.update = (ctx, width2, height) => {
     this.transitionRadian += this.trasitionOmega * this.speed;
-    this.motion(width, height);
-    this.addTexture(width, height, ctx);
-    this.updateFps(width, height, ctx);
+    this.motion(width2, height);
+    this.addTexture(width2, height, ctx);
+    this.updateFps(width2, height, ctx);
   };
-  this.motion = (width, height) => {
+  this.motion = (width2, height) => {
     this.data.forEach((point) => {
       const rad = this.transitionRadian;
       const period1 = Math.cos(rad) * Math.sin(rad);
@@ -7282,20 +7286,20 @@ function lokaVolterraAlgorithm() {
       let newY;
       switch (this.motionType) {
         case "plate":
-          newX = width / 2 + d * Math.cos(point.r + period1);
+          newX = width2 / 2 + d * Math.cos(point.r + period1);
           newY = height / 2 + d * Math.sin(point.r + period2);
           break;
         case "hourglass":
-          newX = width / 2 + d * Math.cos(point.r + period1) * Math.sin(point.r + period1);
+          newX = width2 / 2 + d * Math.cos(point.r + period1) * Math.sin(point.r + period1);
           newY = height / 2 + d * Math.sin(point.r + period1);
           break;
         case "cookie":
-          newX = width / 2 + d * Math.cos(point.r + period1) * Math.sin(point.r + period1);
+          newX = width2 / 2 + d * Math.cos(point.r + period1) * Math.sin(point.r + period1);
           newY = height / 2 + d * Math.sin(point.r + period2);
           break;
         case "taro":
         default:
-          newX = width / 2 + d * Math.cos(point.r + angular1);
+          newX = width2 / 2 + d * Math.cos(point.r + angular1);
           newY = height / 2 + d * Math.sin(point.r + angular2);
           break;
       }
@@ -7329,8 +7333,8 @@ function lokaVolterraAlgorithm() {
       p1.y += caluVelocity(p1.vy);
       const GRAVITY = 10;
       const GAP = 50;
-      vx += width * 0.5 + GAP > p1.x ? 1 : -1 * GRAVITY;
-      vx -= width * 0.5 - GAP < p1.x ? 1 : -1 * GRAVITY;
+      vx += width2 * 0.5 + GAP > p1.x ? 1 : -1 * GRAVITY;
+      vx -= width2 * 0.5 - GAP < p1.x ? 1 : -1 * GRAVITY;
       vy += height * 0.5 + GAP > p1.y ? 1 : -1 * GRAVITY;
       vy -= height * 0.5 - GAP < p1.y ? 1 : -1 * GRAVITY;
       addVelocity(p1.vx, vx);
@@ -7349,18 +7353,18 @@ function lokaVolterraAlgorithm() {
       return avg;
     }
   };
-  this.addTexture = (width, height, ctx) => {
+  this.addTexture = (width2, height, ctx) => {
     this.data.forEach((point) => {
       const x2 = point.x;
       const y2 = point.y;
-      const ex = x2 / width;
+      const ex = x2 / width2;
       const ey = y2 / height;
-      const dx = this.equation1(ex, ey, height) * width;
-      const dy = this.equation2(ex, ey, width) * height;
+      const dx = this.equation1(ex, ey, height) * width2;
+      const dy = this.equation2(ex, ey, width2) * height;
       const x22 = x2 + this.dlength * dx;
       const y22 = y2 + this.dlength * dy;
-      const blue = Math.abs(y2 / width * 255);
-      const green = Math.abs(x2 / width * 255);
+      const blue = Math.abs(y2 / width2 * 255);
+      const green = Math.abs(x2 / width2 * 255);
       const red = Math.abs(Math.sin(this.transitionRadian) * 255);
       const color = `rgb(${red}, ${green}, ${blue})`;
       const mypoint = { name: "point", size: 2, ctx, x: x2, y: y2, color };
@@ -7375,9 +7379,9 @@ function lokaVolterraAlgorithm() {
     }
     return this.alpha * x2 - this.beta * x2 * y2;
   };
-  this.equation2 = (x2, y2, width) => {
+  this.equation2 = (x2, y2, width2) => {
     if (this.useMouse) {
-      const ratio = myMouse.pointX / width > 0.2 ? myMouse.pointX / width : 0.2;
+      const ratio = myMouse.pointX / width2 > 0.2 ? myMouse.pointX / width2 : 0.2;
       return 1 / ratio * this.gamma * x2 * y2 - this.gamma * y2;
     }
     return this.delta * x2 * y2 - this.gamma * y2;
@@ -7385,7 +7389,7 @@ function lokaVolterraAlgorithm() {
   this.timeBefore = Date.now();
   const delay = new Array(100);
   delay.fill(16);
-  this.updateFps = (width, height, ctx) => {
+  this.updateFps = (width2, height, ctx) => {
     const duration = Date.now() - this.timeBefore;
     this.timeBefore = Date.now();
     delay.push(duration);
@@ -7395,11 +7399,11 @@ function lokaVolterraAlgorithm() {
     }, 0);
     const fps = Math.round(1e3 / (sum / delay.length));
     const angle = Math.PI * (Date.now() % 3e3) / 1500;
-    const size = (height + width) * 3e-3;
-    const x2 = width * 0.5;
+    const size = (height + width2) * 3e-3;
+    const x2 = width2 * 0.5;
     const y2 = height - size * 20;
-    const blue = y2 / width * 255;
-    const green = x2 / width * 255;
+    const blue = y2 / width2 * 255;
+    const green = x2 / width2 * 255;
     const red = Math.sin(this.transitionRadian) * 255;
     const transitionColor = "rgb(" + Math.abs(red).toString() + "," + Math.abs(green).toString() + "," + Math.abs(blue).toString() + ")";
     const backgroundColor = "rgb(" + Math.abs(red * 0.3).toString() + "," + Math.abs(green * 0.2).toString() + "," + Math.abs(blue * 0.4).toString() + ")";
@@ -7465,7 +7469,7 @@ function lokaVolterraAlgorithm() {
     const text3 = {
       "name": "text",
       "ctx": ctx,
-      "text": "Res: " + Math.round(width) + " x " + Math.round(height),
+      "text": "Res: " + Math.round(width2) + " x " + Math.round(height),
       "size": size * 4,
       "x": x2,
       "y": y2 + size * 13,
@@ -8028,8 +8032,8 @@ function lerp(x2, y2, t2) {
 function damp(x2, y2, lambda, dt) {
   return lerp(x2, y2, 1 - Math.exp(-lambda * dt));
 }
-function pingpong(x2, length = 1) {
-  return length - Math.abs(euclideanModulo(x2, length * 2) - length);
+function pingpong(x2, length2 = 1) {
+  return length2 - Math.abs(euclideanModulo(x2, length2 * 2) - length2);
 }
 function smoothstep(x2, min, max) {
   if (x2 <= min) return 0;
@@ -8322,8 +8326,8 @@ class Vector2 {
     return this;
   }
   clampLength(min, max) {
-    const length = this.length();
-    return this.divideScalar(length || 1).multiplyScalar(Math.max(min, Math.min(max, length)));
+    const length2 = this.length();
+    return this.divideScalar(length2 || 1).multiplyScalar(Math.max(min, Math.min(max, length2)));
   }
   floor() {
     this.x = Math.floor(this.x);
@@ -8388,8 +8392,8 @@ class Vector2 {
   manhattanDistanceTo(v2) {
     return Math.abs(this.x - v2.x) + Math.abs(this.y - v2.y);
   }
-  setLength(length) {
-    return this.normalize().multiplyScalar(length);
+  setLength(length2) {
+    return this.normalize().multiplyScalar(length2);
   }
   lerp(v2, alpha) {
     this.x += (v2.x - this.x) * alpha;
@@ -9441,8 +9445,8 @@ class Vector4 {
     return this;
   }
   clampLength(min, max) {
-    const length = this.length();
-    return this.divideScalar(length || 1).multiplyScalar(Math.max(min, Math.min(max, length)));
+    const length2 = this.length();
+    return this.divideScalar(length2 || 1).multiplyScalar(Math.max(min, Math.min(max, length2)));
   }
   floor() {
     this.x = Math.floor(this.x);
@@ -9494,8 +9498,8 @@ class Vector4 {
   normalize() {
     return this.divideScalar(this.length() || 1);
   }
-  setLength(length) {
-    return this.normalize().multiplyScalar(length);
+  setLength(length2) {
+    return this.normalize().multiplyScalar(length2);
   }
   lerp(v2, alpha) {
     this.x += (v2.x - this.x) * alpha;
@@ -9550,16 +9554,16 @@ class Vector4 {
   }
 }
 class RenderTarget extends EventDispatcher {
-  constructor(width = 1, height = 1, options = {}) {
+  constructor(width2 = 1, height = 1, options = {}) {
     super();
     this.isRenderTarget = true;
-    this.width = width;
+    this.width = width2;
     this.height = height;
     this.depth = 1;
-    this.scissor = new Vector4(0, 0, width, height);
+    this.scissor = new Vector4(0, 0, width2, height);
     this.scissorTest = false;
-    this.viewport = new Vector4(0, 0, width, height);
-    const image = { width, height, depth: 1 };
+    this.viewport = new Vector4(0, 0, width2, height);
+    const image = { width: width2, height, depth: 1 };
     options = Object.assign({
       generateMipmaps: false,
       internalFormat: null,
@@ -9595,20 +9599,20 @@ class RenderTarget extends EventDispatcher {
   set texture(value) {
     this.textures[0] = value;
   }
-  setSize(width, height, depth = 1) {
-    if (this.width !== width || this.height !== height || this.depth !== depth) {
-      this.width = width;
+  setSize(width2, height, depth2 = 1) {
+    if (this.width !== width2 || this.height !== height || this.depth !== depth2) {
+      this.width = width2;
       this.height = height;
-      this.depth = depth;
+      this.depth = depth2;
       for (let i = 0, il2 = this.textures.length; i < il2; i++) {
-        this.textures[i].image.width = width;
+        this.textures[i].image.width = width2;
         this.textures[i].image.height = height;
-        this.textures[i].image.depth = depth;
+        this.textures[i].image.depth = depth2;
       }
       this.dispose();
     }
-    this.viewport.set(0, 0, width, height);
-    this.scissor.set(0, 0, width, height);
+    this.viewport.set(0, 0, width2, height);
+    this.scissor.set(0, 0, width2, height);
   }
   clone() {
     return new this.constructor().copy(this);
@@ -9640,16 +9644,16 @@ class RenderTarget extends EventDispatcher {
   }
 }
 class WebGLRenderTarget extends RenderTarget {
-  constructor(width = 1, height = 1, options = {}) {
-    super(width, height, options);
+  constructor(width2 = 1, height = 1, options = {}) {
+    super(width2, height, options);
     this.isWebGLRenderTarget = true;
   }
 }
 class DataArrayTexture extends Texture {
-  constructor(data = null, width = 1, height = 1, depth = 1) {
+  constructor(data = null, width2 = 1, height = 1, depth2 = 1) {
     super(null);
     this.isDataArrayTexture = true;
-    this.image = { data, width, height, depth };
+    this.image = { data, width: width2, height, depth: depth2 };
     this.magFilter = NearestFilter;
     this.minFilter = NearestFilter;
     this.wrapR = ClampToEdgeWrapping;
@@ -9666,10 +9670,10 @@ class DataArrayTexture extends Texture {
   }
 }
 class Data3DTexture extends Texture {
-  constructor(data = null, width = 1, height = 1, depth = 1) {
+  constructor(data = null, width2 = 1, height = 1, depth2 = 1) {
     super(null);
     this.isData3DTexture = true;
-    this.image = { data, width, height, depth };
+    this.image = { data, width: width2, height, depth: depth2 };
     this.magFilter = NearestFilter;
     this.minFilter = NearestFilter;
     this.wrapR = ClampToEdgeWrapping;
@@ -10284,8 +10288,8 @@ class Vector3 {
     return this;
   }
   clampLength(min, max) {
-    const length = this.length();
-    return this.divideScalar(length || 1).multiplyScalar(Math.max(min, Math.min(max, length)));
+    const length2 = this.length();
+    return this.divideScalar(length2 || 1).multiplyScalar(Math.max(min, Math.min(max, length2)));
   }
   floor() {
     this.x = Math.floor(this.x);
@@ -10333,8 +10337,8 @@ class Vector3 {
   normalize() {
     return this.divideScalar(this.length() || 1);
   }
-  setLength(length) {
-    return this.normalize().multiplyScalar(length);
+  setLength(length2) {
+    return this.normalize().multiplyScalar(length2);
   }
   lerp(v2, alpha) {
     this.x += (v2.x - this.x) * alpha;
@@ -10874,9 +10878,9 @@ class Sphere {
     _v1$6.subVectors(point, this.center);
     const lengthSq = _v1$6.lengthSq();
     if (lengthSq > this.radius * this.radius) {
-      const length = Math.sqrt(lengthSq);
-      const delta = (length - this.radius) * 0.5;
-      this.center.addScaledVector(_v1$6, delta / length);
+      const length2 = Math.sqrt(lengthSq);
+      const delta = (length2 - this.radius) * 0.5;
+      this.center.addScaledVector(_v1$6, delta / length2);
       this.radius += delta;
     }
     return this;
@@ -14729,13 +14733,13 @@ function checkGeometryIntersection(object, material, raycaster, ray, uv, uv1, no
   return intersection;
 }
 class BoxGeometry extends BufferGeometry {
-  constructor(width = 1, height = 1, depth = 1, widthSegments = 1, heightSegments = 1, depthSegments = 1) {
+  constructor(width2 = 1, height = 1, depth2 = 1, widthSegments = 1, heightSegments = 1, depthSegments = 1) {
     super();
     this.type = "BoxGeometry";
     this.parameters = {
-      width,
+      width: width2,
       height,
-      depth,
+      depth: depth2,
       widthSegments,
       heightSegments,
       depthSegments
@@ -14750,22 +14754,22 @@ class BoxGeometry extends BufferGeometry {
     const uvs = [];
     let numberOfVertices = 0;
     let groupStart = 0;
-    buildPlane("z", "y", "x", -1, -1, depth, height, width, depthSegments, heightSegments, 0);
-    buildPlane("z", "y", "x", 1, -1, depth, height, -width, depthSegments, heightSegments, 1);
-    buildPlane("x", "z", "y", 1, 1, width, depth, height, widthSegments, depthSegments, 2);
-    buildPlane("x", "z", "y", 1, -1, width, depth, -height, widthSegments, depthSegments, 3);
-    buildPlane("x", "y", "z", 1, -1, width, height, depth, widthSegments, heightSegments, 4);
-    buildPlane("x", "y", "z", -1, -1, width, height, -depth, widthSegments, heightSegments, 5);
+    buildPlane("z", "y", "x", -1, -1, depth2, height, width2, depthSegments, heightSegments, 0);
+    buildPlane("z", "y", "x", 1, -1, depth2, height, -width2, depthSegments, heightSegments, 1);
+    buildPlane("x", "z", "y", 1, 1, width2, depth2, height, widthSegments, depthSegments, 2);
+    buildPlane("x", "z", "y", 1, -1, width2, depth2, -height, widthSegments, depthSegments, 3);
+    buildPlane("x", "y", "z", 1, -1, width2, height, depth2, widthSegments, heightSegments, 4);
+    buildPlane("x", "y", "z", -1, -1, width2, height, -depth2, widthSegments, heightSegments, 5);
     this.setIndex(indices);
     this.setAttribute("position", new Float32BufferAttribute(vertices, 3));
     this.setAttribute("normal", new Float32BufferAttribute(normals, 3));
     this.setAttribute("uv", new Float32BufferAttribute(uvs, 2));
-    function buildPlane(u2, v2, w2, udir, vdir, width2, height2, depth2, gridX, gridY, materialIndex) {
-      const segmentWidth = width2 / gridX;
+    function buildPlane(u2, v2, w2, udir, vdir, width3, height2, depth3, gridX, gridY, materialIndex) {
+      const segmentWidth = width3 / gridX;
       const segmentHeight = height2 / gridY;
-      const widthHalf = width2 / 2;
+      const widthHalf = width3 / 2;
       const heightHalf = height2 / 2;
-      const depthHalf = depth2 / 2;
+      const depthHalf = depth3 / 2;
       const gridX1 = gridX + 1;
       const gridY1 = gridY + 1;
       let vertexCounter = 0;
@@ -14781,7 +14785,7 @@ class BoxGeometry extends BufferGeometry {
           vertices.push(vector.x, vector.y, vector.z);
           vector[u2] = 0;
           vector[v2] = 0;
-          vector[w2] = depth2 > 0 ? 1 : -1;
+          vector[w2] = depth3 > 0 ? 1 : -1;
           normals.push(vector.x, vector.y, vector.z);
           uvs.push(ix / gridX);
           uvs.push(1 - iy / gridY);
@@ -15126,7 +15130,7 @@ class PerspectiveCamera extends Camera {
    *
    *   Note there is no reason monitors have to be the same size or in a grid.
    */
-  setViewOffset(fullWidth, fullHeight, x2, y2, width, height) {
+  setViewOffset(fullWidth, fullHeight, x2, y2, width2, height) {
     this.aspect = fullWidth / fullHeight;
     if (this.view === null) {
       this.view = {
@@ -15144,7 +15148,7 @@ class PerspectiveCamera extends Camera {
     this.view.fullHeight = fullHeight;
     this.view.offsetX = x2;
     this.view.offsetY = y2;
-    this.view.width = width;
+    this.view.width = width2;
     this.view.height = height;
     this.updateProjectionMatrix();
   }
@@ -15158,19 +15162,19 @@ class PerspectiveCamera extends Camera {
     const near = this.near;
     let top = near * Math.tan(DEG2RAD * 0.5 * this.fov) / this.zoom;
     let height = 2 * top;
-    let width = this.aspect * height;
-    let left = -0.5 * width;
+    let width2 = this.aspect * height;
+    let left = -0.5 * width2;
     const view = this.view;
     if (this.view !== null && this.view.enabled) {
       const fullWidth = view.fullWidth, fullHeight = view.fullHeight;
-      left += view.offsetX * width / fullWidth;
+      left += view.offsetX * width2 / fullWidth;
       top -= view.offsetY * height / fullHeight;
-      width *= view.width / fullWidth;
+      width2 *= view.width / fullWidth;
       height *= view.height / fullHeight;
     }
     const skew = this.filmOffset;
     if (skew !== 0) left += near * skew / this.getFilmWidth();
-    this.projectionMatrix.makePerspective(left, left + width, top, top - height, near, this.far, this.coordinateSystem);
+    this.projectionMatrix.makePerspective(left, left + width2, top, top - height, near, this.far, this.coordinateSystem);
     this.projectionMatrixInverse.copy(this.projectionMatrix).invert();
   }
   toJSON(meta) {
@@ -15387,11 +15391,11 @@ class WebGLCubeRenderTarget extends WebGLRenderTarget {
     mesh.material.dispose();
     return this;
   }
-  clear(renderer, color, depth, stencil) {
+  clear(renderer, color, depth2, stencil) {
     const currentRenderTarget = renderer.getRenderTarget();
     for (let i = 0; i < 6; i++) {
       renderer.setRenderTarget(this, i);
-      renderer.clear(color, depth, stencil);
+      renderer.clear(color, depth2, stencil);
     }
     renderer.setRenderTarget(currentRenderTarget);
   }
@@ -15743,22 +15747,22 @@ function WebGLAttributes(gl2) {
   };
 }
 class PlaneGeometry extends BufferGeometry {
-  constructor(width = 1, height = 1, widthSegments = 1, heightSegments = 1) {
+  constructor(width2 = 1, height = 1, widthSegments = 1, heightSegments = 1) {
     super();
     this.type = "PlaneGeometry";
     this.parameters = {
-      width,
+      width: width2,
       height,
       widthSegments,
       heightSegments
     };
-    const width_half = width / 2;
+    const width_half = width2 / 2;
     const height_half = height / 2;
     const gridX = Math.floor(widthSegments);
     const gridY = Math.floor(heightSegments);
     const gridX1 = gridX + 1;
     const gridY1 = gridY + 1;
-    const segment_width = width / gridX;
+    const segment_width = width2 / gridX;
     const segment_height = height / gridY;
     const indices = [];
     const vertices = [];
@@ -17288,7 +17292,7 @@ class OrthographicCamera extends Camera {
     this.view = source.view === null ? null : Object.assign({}, source.view);
     return this;
   }
-  setViewOffset(fullWidth, fullHeight, x2, y2, width, height) {
+  setViewOffset(fullWidth, fullHeight, x2, y2, width2, height) {
     if (this.view === null) {
       this.view = {
         enabled: true,
@@ -17305,7 +17309,7 @@ class OrthographicCamera extends Camera {
     this.view.fullHeight = fullHeight;
     this.view.offsetX = x2;
     this.view.offsetY = y2;
-    this.view.width = width;
+    this.view.width = width2;
     this.view.height = height;
     this.updateProjectionMatrix();
   }
@@ -17493,7 +17497,7 @@ class PMREMGenerator {
     return cubeUVRenderTarget;
   }
   _allocateTargets() {
-    const width = 3 * Math.max(this._cubeSize, 16 * 7);
+    const width2 = 3 * Math.max(this._cubeSize, 16 * 7);
     const height = 4 * this._cubeSize;
     const params = {
       magFilter: LinearFilter,
@@ -17504,15 +17508,15 @@ class PMREMGenerator {
       colorSpace: LinearSRGBColorSpace,
       depthBuffer: false
     };
-    const cubeUVRenderTarget = _createRenderTarget(width, height, params);
-    if (this._pingPongRenderTarget === null || this._pingPongRenderTarget.width !== width || this._pingPongRenderTarget.height !== height) {
+    const cubeUVRenderTarget = _createRenderTarget(width2, height, params);
+    if (this._pingPongRenderTarget === null || this._pingPongRenderTarget.width !== width2 || this._pingPongRenderTarget.height !== height) {
       if (this._pingPongRenderTarget !== null) {
         this._dispose();
       }
-      this._pingPongRenderTarget = _createRenderTarget(width, height, params);
+      this._pingPongRenderTarget = _createRenderTarget(width2, height, params);
       const { _lodMax } = this;
       ({ sizeLods: this._sizeLods, lodPlanes: this._lodPlanes, sigmas: this._sigmas } = _createPlanes(_lodMax));
-      this._blurMaterial = _getBlurShader(_lodMax, width, height);
+      this._blurMaterial = _getBlurShader(_lodMax, width2, height);
     }
     return cubeUVRenderTarget;
   }
@@ -17757,25 +17761,25 @@ function _createPlanes(lodMax) {
   }
   return { lodPlanes, sizeLods, sigmas };
 }
-function _createRenderTarget(width, height, params) {
-  const cubeUVRenderTarget = new WebGLRenderTarget(width, height, params);
+function _createRenderTarget(width2, height, params) {
+  const cubeUVRenderTarget = new WebGLRenderTarget(width2, height, params);
   cubeUVRenderTarget.texture.mapping = CubeUVReflectionMapping;
   cubeUVRenderTarget.texture.name = "PMREM.cubeUv";
   cubeUVRenderTarget.scissorTest = true;
   return cubeUVRenderTarget;
 }
-function _setViewport(target, x2, y2, width, height) {
-  target.viewport.set(x2, y2, width, height);
-  target.scissor.set(x2, y2, width, height);
+function _setViewport(target, x2, y2, width2, height) {
+  target.viewport.set(x2, y2, width2, height);
+  target.scissor.set(x2, y2, width2, height);
 }
-function _getBlurShader(lodMax, width, height) {
+function _getBlurShader(lodMax, width2, height) {
   const weights = new Float32Array(MAX_SAMPLES);
   const poleAxis = new Vector3(0, 1, 0);
   const shaderMaterial = new ShaderMaterial({
     name: "SphericalGaussianBlur",
     defines: {
       "n": MAX_SAMPLES,
-      "CUBEUV_TEXEL_WIDTH": 1 / width,
+      "CUBEUV_TEXEL_WIDTH": 1 / width2,
       "CUBEUV_TEXEL_HEIGHT": 1 / height,
       "CUBEUV_MAX_MIP": `${lodMax}.0`
     },
@@ -18028,11 +18032,11 @@ function WebGLCubeUVMaps(renderer) {
   }
   function isCubeTextureComplete(image) {
     let count = 0;
-    const length = 6;
-    for (let i = 0; i < length; i++) {
+    const length2 = 6;
+    for (let i = 0; i < length2; i++) {
       if (image[i] !== void 0) count++;
     }
-    return count === length;
+    return count === length2;
   }
   function onTextureDispose(event) {
     const texture = event.target;
@@ -18334,14 +18338,14 @@ function WebGLMorphtargets(gl2, capabilities, textures) {
       if (hasMorphPosition === true) vertexDataCount = 1;
       if (hasMorphNormals === true) vertexDataCount = 2;
       if (hasMorphColors === true) vertexDataCount = 3;
-      let width = geometry.attributes.position.count * vertexDataCount;
+      let width2 = geometry.attributes.position.count * vertexDataCount;
       let height = 1;
-      if (width > capabilities.maxTextureSize) {
-        height = Math.ceil(width / capabilities.maxTextureSize);
-        width = capabilities.maxTextureSize;
+      if (width2 > capabilities.maxTextureSize) {
+        height = Math.ceil(width2 / capabilities.maxTextureSize);
+        width2 = capabilities.maxTextureSize;
       }
-      const buffer = new Float32Array(width * height * 4 * morphTargetsCount);
-      const texture = new DataArrayTexture(buffer, width, height, morphTargetsCount);
+      const buffer = new Float32Array(width2 * height * 4 * morphTargetsCount);
+      const texture = new DataArrayTexture(buffer, width2, height, morphTargetsCount);
       texture.type = FloatType;
       texture.needsUpdate = true;
       const vertexDataStride = vertexDataCount * 4;
@@ -18349,7 +18353,7 @@ function WebGLMorphtargets(gl2, capabilities, textures) {
         const morphTarget = morphTargets[i];
         const morphNormal = morphNormals[i];
         const morphColor = morphColors[i];
-        const offset = width * height * 4 * i;
+        const offset = width2 * height * 4 * i;
         for (let j = 0; j < morphTarget.count; j++) {
           const stride = j * vertexDataStride;
           if (hasMorphPosition === true) {
@@ -18378,7 +18382,7 @@ function WebGLMorphtargets(gl2, capabilities, textures) {
       entry = {
         count: morphTargetsCount,
         texture,
-        size: new Vector2(width, height)
+        size: new Vector2(width2, height)
       };
       morphTextures.set(geometry, entry);
       geometry.addEventListener("dispose", disposeTexture2);
@@ -18447,7 +18451,7 @@ function WebGLObjects(gl2, geometries, attributes, info) {
   };
 }
 class DepthTexture extends Texture {
-  constructor(width, height, type, mapping, wrapS, wrapT, magFilter, minFilter, anisotropy, format = DepthFormat) {
+  constructor(width2, height, type, mapping, wrapS, wrapT, magFilter, minFilter, anisotropy, format = DepthFormat) {
     if (format !== DepthFormat && format !== DepthStencilFormat) {
       throw new Error("DepthTexture format must be either THREE.DepthFormat or THREE.DepthStencilFormat");
     }
@@ -18455,7 +18459,7 @@ class DepthTexture extends Texture {
     if (type === void 0 && format === DepthStencilFormat) type = UnsignedInt248Type;
     super(null, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy);
     this.isDepthTexture = true;
-    this.image = { width, height };
+    this.image = { width: width2, height };
     this.magFilter = magFilter !== void 0 ? magFilter : NearestFilter;
     this.minFilter = minFilter !== void 0 ? minFilter : NearestFilter;
     this.flipY = false;
@@ -21187,10 +21191,10 @@ function WebGLState(gl2) {
       setLocked: function(lock) {
         locked = lock;
       },
-      setClear: function(depth) {
-        if (currentDepthClear !== depth) {
-          gl2.clearDepth(depth);
-          currentDepthClear = depth;
+      setClear: function(depth2) {
+        if (currentDepthClear !== depth2) {
+          gl2.clearDepth(depth2);
+          currentDepthClear = depth2;
         }
       },
       reset: function() {
@@ -21559,10 +21563,10 @@ function WebGLState(gl2) {
     }
     currentCullFace = cullFace;
   }
-  function setLineWidth(width) {
-    if (width !== currentLineWidth) {
-      if (lineWidthAvailable) gl2.lineWidth(width);
-      currentLineWidth = width;
+  function setLineWidth(width2) {
+    if (width2 !== currentLineWidth) {
+      if (lineWidthAvailable) gl2.lineWidth(width2);
+      currentLineWidth = width2;
     }
   }
   function setPolygonOffset(polygonOffset, factor, units) {
@@ -21823,84 +21827,84 @@ function WebGLState(gl2) {
     reset
   };
 }
-function getByteLength(width, height, format, type) {
+function getByteLength(width2, height, format, type) {
   const typeByteLength = getTextureTypeByteLength(type);
   switch (format) {
     case AlphaFormat:
-      return width * height;
+      return width2 * height;
     case LuminanceFormat:
-      return width * height;
+      return width2 * height;
     case LuminanceAlphaFormat:
-      return width * height * 2;
+      return width2 * height * 2;
     case RedFormat:
-      return width * height / typeByteLength.components * typeByteLength.byteLength;
+      return width2 * height / typeByteLength.components * typeByteLength.byteLength;
     case RedIntegerFormat:
-      return width * height / typeByteLength.components * typeByteLength.byteLength;
+      return width2 * height / typeByteLength.components * typeByteLength.byteLength;
     case RGFormat:
-      return width * height * 2 / typeByteLength.components * typeByteLength.byteLength;
+      return width2 * height * 2 / typeByteLength.components * typeByteLength.byteLength;
     case RGIntegerFormat:
-      return width * height * 2 / typeByteLength.components * typeByteLength.byteLength;
+      return width2 * height * 2 / typeByteLength.components * typeByteLength.byteLength;
     case RGBFormat:
-      return width * height * 3 / typeByteLength.components * typeByteLength.byteLength;
+      return width2 * height * 3 / typeByteLength.components * typeByteLength.byteLength;
     case RGBAFormat:
-      return width * height * 4 / typeByteLength.components * typeByteLength.byteLength;
+      return width2 * height * 4 / typeByteLength.components * typeByteLength.byteLength;
     case RGBAIntegerFormat:
-      return width * height * 4 / typeByteLength.components * typeByteLength.byteLength;
+      return width2 * height * 4 / typeByteLength.components * typeByteLength.byteLength;
     case RGB_S3TC_DXT1_Format:
     case RGBA_S3TC_DXT1_Format:
-      return Math.floor((width + 3) / 4) * Math.floor((height + 3) / 4) * 8;
+      return Math.floor((width2 + 3) / 4) * Math.floor((height + 3) / 4) * 8;
     case RGBA_S3TC_DXT3_Format:
     case RGBA_S3TC_DXT5_Format:
-      return Math.floor((width + 3) / 4) * Math.floor((height + 3) / 4) * 16;
+      return Math.floor((width2 + 3) / 4) * Math.floor((height + 3) / 4) * 16;
     case RGB_PVRTC_2BPPV1_Format:
     case RGBA_PVRTC_2BPPV1_Format:
-      return Math.max(width, 16) * Math.max(height, 8) / 4;
+      return Math.max(width2, 16) * Math.max(height, 8) / 4;
     case RGB_PVRTC_4BPPV1_Format:
     case RGBA_PVRTC_4BPPV1_Format:
-      return Math.max(width, 8) * Math.max(height, 8) / 2;
+      return Math.max(width2, 8) * Math.max(height, 8) / 2;
     case RGB_ETC1_Format:
     case RGB_ETC2_Format:
-      return Math.floor((width + 3) / 4) * Math.floor((height + 3) / 4) * 8;
+      return Math.floor((width2 + 3) / 4) * Math.floor((height + 3) / 4) * 8;
     case RGBA_ETC2_EAC_Format:
-      return Math.floor((width + 3) / 4) * Math.floor((height + 3) / 4) * 16;
+      return Math.floor((width2 + 3) / 4) * Math.floor((height + 3) / 4) * 16;
     case RGBA_ASTC_4x4_Format:
-      return Math.floor((width + 3) / 4) * Math.floor((height + 3) / 4) * 16;
+      return Math.floor((width2 + 3) / 4) * Math.floor((height + 3) / 4) * 16;
     case RGBA_ASTC_5x4_Format:
-      return Math.floor((width + 4) / 5) * Math.floor((height + 3) / 4) * 16;
+      return Math.floor((width2 + 4) / 5) * Math.floor((height + 3) / 4) * 16;
     case RGBA_ASTC_5x5_Format:
-      return Math.floor((width + 4) / 5) * Math.floor((height + 4) / 5) * 16;
+      return Math.floor((width2 + 4) / 5) * Math.floor((height + 4) / 5) * 16;
     case RGBA_ASTC_6x5_Format:
-      return Math.floor((width + 5) / 6) * Math.floor((height + 4) / 5) * 16;
+      return Math.floor((width2 + 5) / 6) * Math.floor((height + 4) / 5) * 16;
     case RGBA_ASTC_6x6_Format:
-      return Math.floor((width + 5) / 6) * Math.floor((height + 5) / 6) * 16;
+      return Math.floor((width2 + 5) / 6) * Math.floor((height + 5) / 6) * 16;
     case RGBA_ASTC_8x5_Format:
-      return Math.floor((width + 7) / 8) * Math.floor((height + 4) / 5) * 16;
+      return Math.floor((width2 + 7) / 8) * Math.floor((height + 4) / 5) * 16;
     case RGBA_ASTC_8x6_Format:
-      return Math.floor((width + 7) / 8) * Math.floor((height + 5) / 6) * 16;
+      return Math.floor((width2 + 7) / 8) * Math.floor((height + 5) / 6) * 16;
     case RGBA_ASTC_8x8_Format:
-      return Math.floor((width + 7) / 8) * Math.floor((height + 7) / 8) * 16;
+      return Math.floor((width2 + 7) / 8) * Math.floor((height + 7) / 8) * 16;
     case RGBA_ASTC_10x5_Format:
-      return Math.floor((width + 9) / 10) * Math.floor((height + 4) / 5) * 16;
+      return Math.floor((width2 + 9) / 10) * Math.floor((height + 4) / 5) * 16;
     case RGBA_ASTC_10x6_Format:
-      return Math.floor((width + 9) / 10) * Math.floor((height + 5) / 6) * 16;
+      return Math.floor((width2 + 9) / 10) * Math.floor((height + 5) / 6) * 16;
     case RGBA_ASTC_10x8_Format:
-      return Math.floor((width + 9) / 10) * Math.floor((height + 7) / 8) * 16;
+      return Math.floor((width2 + 9) / 10) * Math.floor((height + 7) / 8) * 16;
     case RGBA_ASTC_10x10_Format:
-      return Math.floor((width + 9) / 10) * Math.floor((height + 9) / 10) * 16;
+      return Math.floor((width2 + 9) / 10) * Math.floor((height + 9) / 10) * 16;
     case RGBA_ASTC_12x10_Format:
-      return Math.floor((width + 11) / 12) * Math.floor((height + 9) / 10) * 16;
+      return Math.floor((width2 + 11) / 12) * Math.floor((height + 9) / 10) * 16;
     case RGBA_ASTC_12x12_Format:
-      return Math.floor((width + 11) / 12) * Math.floor((height + 11) / 12) * 16;
+      return Math.floor((width2 + 11) / 12) * Math.floor((height + 11) / 12) * 16;
     case RGBA_BPTC_Format:
     case RGB_BPTC_SIGNED_Format:
     case RGB_BPTC_UNSIGNED_Format:
-      return Math.ceil(width / 4) * Math.ceil(height / 4) * 16;
+      return Math.ceil(width2 / 4) * Math.ceil(height / 4) * 16;
     case RED_RGTC1_Format:
     case SIGNED_RED_RGTC1_Format:
-      return Math.ceil(width / 4) * Math.ceil(height / 4) * 8;
+      return Math.ceil(width2 / 4) * Math.ceil(height / 4) * 8;
     case RED_GREEN_RGTC2_Format:
     case SIGNED_RED_GREEN_RGTC2_Format:
-      return Math.ceil(width / 4) * Math.ceil(height / 4) * 16;
+      return Math.ceil(width2 / 4) * Math.ceil(height / 4) * 16;
   }
   throw new Error(
     `Unable to determine texture byte length for ${format} format.`
@@ -21939,10 +21943,10 @@ function WebGLTextures(_gl, extensions, state, properties, capabilities, utils2,
     useOffscreenCanvas = typeof OffscreenCanvas !== "undefined" && new OffscreenCanvas(1, 1).getContext("2d") !== null;
   } catch (err) {
   }
-  function createCanvas(width, height) {
+  function createCanvas(width2, height) {
     return useOffscreenCanvas ? (
       // eslint-disable-next-line compat/compat
-      new OffscreenCanvas(width, height)
+      new OffscreenCanvas(width2, height)
     ) : createElementNS("canvas");
   }
   function resizeImage(image, needsNewCanvas, maxSize) {
@@ -21953,15 +21957,15 @@ function WebGLTextures(_gl, extensions, state, properties, capabilities, utils2,
     }
     if (scale < 1) {
       if (typeof HTMLImageElement !== "undefined" && image instanceof HTMLImageElement || typeof HTMLCanvasElement !== "undefined" && image instanceof HTMLCanvasElement || typeof ImageBitmap !== "undefined" && image instanceof ImageBitmap || typeof VideoFrame !== "undefined" && image instanceof VideoFrame) {
-        const width = Math.floor(scale * dimensions.width);
+        const width2 = Math.floor(scale * dimensions.width);
         const height = Math.floor(scale * dimensions.height);
-        if (_canvas2 === void 0) _canvas2 = createCanvas(width, height);
-        const canvas = needsNewCanvas ? createCanvas(width, height) : _canvas2;
-        canvas.width = width;
+        if (_canvas2 === void 0) _canvas2 = createCanvas(width2, height);
+        const canvas = needsNewCanvas ? createCanvas(width2, height) : _canvas2;
+        canvas.width = width2;
         canvas.height = height;
         const context = canvas.getContext("2d");
-        context.drawImage(image, 0, 0, width, height);
-        console.warn("THREE.WebGLRenderer: Texture has been resized from (" + dimensions.width + "x" + dimensions.height + ") to (" + width + "x" + height + ").");
+        context.drawImage(image, 0, 0, width2, height);
+        console.warn("THREE.WebGLRenderer: Texture has been resized from (" + dimensions.width + "x" + dimensions.height + ") to (" + width2 + "x" + height + ").");
         return canvas;
       } else {
         if ("data" in image) {
@@ -22466,10 +22470,10 @@ function WebGLTextures(_gl, extensions, state, properties, capabilities, utils2,
           if (useTexStorage) {
             state.texStorage2D(_gl.TEXTURE_2D, levels, glInternalFormat, image.width, image.height);
           } else {
-            let width = image.width, height = image.height;
+            let width2 = image.width, height = image.height;
             for (let i = 0; i < levels; i++) {
-              state.texImage2D(_gl.TEXTURE_2D, i, glInternalFormat, width, height, 0, glFormat, glType, null);
-              width >>= 1;
+              state.texImage2D(_gl.TEXTURE_2D, i, glInternalFormat, width2, height, 0, glFormat, glType, null);
+              width2 >>= 1;
               height >>= 1;
             }
           }
@@ -22639,12 +22643,12 @@ function WebGLTextures(_gl, extensions, state, properties, capabilities, utils2,
     const glInternalFormat = getInternalFormat(texture.internalFormat, glFormat, glType, texture.colorSpace);
     const renderTargetProperties = properties.get(renderTarget);
     if (!renderTargetProperties.__hasExternalTextures) {
-      const width = Math.max(1, renderTarget.width >> level);
+      const width2 = Math.max(1, renderTarget.width >> level);
       const height = Math.max(1, renderTarget.height >> level);
       if (textureTarget === _gl.TEXTURE_3D || textureTarget === _gl.TEXTURE_2D_ARRAY) {
-        state.texImage3D(textureTarget, level, glInternalFormat, width, height, renderTarget.depth, 0, glFormat, glType, null);
+        state.texImage3D(textureTarget, level, glInternalFormat, width2, height, renderTarget.depth, 0, glFormat, glType, null);
       } else {
-        state.texImage2D(textureTarget, level, glInternalFormat, width, height, 0, glFormat, glType, null);
+        state.texImage2D(textureTarget, level, glInternalFormat, width2, height, 0, glFormat, glType, null);
       }
     }
     state.bindFramebuffer(_gl.FRAMEBUFFER, framebuffer);
@@ -22891,7 +22895,7 @@ function WebGLTextures(_gl, extensions, state, properties, capabilities, utils2,
     if (renderTarget.samples > 0) {
       if (useMultisampledRTT(renderTarget) === false) {
         const textures = renderTarget.textures;
-        const width = renderTarget.width;
+        const width2 = renderTarget.width;
         const height = renderTarget.height;
         let mask = _gl.COLOR_BUFFER_BIT;
         const depthStyle = renderTarget.stencilBuffer ? _gl.DEPTH_STENCIL_ATTACHMENT : _gl.DEPTH_ATTACHMENT;
@@ -22917,7 +22921,7 @@ function WebGLTextures(_gl, extensions, state, properties, capabilities, utils2,
             const webglTexture = properties.get(textures[i]).__webglTexture;
             _gl.framebufferTexture2D(_gl.DRAW_FRAMEBUFFER, _gl.COLOR_ATTACHMENT0, _gl.TEXTURE_2D, webglTexture, 0);
           }
-          _gl.blitFramebuffer(0, 0, width, height, 0, 0, width, height, mask, _gl.NEAREST);
+          _gl.blitFramebuffer(0, 0, width2, height, 0, 0, width2, height, mask, _gl.NEAREST);
           if (supportsInvalidateFramebuffer === true) {
             invalidationArrayRead.length = 0;
             invalidationArrayDraw.length = 0;
@@ -24370,7 +24374,7 @@ class WebGLRenderer {
     const {
       canvas = createCanvasElement(),
       context = null,
-      depth = true,
+      depth: depth2 = true,
       stencil = false,
       alpha = false,
       antialias = false,
@@ -24456,7 +24460,7 @@ class WebGLRenderer {
     try {
       const contextAttributes = {
         alpha: true,
-        depth,
+        depth: depth2,
         stencil,
         antialias,
         premultipliedAlpha,
@@ -24551,31 +24555,31 @@ class WebGLRenderer {
     this.getSize = function(target) {
       return target.set(_width, _height);
     };
-    this.setSize = function(width, height, updateStyle = true) {
+    this.setSize = function(width2, height, updateStyle = true) {
       if (xr.isPresenting) {
         console.warn("THREE.WebGLRenderer: Can't change size while VR device is presenting.");
         return;
       }
-      _width = width;
+      _width = width2;
       _height = height;
-      canvas.width = Math.floor(width * _pixelRatio);
+      canvas.width = Math.floor(width2 * _pixelRatio);
       canvas.height = Math.floor(height * _pixelRatio);
       if (updateStyle === true) {
-        canvas.style.width = width + "px";
+        canvas.style.width = width2 + "px";
         canvas.style.height = height + "px";
       }
-      this.setViewport(0, 0, width, height);
+      this.setViewport(0, 0, width2, height);
     };
     this.getDrawingBufferSize = function(target) {
       return target.set(_width * _pixelRatio, _height * _pixelRatio).floor();
     };
-    this.setDrawingBufferSize = function(width, height, pixelRatio) {
-      _width = width;
+    this.setDrawingBufferSize = function(width2, height, pixelRatio) {
+      _width = width2;
       _height = height;
       _pixelRatio = pixelRatio;
-      canvas.width = Math.floor(width * pixelRatio);
+      canvas.width = Math.floor(width2 * pixelRatio);
       canvas.height = Math.floor(height * pixelRatio);
-      this.setViewport(0, 0, width, height);
+      this.setViewport(0, 0, width2, height);
     };
     this.getCurrentViewport = function(target) {
       return target.copy(_currentViewport);
@@ -24583,22 +24587,22 @@ class WebGLRenderer {
     this.getViewport = function(target) {
       return target.copy(_viewport);
     };
-    this.setViewport = function(x2, y2, width, height) {
+    this.setViewport = function(x2, y2, width2, height) {
       if (x2.isVector4) {
         _viewport.set(x2.x, x2.y, x2.z, x2.w);
       } else {
-        _viewport.set(x2, y2, width, height);
+        _viewport.set(x2, y2, width2, height);
       }
       state.viewport(_currentViewport.copy(_viewport).multiplyScalar(_pixelRatio).round());
     };
     this.getScissor = function(target) {
       return target.copy(_scissor);
     };
-    this.setScissor = function(x2, y2, width, height) {
+    this.setScissor = function(x2, y2, width2, height) {
       if (x2.isVector4) {
         _scissor.set(x2.x, x2.y, x2.z, x2.w);
       } else {
-        _scissor.set(x2, y2, width, height);
+        _scissor.set(x2, y2, width2, height);
       }
       state.scissor(_currentScissor.copy(_scissor).multiplyScalar(_pixelRatio).round());
     };
@@ -24626,7 +24630,7 @@ class WebGLRenderer {
     this.setClearAlpha = function() {
       background.setClearAlpha.apply(background, arguments);
     };
-    this.clear = function(color = true, depth2 = true, stencil2 = true) {
+    this.clear = function(color = true, depth3 = true, stencil2 = true) {
       let bits = 0;
       if (color) {
         let isIntegerFormat = false;
@@ -24659,7 +24663,7 @@ class WebGLRenderer {
           bits |= _gl.COLOR_BUFFER_BIT;
         }
       }
-      if (depth2) bits |= _gl.DEPTH_BUFFER_BIT;
+      if (depth3) bits |= _gl.DEPTH_BUFFER_BIT;
       if (stencil2) {
         bits |= _gl.STENCIL_BUFFER_BIT;
         this.state.buffers.stencil.setMask(4294967295);
@@ -25562,7 +25566,7 @@ class WebGLRenderer {
       }
       _currentMaterialId = -1;
     };
-    this.readRenderTargetPixels = function(renderTarget, x2, y2, width, height, buffer, activeCubeFaceIndex) {
+    this.readRenderTargetPixels = function(renderTarget, x2, y2, width2, height, buffer, activeCubeFaceIndex) {
       if (!(renderTarget && renderTarget.isWebGLRenderTarget)) {
         console.error("THREE.WebGLRenderer.readRenderTargetPixels: renderTarget is not THREE.WebGLRenderTarget.");
         return;
@@ -25585,8 +25589,8 @@ class WebGLRenderer {
             console.error("THREE.WebGLRenderer.readRenderTargetPixels: renderTarget is not in UnsignedByteType or implementation defined type.");
             return;
           }
-          if (x2 >= 0 && x2 <= renderTarget.width - width && (y2 >= 0 && y2 <= renderTarget.height - height)) {
-            _gl.readPixels(x2, y2, width, height, utils2.convert(textureFormat), utils2.convert(textureType), buffer);
+          if (x2 >= 0 && x2 <= renderTarget.width - width2 && (y2 >= 0 && y2 <= renderTarget.height - height)) {
+            _gl.readPixels(x2, y2, width2, height, utils2.convert(textureFormat), utils2.convert(textureType), buffer);
           }
         } finally {
           const framebuffer2 = _currentRenderTarget !== null ? properties.get(_currentRenderTarget).__webglFramebuffer : null;
@@ -25594,7 +25598,7 @@ class WebGLRenderer {
         }
       }
     };
-    this.readRenderTargetPixelsAsync = async function(renderTarget, x2, y2, width, height, buffer, activeCubeFaceIndex) {
+    this.readRenderTargetPixelsAsync = async function(renderTarget, x2, y2, width2, height, buffer, activeCubeFaceIndex) {
       if (!(renderTarget && renderTarget.isWebGLRenderTarget)) {
         throw new Error("THREE.WebGLRenderer.readRenderTargetPixels: renderTarget is not THREE.WebGLRenderTarget.");
       }
@@ -25614,11 +25618,11 @@ class WebGLRenderer {
           if (!capabilities.textureTypeReadable(textureType)) {
             throw new Error("THREE.WebGLRenderer.readRenderTargetPixelsAsync: renderTarget is not in UnsignedByteType or implementation defined type.");
           }
-          if (x2 >= 0 && x2 <= renderTarget.width - width && (y2 >= 0 && y2 <= renderTarget.height - height)) {
+          if (x2 >= 0 && x2 <= renderTarget.width - width2 && (y2 >= 0 && y2 <= renderTarget.height - height)) {
             const glBuffer = _gl.createBuffer();
             _gl.bindBuffer(_gl.PIXEL_PACK_BUFFER, glBuffer);
             _gl.bufferData(_gl.PIXEL_PACK_BUFFER, buffer.byteLength, _gl.STREAM_READ);
-            _gl.readPixels(x2, y2, width, height, utils2.convert(textureFormat), utils2.convert(textureType), 0);
+            _gl.readPixels(x2, y2, width2, height, utils2.convert(textureFormat), utils2.convert(textureType), 0);
             _gl.flush();
             const sync = _gl.fenceSync(_gl.SYNC_GPU_COMMANDS_COMPLETE, 0);
             await probeAsync(_gl, sync, 4);
@@ -25644,12 +25648,12 @@ class WebGLRenderer {
         texture = arguments[1];
       }
       const levelScale = Math.pow(2, -level);
-      const width = Math.floor(texture.image.width * levelScale);
+      const width2 = Math.floor(texture.image.width * levelScale);
       const height = Math.floor(texture.image.height * levelScale);
       const x2 = position !== null ? position.x : 0;
       const y2 = position !== null ? position.y : 0;
       textures.setTexture2D(texture, 0);
-      _gl.copyTexSubImage2D(_gl.TEXTURE_2D, level, 0, 0, x2, y2, width, height);
+      _gl.copyTexSubImage2D(_gl.TEXTURE_2D, level, 0, 0, x2, y2, width2, height);
       state.unbindTexture();
     };
     this.copyTextureToTexture = function(srcTexture, dstTexture, srcRegion = null, dstPosition = null, level = 0) {
@@ -25661,15 +25665,15 @@ class WebGLRenderer {
         level = arguments[3] || 0;
         srcRegion = null;
       }
-      let width, height, minX, minY;
+      let width2, height, minX, minY;
       let dstX, dstY;
       if (srcRegion !== null) {
-        width = srcRegion.max.x - srcRegion.min.x;
+        width2 = srcRegion.max.x - srcRegion.min.x;
         height = srcRegion.max.y - srcRegion.min.y;
         minX = srcRegion.min.x;
         minY = srcRegion.min.y;
       } else {
-        width = srcTexture.image.width;
+        width2 = srcTexture.image.width;
         height = srcTexture.image.height;
         minX = 0;
         minY = 0;
@@ -25698,12 +25702,12 @@ class WebGLRenderer {
       _gl.pixelStorei(_gl.UNPACK_SKIP_PIXELS, minX);
       _gl.pixelStorei(_gl.UNPACK_SKIP_ROWS, minY);
       if (srcTexture.isDataTexture) {
-        _gl.texSubImage2D(_gl.TEXTURE_2D, level, dstX, dstY, width, height, glFormat, glType, image.data);
+        _gl.texSubImage2D(_gl.TEXTURE_2D, level, dstX, dstY, width2, height, glFormat, glType, image.data);
       } else {
         if (srcTexture.isCompressedTexture) {
           _gl.compressedTexSubImage2D(_gl.TEXTURE_2D, level, dstX, dstY, image.width, image.height, glFormat, image.data);
         } else {
-          _gl.texSubImage2D(_gl.TEXTURE_2D, level, dstX, dstY, width, height, glFormat, glType, image);
+          _gl.texSubImage2D(_gl.TEXTURE_2D, level, dstX, dstY, width2, height, glFormat, glType, image);
         }
       }
       _gl.pixelStorei(_gl.UNPACK_ROW_LENGTH, currentUnpackRowLen);
@@ -25723,20 +25727,20 @@ class WebGLRenderer {
         dstTexture = arguments[3];
         level = arguments[4] || 0;
       }
-      let width, height, depth2, minX, minY, minZ;
+      let width2, height, depth3, minX, minY, minZ;
       let dstX, dstY, dstZ;
       const image = srcTexture.isCompressedTexture ? srcTexture.mipmaps[level] : srcTexture.image;
       if (srcRegion !== null) {
-        width = srcRegion.max.x - srcRegion.min.x;
+        width2 = srcRegion.max.x - srcRegion.min.x;
         height = srcRegion.max.y - srcRegion.min.y;
-        depth2 = srcRegion.max.z - srcRegion.min.z;
+        depth3 = srcRegion.max.z - srcRegion.min.z;
         minX = srcRegion.min.x;
         minY = srcRegion.min.y;
         minZ = srcRegion.min.z;
       } else {
-        width = image.width;
+        width2 = image.width;
         height = image.height;
-        depth2 = image.depth;
+        depth3 = image.depth;
         minX = 0;
         minY = 0;
         minZ = 0;
@@ -25777,12 +25781,12 @@ class WebGLRenderer {
       _gl.pixelStorei(_gl.UNPACK_SKIP_ROWS, minY);
       _gl.pixelStorei(_gl.UNPACK_SKIP_IMAGES, minZ);
       if (srcTexture.isDataTexture || srcTexture.isData3DTexture) {
-        _gl.texSubImage3D(glTarget, level, dstX, dstY, dstZ, width, height, depth2, glFormat, glType, image.data);
+        _gl.texSubImage3D(glTarget, level, dstX, dstY, dstZ, width2, height, depth3, glFormat, glType, image.data);
       } else {
         if (dstTexture.isCompressedArrayTexture) {
-          _gl.compressedTexSubImage3D(glTarget, level, dstX, dstY, dstZ, width, height, depth2, glFormat, image.data);
+          _gl.compressedTexSubImage3D(glTarget, level, dstX, dstY, dstZ, width2, height, depth3, glFormat, image.data);
         } else {
-          _gl.texSubImage3D(glTarget, level, dstX, dstY, dstZ, width, height, depth2, glFormat, glType, image);
+          _gl.texSubImage3D(glTarget, level, dstX, dstY, dstZ, width2, height, depth3, glFormat, glType, image);
         }
       }
       _gl.pixelStorei(_gl.UNPACK_ROW_LENGTH, currentUnpackRowLen);
@@ -26421,27 +26425,62 @@ class BufferFactory {
     this.mesh = new Group();
     __privateSet(this, _factorys, new Array(360).fill(0).map(() => this.createFactory()));
   }
+  // 方法二：直接修改 BufferAttribute 頂點數據
   createFactory() {
     const factory = {
       "geometry": new BufferGeometry(),
-      "mesh": null
+      "mesh": null,
+      "needSet": true
     };
     factory.mesh = new Mesh(factory.geometry, __privateGet(this, _material));
     this.mesh.add(factory.mesh);
     return factory;
   }
+  setAttribute(factory, length2) {
+    if (factory.needSet != true) return;
+    const attribute = new BufferAttribute(new Float32Array(length2 * 36 * 3), 3);
+    const attribute2 = new BufferAttribute(new Float32Array(length2 * 36 * 3), 3);
+    factory.geometry.setAttribute("position", attribute);
+    factory.geometry.setAttribute("color", attribute2);
+    factory.needSet = false;
+  }
   transformData(data) {
     const factory = __privateGet(this, _factorys).shift();
     __privateGet(this, _factorys).push(factory);
+    this.setAttribute(factory, data.length);
     const vector = this.getPosition(data);
     const vertices = this.getVertices(vector);
-    const attribute = new BufferAttribute(vertices, 3);
-    factory.geometry.setAttribute("position", attribute);
-    factory.geometry.computeBoundingBox();
+    factory.geometry.attributes.position.needsUpdate = true;
+    factory.geometry.attributes.position.array = vertices;
     const colorVertices = this.getColorVertices(data, vertices);
-    const colorAttribute = new BufferAttribute(colorVertices, 3);
-    factory.geometry.setAttribute("color", colorAttribute);
+    factory.geometry.attributes.color.needsUpdate = true;
+    factory.geometry.attributes.color.array = colorVertices;
   }
+  // 方法一：每次重建新的頂點數據
+  // createFactory(){
+  //     const factory = {
+  //         'geometry': new THREE.BufferGeometry(),
+  //         'mesh': null
+  //     };
+  //     factory.mesh = new THREE.Mesh( factory.geometry, this.#material )
+  //     this.mesh.add(factory.mesh);
+  //     return factory;
+  // }
+  // transformData(data){
+  //     const factory = this.#factorys.shift();
+  //     this.#factorys.push(factory);
+  //     const vector = this.getPosition(data);
+  //     window.d = data;
+  //     const vertices = this.getVertices(vector);
+  //     const attribute = new THREE.BufferAttribute(vertices, 3);
+  //     factory.geometry.setAttribute('position', attribute);
+  //     // factory.geometry.computeBoundingBox();
+  //     // factory.boxHelper = new THREE.Box3Helper(factory.geometry.boundingBox, 0xcccc77);
+  //     // this.mesh.add(factory.boxHelper);
+  //     const colorVertices = this.getColorVertices(data, vertices);
+  //     const colorAttribute = new THREE.BufferAttribute(colorVertices, 3)
+  //     factory.geometry.setAttribute('color', colorAttribute);
+  // }
   updateFactorys() {
     const len = __privateGet(this, _factorys).length;
     __privateGet(this, _factorys).forEach((factory, index) => {
@@ -26606,8 +26645,8 @@ class BufferFactory {
   // }
   getPosition(data) {
     const vectors = new Array(data.length);
-    const width = 2;
-    const depth = __privateGet(this, _depth);
+    const width2 = 2;
+    const depth2 = __privateGet(this, _depth);
     for (let N2 = 0; N2 < data.length; N2++) {
       const height = data[N2] / 3;
       const vector = new Float32Array(24 * 3);
@@ -26618,28 +26657,28 @@ class BufferFactory {
         vector[idx++] = z2;
       };
       const push1 = () => {
-        push(width * N2, 0, depth);
+        push(width2 * N2, 0, depth2);
       };
       const push2 = () => {
-        push(width * (N2 + 1), 0, depth);
+        push(width2 * (N2 + 1), 0, depth2);
       };
       const push3 = () => {
-        push(width * (N2 + 1), height, depth);
+        push(width2 * (N2 + 1), height, depth2);
       };
       const push4 = () => {
-        push(width * N2, height, depth);
+        push(width2 * N2, height, depth2);
       };
       const push5 = () => {
-        push(width * N2, 0, 0);
+        push(width2 * N2, 0, 0);
       };
       const push6 = () => {
-        push(width * N2, height, 0);
+        push(width2 * N2, height, 0);
       };
       const push7 = () => {
-        push(width * (N2 + 1), height, 0);
+        push(width2 * (N2 + 1), height, 0);
       };
       const push8 = () => {
-        push(width * (N2 + 1), 0, 0);
+        push(width2 * (N2 + 1), 0, 0);
       };
       push1();
       push2();
@@ -26671,7 +26710,7 @@ class BufferFactory {
   }
   getVertices(vector, totalFace = 6, totalPoint = 4) {
     const totalFrament = totalPoint - 2;
-    const verticesCount = vector.length * totalFace * totalFrament * 3;
+    const verticesCount = vector.length * totalFace * totalFrament * 3 * 3;
     const vertices = new Float32Array(verticesCount);
     let index = 0;
     for (let M2 = 0; M2 < vector.length; M2++) {
@@ -26695,7 +26734,7 @@ class BufferFactory {
   getColorVertices(data, vertices) {
     const colorVertices = new Float32Array(vertices.length);
     let colorIndex = 0;
-    const width = 2;
+    const width2 = 2;
     for (let i = 0; i < data.length; i++) {
       const value = data[i];
       const tran = Math.sin(__privateGet(this, _transitionRadian));
@@ -26706,7 +26745,7 @@ class BufferFactory {
         const x2 = vertices[i * 36 * 3 + j * 3];
         const y2 = vertices[i * 36 * 3 + j * 3 + 1];
         vertices[i * 36 * 3 + j * 3 + 2];
-        const isLeft = x2 == i * width;
+        const isLeft = x2 == i * width2;
         const isTop = y2 == value;
         const t2 = isLeft ? 1 : 0;
         const t22 = isTop ? 1 : 0;
@@ -26752,9 +26791,9 @@ function createAnalyser(audio) {
   return analyser;
 }
 class Averager {
-  constructor(length = 60) {
-    this.length = length;
-    this.value = new Array(length).fill(0.0167);
+  constructor(length2 = 60) {
+    this.length = length2;
+    this.value = new Array(length2).fill(0.0167);
     this.index = 0;
     this.average = 0.0167;
     this.fps = 60;
@@ -27619,9 +27658,8 @@ const createMusicAnalyser = function() {
       const bufferLength = this.analyser.frequencyBinCount;
       const dataArray = new Uint8Array(bufferLength);
       this.analyser.getByteFrequencyData(dataArray);
-      this.analyser.frequencyBinCount;
-      const data = new Uint8Array(bufferLength / 2);
-      for (let i = 0; i < bufferLength / 2; i++) {
+      const data = new Uint8Array(bufferLength / 8);
+      for (let i = 0; i < bufferLength / 8; i++) {
         data[i] = dataArray[i];
       }
       this.buff.transformData(data);
@@ -27690,7 +27728,7 @@ class SortAlgorithm {
     this.secondColumns = [];
     this.send(name + " is processing");
     this.sortFunction = this[name];
-    this.timesEveryFrame = Math.ceil(columns.length / 25);
+    this.timesEveryFrame = Math.ceil(columns.length / 50);
     this.isSorting = true;
     this[name + "Setting"](columns);
   }
@@ -27717,9 +27755,9 @@ class SortAlgorithm {
   static swapColumn(a, b, frame) {
     [a.path.pointX, b.path.pointX] = [b.path.pointX, a.path.pointX];
     [a.path.pointY, b.path.pointY] = [b.path.pointY, a.path.pointY];
+    [a.height, b.height] = [b.height, a.height];
     a.path.NewTarget(a.x, a.y, frame);
     b.path.NewTarget(b.x, b.y, frame);
-    [a.height, b.height] = [b.height, a.height];
   }
   bubbleSortSetting(columns) {
     this.i = 0;
@@ -28168,10 +28206,866 @@ class SortAlgorithm {
     return this.randomSort(columns, 30);
   }
 }
-class ParticleSystem {
-  constructor(width, height) {
+class ParticleSystem3D {
+  constructor() {
+    __privateAdd(this, _transitionRadian2, 0);
+    __privateAdd(this, _trasitionOmega2, Math.PI / 300);
+    __publicField(this, "setParameter", (id2, value) => {
+      switch (id2) {
+        case "length":
+          this.expandVertices(this.column, value);
+          break;
+        default:
+          this.column[id2] = value;
+      }
+    });
     this.sort = new SortAlgorithm();
-    const x2 = width / 2;
+    this.mesh = new Group();
+    this.slow = 0.999;
+    this.friction = 0.997;
+    this.maxValue = 865 * 0.4;
+    this.parameter = {
+      length: 32,
+      maxHeight: 255,
+      radius: 150,
+      depth: 10
+    };
+    const length2 = 32, maxHeight = 255, radius = 100, depth2 = 100;
+    this.column = this.createColumn(length2, maxHeight, radius, depth2);
+    this.mesh.add(this.column.mesh);
+    this.walls = [];
+    this.balls = [];
+    const x2 = 500, y2 = 500, z2 = 500;
+    this.rects = [
+      // 底部邊界 (xy 平面，z = 0)
+      { "left": 0, "top": 0, "right": x2, "bottom": y2, "front": 0, "back": 0 },
+      // 頂部邊界 (xy 平面，z = z)
+      { "left": 0, "top": 0, "right": x2, "bottom": y2, "front": z2, "back": z2 },
+      // 左側邊界 (yz 平面，x = 0)
+      { "left": 0, "top": 0, "right": 0, "bottom": y2, "front": 0, "back": z2 },
+      // 右側邊界 (yz 平面，x = x)
+      { "left": x2, "top": 0, "right": x2, "bottom": y2, "front": 0, "back": z2 },
+      // 前側邊界 (xz 平面，y = 0)
+      { "left": 0, "top": 0, "right": x2, "bottom": 0, "front": 0, "back": z2 },
+      // 後側邊界 (xz 平面，y = y)
+      { "left": 0, "top": y2, "right": x2, "bottom": y2, "front": 0, "back": z2 }
+    ];
+  }
+  getMesh() {
+    return this.mesh;
+  }
+  getSortData() {
+    return this.column.geometryData;
+  }
+  expandVertices(column, newLength) {
+    const { length: length2, radius, maxHeight } = column;
+    const vertices = column.geometry.attributes.position.array;
+    const color = column.geometry.attributes.color.array;
+    const len = vertices.length;
+    const newVertices = new Float32Array(newLength * 36 * 3);
+    const colorVertices = new Float32Array(newLength * 36 * 3);
+    for (let N2 = 0; N2 < newLength * 36 * 3 && N2 < len; N2++) {
+      newVertices[N2] = vertices[N2];
+      colorVertices[N2] = color[N2];
+    }
+    const attribute = new BufferAttribute(newVertices, 3);
+    const colorAttribute = new BufferAttribute(colorVertices, 3);
+    column.geometry.setAttribute("position", attribute);
+    column.geometry.setAttribute("color", colorAttribute);
+    column.length = newLength;
+    for (let N2 = 0; N2 < length2; N2++) {
+      if (N2 >= newLength) {
+        column.geometryData.pop();
+        continue;
+      }
+      const data = column.geometryData[N2];
+      const angle = N2 / newLength * Math.PI * 2;
+      data.x = radius * Math.cos(angle);
+      data.y = radius * Math.sin(angle);
+      data.height = data.height * length2 / newLength;
+      if (data.height > maxHeight) data.height = maxHeight;
+      data.path.ResetTo(data.x, data.y);
+      column.updateVertices(N2);
+    }
+    for (let N2 = length2; N2 < newLength; N2++) {
+      column.geometryData[N2] = this.createGeometryData(column, N2);
+      column.updateVertices(N2);
+    }
+  }
+  // 建立 3D 實體和幾何體
+  createColumn(length2, maxHeight, radius, depth2) {
+    const column = { length: length2, maxHeight, radius, depth: depth2 };
+    Object.defineProperty(column, "unitHeight", {
+      get() {
+        return column.maxHeight / column.length;
+      }
+    });
+    const attribute = new BufferAttribute(new Float32Array(length2 * 36 * 3), 3);
+    const colorAttribute = new BufferAttribute(new Float32Array(length2 * 36 * 3), 3);
+    column.geometry = new BufferGeometry();
+    column.geometry.setAttribute("position", attribute);
+    column.geometry.setAttribute("color", colorAttribute);
+    const material = new MeshBasicMaterial({ "vertexColors": true });
+    column.mesh = new Mesh(column.geometry, material);
+    column.updateVertices = (index) => {
+      const cubeVertexCount = 36;
+      const vertexIndex = index * cubeVertexCount * 3;
+      const vertices = column.geometry.attributes.position.array;
+      const color = column.geometry.attributes.color.array;
+      const startAngle = index / column.length * Math.PI * 2;
+      const endAngle = (index + 1) / column.length * Math.PI * 2;
+      const height = column.geometryData[index].height;
+      const path = column.geometryData[index].path;
+      const { pointX, pointY, z: z2, timer, period } = path;
+      const x2 = pointX - z2 * Math.cos(startAngle);
+      const y2 = pointY - z2 * Math.sin(startAngle);
+      const transition = 1 - timer / period;
+      const [newVertices, colorVertices] = this.getColumnVerticesByAngle(
+        x2,
+        y2,
+        z2 * 0.1,
+        column.radius,
+        column.depth,
+        height,
+        column.unitHeight,
+        startAngle,
+        endAngle,
+        transition
+      );
+      for (let N2 = 0; N2 < cubeVertexCount * 3; N2++) {
+        vertices[vertexIndex + N2] = newVertices[N2];
+      }
+      for (let N2 = 0; N2 < cubeVertexCount * 3; N2++) {
+        color[vertexIndex + N2] = colorVertices[N2];
+      }
+      column.geometry.attributes.position.needsUpdate = true;
+      column.geometry.attributes.color.needsUpdate = true;
+    };
+    column.geometryData = new Array(length2).fill().map((v2, index) => {
+      return this.createGeometryData(column, index);
+    });
+    column.geometryData.forEach((data, index) => {
+      column.updateVertices(index);
+    });
+    return column;
+  }
+  createGeometryData(column, index) {
+    const { length: length2, radius, unitHeight } = column;
+    const angle = index / length2 * Math.PI * 2;
+    const x2 = radius * Math.cos(angle);
+    const y2 = radius * Math.sin(angle);
+    const height = index * unitHeight;
+    const path = new Path(x2, y2);
+    const geometryData = { x: x2, y: y2, height, path };
+    let _timer = path.timer;
+    Object.defineProperty(path, "timer", {
+      get() {
+        return _timer;
+      },
+      set(newT) {
+        _timer = newT;
+        column.updateVertices(index);
+      }
+    });
+    return geometryData;
+  }
+  // 幾何體頂點計算
+  getVector(N2, width2, height, depth2) {
+    const vector = new Float32Array(24 * 3);
+    let idx = 0;
+    const push = (x2, y2, z2) => {
+      vector[idx++] = x2;
+      vector[idx++] = y2;
+      vector[idx++] = z2;
+    };
+    const push1 = () => {
+      push(width2 * N2, 0, depth2);
+    };
+    const push2 = () => {
+      push(width2 * (N2 + 1), 0, depth2);
+    };
+    const push3 = () => {
+      push(width2 * (N2 + 1), height, depth2);
+    };
+    const push4 = () => {
+      push(width2 * N2, height, depth2);
+    };
+    const push5 = () => {
+      push(width2 * N2, 0, 0);
+    };
+    const push6 = () => {
+      push(width2 * N2, height, 0);
+    };
+    const push7 = () => {
+      push(width2 * (N2 + 1), height, 0);
+    };
+    const push8 = () => {
+      push(width2 * (N2 + 1), 0, 0);
+    };
+    push1();
+    push2();
+    push3();
+    push4();
+    push5();
+    push6();
+    push7();
+    push8();
+    push1();
+    push4();
+    push6();
+    push5();
+    push2();
+    push8();
+    push7();
+    push3();
+    push3();
+    push7();
+    push6();
+    push4();
+    push1();
+    push5();
+    push8();
+    push2();
+    return vector;
+  }
+  getPosition(data, width2 = 2, depth2 = 2) {
+    const vectors = new Array(data.length);
+    for (let N2 = 0; N2 < data.length; N2++) {
+      const height = data[N2];
+      vectors[N2] = this.getVector(N2, width2, height, depth2);
+    }
+    return vectors;
+  }
+  getVertices(vector, totalFace = 6, totalPoint = 4) {
+    const totalFrament = totalPoint - 2;
+    const verticesCount = vector.length * totalFace * totalFrament * 3 * 3;
+    const vertices = new Float32Array(verticesCount);
+    let index = 0;
+    for (let M2 = 0; M2 < vector.length; M2++) {
+      for (let face = 0; face < totalFace; face++) {
+        const baseIndex = face * totalPoint * 3;
+        for (let N2 = 0; N2 < 3 * totalFrament; N2 += 3) {
+          vertices[index++] = vector[M2][baseIndex];
+          vertices[index++] = vector[M2][baseIndex + 1];
+          vertices[index++] = vector[M2][baseIndex + 2];
+          vertices[index++] = vector[M2][baseIndex + 3 + N2];
+          vertices[index++] = vector[M2][baseIndex + 4 + N2];
+          vertices[index++] = vector[M2][baseIndex + 5 + N2];
+          vertices[index++] = vector[M2][baseIndex + 6 + N2];
+          vertices[index++] = vector[M2][baseIndex + 7 + N2];
+          vertices[index++] = vector[M2][baseIndex + 8 + N2];
+        }
+      }
+    }
+    return vertices;
+  }
+  getColorVertices(data, vertices) {
+    const colorVertices = new Float32Array(vertices.length);
+    let colorIndex = 0;
+    const width2 = 2;
+    for (let i = 0; i < data.length; i++) {
+      const value = data[i];
+      const tran = Math.sin(__privateGet(this, _transitionRadian2));
+      const r2 = 0.2 + value / 255 * (0.816 - 0.2);
+      const g = 0.329 + value / 255 * (0.59 - 0.329) * tran;
+      const b = 0.584 + value / 255 * (0.949 - 0.584);
+      for (let j = 0; j < 36; j++) {
+        const x2 = vertices[i * 36 * 3 + j * 3];
+        const y2 = vertices[i * 36 * 3 + j * 3 + 1];
+        vertices[i * 36 * 3 + j * 3 + 2];
+        const isLeft = x2 == i * width2;
+        const isTop = y2 == value;
+        const t2 = isLeft ? 1 : 0;
+        const t22 = isTop ? 1 : 0;
+        const R2 = r2 + (t2 + t22) / 2 * (0.816 - r2);
+        const G2 = g + (t2 + t22) / 2 * (0.59 - g) * tran;
+        const B2 = b + (t2 + t22) / 2 * (0.949 - b);
+        colorVertices[colorIndex++] = B2;
+        colorVertices[colorIndex++] = R2;
+        colorVertices[colorIndex++] = G2;
+      }
+    }
+    return colorVertices;
+  }
+  getColumnAttribute() {
+    const totalVertices = length * 36;
+    const attribute = new BufferAttribute(new Float32Array(totalVertices), 3);
+    for (let i = 0; i < length; i++) {
+      const height = i + 1;
+      const vertexIndex = i * 36;
+      const x2 = i * width;
+      const y2 = 0;
+      const z2 = 0;
+      const vertices = [
+        // 前面
+        x2,
+        y2,
+        z2,
+        x2 + width,
+        y2,
+        z2,
+        x2 + width,
+        y2 + height,
+        z2,
+        x2,
+        y2 + height,
+        z2,
+        // 後面
+        x2,
+        y2,
+        z2 + depth,
+        x2 + width,
+        y2,
+        z2 + depth,
+        x2 + width,
+        y2 + height,
+        z2 + depth,
+        x2,
+        y2 + height,
+        z2 + depth
+      ];
+      attribute.array.set(vertices, vertexIndex);
+    }
+    return attribute;
+  }
+  getColumnVertices(x2, y2, z2, width2, height, depth2) {
+    const vertices = new Float32Array(36 * 3);
+    let idx = 0;
+    const push = (x3, y3, z3) => {
+      vertices[idx++] = x3;
+      vertices[idx++] = y3;
+      vertices[idx++] = z3;
+    };
+    const addPoint = {};
+    addPoint[1] = () => {
+      push(x2 + 0, y2 + 0, z2 + depth2);
+    };
+    addPoint[2] = () => {
+      push(x2 + width2, y2 + 0, z2 + depth2);
+    };
+    addPoint[3] = () => {
+      push(x2 + width2, y2 + height, z2 + depth2);
+    };
+    addPoint[4] = () => {
+      push(x2 + 0, y2 + height, z2 + depth2);
+    };
+    addPoint[5] = () => {
+      push(x2 + 0, y2 + 0, z2 + 0);
+    };
+    addPoint[6] = () => {
+      push(x2 + 0, y2 + height, z2 + 0);
+    };
+    addPoint[7] = () => {
+      push(x2 + width2, y2 + height, z2 + 0);
+    };
+    addPoint[8] = () => {
+      push(x2 + width2, y2 + 0, z2 + 0);
+    };
+    const indices = new Uint8Array([
+      // 前面
+      1,
+      2,
+      3,
+      1,
+      3,
+      4,
+      // 後面
+      5,
+      6,
+      7,
+      5,
+      7,
+      8,
+      // 左面
+      1,
+      4,
+      6,
+      1,
+      6,
+      5,
+      // 右面
+      2,
+      8,
+      7,
+      2,
+      7,
+      3,
+      // 上面
+      3,
+      7,
+      6,
+      3,
+      6,
+      4,
+      // 下面
+      1,
+      5,
+      8,
+      1,
+      8,
+      2
+    ]);
+    indices.forEach((point) => {
+      addPoint[point]();
+    });
+    return vertices;
+  }
+  getColumnVerticesByAngle(centerX, centerY, z2, r2, depth2, height, unitHeight, startAngle, endAngle, transition) {
+    const vertices = new Float32Array(36 * 3);
+    let idx = 0;
+    const push = (x5, y5, z3) => {
+      vertices[idx++] = x5;
+      vertices[idx++] = z3;
+      vertices[idx++] = y5;
+    };
+    const getXY = (radius, angle) => {
+      const x5 = centerX + radius * Math.cos(angle) - r2 * Math.cos(startAngle);
+      const y5 = centerY + radius * Math.sin(angle) - r2 * Math.sin(startAngle);
+      return [x5, y5];
+    };
+    const [x1, y1] = getXY(r2 - depth2, startAngle);
+    const [x2, y2] = getXY(r2 - depth2, endAngle);
+    const [x3, y3] = getXY(r2, endAngle);
+    const [x4, y4] = getXY(r2, startAngle);
+    const addPoint = {};
+    const h = unitHeight / 2;
+    addPoint[1] = () => {
+      push(x1, y1, z2 + height - h + 10);
+    };
+    addPoint[2] = () => {
+      push(x2, y2, z2 + height + h + 10);
+    };
+    addPoint[3] = () => {
+      push(x3, y3, z2 + height + h);
+    };
+    addPoint[4] = () => {
+      push(x4, y4, z2 + height - h);
+    };
+    addPoint[5] = () => {
+      push(x1, y1, z2);
+    };
+    addPoint[6] = () => {
+      push(x4, y4, z2);
+    };
+    addPoint[7] = () => {
+      push(x3, y3, z2);
+    };
+    addPoint[8] = () => {
+      push(x2, y2, z2);
+    };
+    let idx2 = 0;
+    const colorVertices = new Float32Array(36 * 3);
+    const pushBRG = (x5, y5, z3) => {
+      colorVertices[idx2++] = x5;
+      colorVertices[idx2++] = y5;
+      colorVertices[idx2++] = z3;
+    };
+    const tran = Math.sin(__privateGet(this, _transitionRadian2));
+    const r1 = 0.2 + height / 255 * (0.816 - 0.2);
+    const g1 = 0.329 + height / 255 * (0.59 - 0.329) * tran;
+    const b1 = 0.584 + height / 255 * (0.949 - 0.584);
+    const r22 = 0.2 + transition * (0.816 - 0.2);
+    const g2 = 0.329 + transition * (0.59 - 0.329);
+    const b2 = 0.584 + transition * (0.949 - 0.584);
+    const addColor = {};
+    addColor[1] = () => {
+      pushBRG(b2, r22, g2);
+    };
+    addColor[2] = () => {
+      pushBRG(b1, r1, g1);
+    };
+    addColor[3] = () => {
+      pushBRG(b1, r1, g1);
+    };
+    addColor[4] = () => {
+      pushBRG(b1, r1, g1);
+    };
+    addColor[5] = () => {
+      pushBRG(b2, r22, g2);
+    };
+    addColor[6] = () => {
+      pushBRG(b2, r22, g2);
+    };
+    addColor[7] = () => {
+      pushBRG(b1, r1, g1);
+    };
+    addColor[8] = () => {
+      pushBRG(b2, r22, g2);
+    };
+    const indices = new Uint8Array([
+      // 前面
+      1,
+      2,
+      3,
+      1,
+      3,
+      4,
+      // 後面
+      5,
+      6,
+      7,
+      5,
+      7,
+      8,
+      // 左面
+      1,
+      4,
+      6,
+      1,
+      6,
+      5,
+      // 右面
+      2,
+      8,
+      7,
+      2,
+      7,
+      3,
+      // 上面
+      3,
+      7,
+      6,
+      3,
+      6,
+      4,
+      // 下面
+      1,
+      5,
+      8,
+      1,
+      8,
+      2
+    ]);
+    indices.forEach((point) => {
+      addPoint[point]();
+      addColor[point]();
+    });
+    return [vertices, colorVertices];
+  }
+  // 物理
+  getDist(a, b) {
+    return Math.hypot(a.x - b.x, a.y - b.y, a.z - b.z);
+  }
+  getCollide(target, wall) {
+    if (wall.type === "arcBall") {
+      const dist = this.getDist(target, wall);
+      const outerBound = wall.length + wall.thick;
+      const innerBound = wall.length - wall.thick;
+      return dist + target.r >= innerBound && dist <= outerBound ? dist : 0;
+    }
+    return 0;
+  }
+  handleBallCollision(ball, anotherBall, dist) {
+    const x2 = (ball.x + anotherBall.x) / 2;
+    const y2 = (ball.y + anotherBall.y) / 2;
+    const z2 = (ball.z + anotherBall.z) / 2;
+    ball.x = x2 + (ball.x - x2) / (dist / 2) * ball.r;
+    ball.y = y2 + (ball.y - y2) / (dist / 2) * ball.r;
+    ball.z = z2 + (ball.z - z2) / (dist / 2) * ball.r;
+    anotherBall.x = x2 + (anotherBall.x - x2) / (dist / 2) * anotherBall.r;
+    anotherBall.y = y2 + (anotherBall.y - y2) / (dist / 2) * anotherBall.r;
+    anotherBall.z = z2 + (anotherBall.z - z2) / (dist / 2) * anotherBall.r;
+    const vx = (ball.vx - anotherBall.vx) / 2;
+    const vy = (ball.vy - anotherBall.vy) / 2;
+    const vz = (ball.vz - anotherBall.vz) / 2;
+    const angleXY = Math.atan2(ball.y - y2, ball.x - x2);
+    const angleXZ = Math.atan2(ball.z - z2, ball.x - x2);
+    const vectorTXY = -vx * Math.sin(angleXY) + vy * Math.cos(angleXY);
+    const vectorNXY = -1 * (vx * Math.cos(angleXY) + vy * Math.sin(angleXY));
+    const vectorTXZ = -vx * Math.sin(angleXZ) + vz * Math.cos(angleXZ);
+    const vectorNXZ = -1 * (vx * Math.cos(angleXZ) + vz * Math.sin(angleXZ));
+    const relativeVX = -vectorTXY * Math.sin(angleXY) + vectorNXY * Math.cos(angleXY);
+    const relativeVY = vectorTXY * Math.cos(angleXY) + vectorNXY * Math.sin(angleXY);
+    const relativeVZ = vectorTXZ * Math.cos(angleXZ) + vectorNXZ * Math.sin(angleXZ);
+    const averageVx = (ball.vx + anotherBall.vx) / 2;
+    const averageVy = (ball.vy + anotherBall.vy) / 2;
+    const averageVz = (ball.vz + anotherBall.vz) / 2;
+    ball.vx = (averageVx + relativeVX) * this.friction;
+    ball.vy = (averageVy + relativeVY) * this.friction;
+    ball.vz = (averageVz + relativeVZ) * this.friction;
+    anotherBall.vx = (averageVx - relativeVX) * this.friction;
+    anotherBall.vy = (averageVy - relativeVY) * this.friction;
+    anotherBall.vz = (averageVz - relativeVZ) * this.friction;
+  }
+  handleWallCollision(ball, wall, dist) {
+    const x2 = wall.x + (ball.x - wall.x) / dist * wall.length;
+    const y2 = wall.y + (ball.y - wall.y) / dist * wall.length;
+    const z2 = wall.z + (ball.z - wall.z) / dist * wall.length;
+    const angleXY = Math.atan2(y2 - wall.y, x2 - wall.x);
+    const angleXZ = Math.atan2(z2 - wall.z, x2 - wall.x);
+    const isInside = dist <= wall.length ? 1 : -1;
+    ball.x = x2 + (ball.x - x2) / (wall.length - dist) * (ball.r + wall.thick) * isInside;
+    ball.y = y2 + (ball.y - y2) / (wall.length - dist) * (ball.r + wall.thick) * isInside;
+    ball.z = z2 + (ball.z - z2) / (wall.length - dist) * (ball.r + wall.thick) * isInside;
+    const vectorTXY = -ball.vx * Math.sin(angleXY) + ball.vy * Math.cos(angleXY);
+    const vectorNXY = -1 * (ball.vx * Math.cos(angleXY) + ball.vy * Math.sin(angleXY));
+    const vectorTXZ = -ball.vx * Math.sin(angleXZ) + ball.vz * Math.cos(angleXZ);
+    const vectorNXZ = -1 * (ball.vx * Math.cos(angleXZ) + ball.vz * Math.sin(angleXZ));
+    ball.vx = (-vectorTXY * Math.sin(angleXY) + vectorNXY * Math.cos(angleXY)) * this.friction;
+    ball.vy = (vectorTXY * Math.cos(angleXY) + vectorNXY * Math.sin(angleXY)) * this.friction;
+    ball.vz = (vectorTXZ * Math.cos(angleXZ) + vectorNXZ * Math.sin(angleXZ)) * this.friction;
+  }
+  handleColumnCollision(ball, column) {
+    const columnTop = column.path.pointY - column.height;
+    const columnBottom = column.path.pointY;
+    const columnLeft = column.path.pointX - column.width / 2;
+    const columnRight = column.path.pointX + column.width / 2;
+    const columnFront = column.path.pointZ - column.depth / 2;
+    const columnBack = column.path.pointZ + column.depth / 2;
+    const overlapX = Math.min(ball.x + ball.r - columnLeft, columnRight - ball.x + ball.r);
+    const overlapY = Math.min(ball.y + ball.r - columnTop, columnBottom - ball.y + ball.r);
+    const overlapZ = Math.min(ball.z + ball.r - columnFront, columnBack - ball.z + ball.r);
+    if (overlapX < 0 || overlapY < 0 || overlapZ < 0) return;
+    if (overlapX < overlapY && overlapX < overlapZ) {
+      ball.vx = -ball.vx * this.friction;
+      if (ball.x < column.path.pointX) {
+        ball.x = columnLeft - ball.r;
+      } else {
+        ball.x = columnRight + ball.r;
+      }
+    } else if (overlapY < overlapX && overlapY < overlapZ) {
+      ball.vy = -ball.vy * this.friction;
+      if (ball.y < column.path.pointY) {
+        ball.y = columnTop - ball.r;
+      } else {
+        ball.y = columnBottom + ball.r;
+      }
+    } else {
+      ball.vz = -ball.vz * this.friction;
+      if (ball.z < column.path.pointZ) {
+        ball.z = columnFront - ball.r;
+      } else {
+        ball.z = columnBack + ball.r;
+      }
+    }
+  }
+  handleRectCollision(ball, rect) {
+    if (ball.x + ball.r > rect.left && ball.x - ball.r < rect.right && ball.y + ball.r > rect.top && ball.y - ball.r < rect.bottom && ball.z + ball.r > rect.front && ball.z - ball.r < rect.back) {
+      const overlapX = Math.min(ball.x + ball.r - rect.left, rect.right - ball.x + ball.r);
+      const overlapY = Math.min(ball.y + ball.r - rect.top, rect.bottom - ball.y + ball.r);
+      const overlapZ = Math.min(ball.z + ball.r - rect.front, rect.back - ball.z + ball.r);
+      if (overlapX < overlapY && overlapX < overlapZ) {
+        ball.vx = -ball.vx * this.friction;
+        if (ball.x < (rect.left + rect.right) / 2) {
+          ball.x = rect.left - ball.r;
+        } else {
+          ball.x = rect.right + ball.r;
+        }
+      } else if (overlapY < overlapX && overlapY < overlapZ) {
+        ball.vy = -ball.vy * this.friction;
+        if (ball.y < (rect.top + rect.bottom) / 2) {
+          ball.y = rect.top - ball.r;
+        } else {
+          ball.y = rect.bottom + ball.r;
+        }
+      } else {
+        ball.vz = -ball.vz * this.friction;
+        if (ball.z < (rect.front + rect.back) / 2) {
+          ball.z = rect.front - ball.r;
+        } else {
+          ball.z = rect.back + ball.r;
+        }
+      }
+    }
+  }
+  update() {
+    __privateSet(this, _transitionRadian2, __privateGet(this, _transitionRadian2) + __privateGet(this, _trasitionOmega2));
+    this.sort.update(this.column.geometryData);
+    this.walls.forEach((wall) => {
+      wall.period += 0.25 * 2 * Math.PI / 60;
+      wall.x = wall.centerX + wall.swing * Math.cos(wall.period);
+      wall.y = wall.centerY + wall.swing * Math.sin(wall.period);
+    });
+    this.balls.forEach((ball) => {
+      ball.x = ball.x + ball.vx / 60;
+      ball.y = ball.y + ball.vy / 60;
+      ball.vx = (ball.vx + ball.ax / 60) * this.slow;
+      ball.vy = (ball.vy + ball.ay / 60) * this.slow;
+      this.balls.forEach((anotherBall) => {
+        if (ball == anotherBall) return;
+        const dist = this.getDist(ball, anotherBall);
+        if (dist < ball.r + anotherBall.r) {
+          this.handleBallCollision(ball, anotherBall, dist);
+        }
+      });
+      this.walls.forEach((wall) => {
+        const dist = this.getCollide(ball, wall);
+        if (dist > 0) {
+          this.handleWallCollision(ball, wall, dist);
+        }
+      });
+      this.columns.forEach((column) => {
+        this.handleColumnCollision(ball, column);
+      });
+      this.sort.secondColumns.forEach((column) => {
+        this.handleColumnCollision(ball, column);
+      });
+      this.rects.forEach((rect) => {
+        this.handleRectCollision(ball, rect);
+      });
+    });
+  }
+}
+_transitionRadian2 = new WeakMap();
+_trasitionOmega2 = new WeakMap();
+const createThreeParticle = function() {
+  const frame = new Averager(60);
+  const clock = new Clock();
+  this.setCanvas = (canvas) => {
+    this.canvas = canvas;
+    this.scene = new Scene();
+    this.renderer = new WebGLRenderer({ "alpha": true, "canvas": canvas });
+    this.camera = new PerspectiveCamera(75, canvas.width / canvas.height, 0.1, 1e3);
+    const radius = 1024;
+    this.camera.position.set(radius * 0.1, radius * 0.4, radius * 0.4);
+    this.controls = new OrbitControls(this.camera, this.renderer.domElement);
+    this.controls.target.set(0, -radius * 0.1, -radius * 0.2);
+    this.controls.update();
+    window.c = this.controls;
+    this.system = new ParticleSystem3D();
+    const mesh = this.system.getMesh();
+    const ball = makeBall(radius, 60, 30, radius / 500);
+    const group = new Group();
+    group.add(ball, mesh);
+    this.scene.add(group);
+  };
+  this.cleanup = () => {
+    if (this.scene) {
+      this.scene.traverse((object) => {
+        if (object instanceof Mesh) {
+          if (object.geometry) {
+            object.geometry.dispose();
+          }
+          if (object.material) {
+            if (Array.isArray(object.material)) {
+              object.material.forEach((material) => material.dispose());
+            } else {
+              object.material.dispose();
+            }
+          }
+        }
+      });
+      while (this.scene.children.length > 0) {
+        const child = this.scene.children[0];
+        this.scene.remove(child);
+        if (child.geometry) child.geometry.dispose();
+        if (Array.isArray(child.material)) {
+          child.material.forEach((material) => material.dispose());
+        } else if (child.material) {
+          child.material.dispose();
+        }
+      }
+    }
+    if (this.renderer) {
+      this.renderer.dispose();
+    }
+    this.canvas = null;
+    this.scene = null;
+    this.camera = null;
+    this.renderer = null;
+    this.axis = null;
+  };
+  this.resize = () => {
+    const [w2, h] = [this.canvas.width, this.canvas.height];
+    this.renderer.setSize(w2, h);
+    this.camera.aspect = w2 / h;
+    this.camera.updateProjectionMatrix();
+  };
+  this.start = (ID) => {
+    PathConfig.resetPath(0.5, 0, 0.5);
+    if (!this.system.sort[ID] && !this.system.sort[ID + "Maker"]) {
+      console.warn("invalid function name. Button id " + ID + " is not any of sortFunctions");
+      return;
+    }
+    this.system.sort.start(ID, this.system.getSortData());
+  };
+  this.update = () => {
+    this.system.update();
+    frame.updateValue(clock.getDelta());
+    window.fps = frame.getFPS();
+  };
+  this.render = () => {
+    this.renderer.render(this.scene, this.camera);
+  };
+  return this;
+};
+const threeParticle = new createThreeParticle();
+const CanvasSectionS2A = ({ ratio, min, sectinoID = "Sort3D" }) => {
+  const canvas = reactExports.useRef(null);
+  const audio = reactExports.useRef(null);
+  const menu = reactExports.useRef(null);
+  const section = reactExports.useRef(null);
+  const [error, setError] = reactExports.useState();
+  reactExports.useEffect(() => {
+    try {
+      window.addEventListener("resize", threeParticle.resize, false);
+      threeParticle.setCanvas(canvas.current);
+      manager.addSubjectElement(section.current);
+      manager.registerAnimationCallback("update" + sectinoID, threeParticle.update);
+      manager.registerAnimationCallback("render" + sectinoID, threeParticle.render);
+    } catch (e) {
+      setError(e.message);
+      console.warn(e.stack);
+    }
+    return () => {
+      window.removeEventListener("resize", threeParticle.resize);
+      threeParticle.cleanup();
+      manager.removeSubjectID(sectinoID);
+      manager.unregisterAnimationCallback("update" + sectinoID);
+      manager.unregisterAnimationCallback("render" + sectinoID);
+    };
+  }, []);
+  function handleClick(e) {
+    const ID = e.target.id;
+    threeParticle.start(ID);
+  }
+  function handleParameterChange(e) {
+    const id2 = e.target.id;
+    const value = e.target.value * 1;
+    threeParticle.system.setParameter(id2, value);
+  }
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs("section", { ref: section, className: "section", id: sectinoID, children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsx("canvas", { ref: canvas, width: min * ratio, height: ratio * min * ratio }),
+    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { ref: menu, className: "gamemenu", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx("header", { id: "header", children: /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { children: "threeParticle" }) }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "parameter", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("label", { children: "長度" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("input", { onChange: handleParameterChange, type: "number", id: "length", defaultValue: "32" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("label", { children: "Beta" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("input", { onChange: handleParameterChange, type: "number", id: "", defaultValue: "10" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("label", { children: "Gamma" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("input", { onChange: handleParameterChange, type: "number", id: "", defaultValue: "10" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("label", { children: "Delta" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("input", { onChange: handleParameterChange, type: "number", id: "", defaultValue: "10" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("label", { children: "Vector Size" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("input", { onChange: handleParameterChange, type: "number", id: "", defaultValue: "10" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("label", { children: "Transform Speed" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("input", { onChange: handleParameterChange, type: "number", id: "", defaultValue: "10" })
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "controlpanel", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(RecordBtn, { canvas, audio }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: handleClick, id: "bubbleSort", children: "泡沫排序" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: handleClick, id: "selectionSort", children: "選擇排序" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: handleClick, id: "insertionSort", children: "插入排序" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: handleClick, id: "quickSort", children: "快速排序" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: handleClick, id: "mergeSort", children: "合併排序" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: handleClick, id: "heapSort", children: "堆排序" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: handleClick, id: "shellSort", children: "希爾排序" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: handleClick, id: "countingSort", children: "計數排序" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: handleClick, id: "randomSort", children: "打亂" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: handleClick, id: "instantRandomSort", children: "立刻打亂" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: threeParticle.cancel, id: "cancelSort", children: "取消" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: threeParticle.stepByStep, id: "stepByStep", children: "一步一步來" })
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(SlideMenuBtn, { menu }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { id: "dialogbox", children: /* @__PURE__ */ jsxRuntimeExports.jsx("p", { id: "dialog", children: error ? error : "" }) })
+    ] })
+  ] });
+};
+class ParticleSystem {
+  constructor(width2, height) {
+    this.sort = new SortAlgorithm();
+    const x2 = width2 / 2;
     const y2 = height / 2;
     this.x = x2;
     this.y = y2;
@@ -28180,16 +29074,15 @@ class ParticleSystem {
     this.i = 0;
     this.j = 0;
     this.maxValue = 865 * 0.4;
-    const length = Math.floor((x2 - 200) / 2);
-    const thick = Math.max(Math.floor(x2 * 2 / length), 0.5);
-    this.columns = new Array(length).fill().map((v2, i) => {
-      return this.createColumn(x2 - thick * length / 2 + thick * i, y2 * 1.8, thick, (i + 1) / length * this.maxValue);
+    const length2 = Math.floor((x2 - 200) / 2);
+    const thick = Math.max(Math.floor(x2 * 2 / length2), 0.5);
+    this.columns = new Array(length2).fill().map((v2, i) => {
+      return this.createColumn(x2 - thick * length2 / 2 + thick * i, y2 * 1.8, thick, (i + 1) / length2 * this.maxValue);
     });
-    this.secondColumns = [];
     this.walls = new Array(5).fill().map((v2, i) => {
       return this.createWall("arc", x2, y2 - x2 / 2, 865 / 2 / 25 * (1 + i * i), 3, 0 + Math.PI / 16 * (4 - i), Math.PI / 16 * (12 + i), Math.PI / 15 * i, 865 / 2 / 25);
     });
-    const ballLen = Math.min(length * 2, 500);
+    const ballLen = Math.min(length2 * 2, 500);
     const ballSize = 1 + Math.floor(thick / 3);
     this.balls = new Array(ballLen).fill().map(() => {
       const r2 = Math.pow(Math.random(), 0.6) * 865 / 4;
@@ -28205,16 +29098,16 @@ class ParticleSystem {
     const fontpx = Math.floor(this.x / 15);
     this.texts = { "log": { "text": "Welcome to Sorting Algorithm animation", "fontpx": fontpx, "x": this.x, "y": this.y * 2 - fontpx * 1 } };
   }
-  createColumn(x2, y2, width, height) {
+  createColumn(x2, y2, width2, height) {
     const path = new Path(x2, y2);
-    const column = { x: x2, y: y2, width, height, path };
+    const column = { x: x2, y: y2, width: width2, height, path };
     return column;
   }
-  createWall(type = "arc", centerX, centerY, length, thick = 5, startAngle = 0, endAngle = 2 * Math.PI, period = 0, swing) {
-    if (!swing) swing = length / 20;
+  createWall(type = "arc", centerX, centerY, length2, thick = 5, startAngle = 0, endAngle = 2 * Math.PI, period = 0, swing) {
+    if (!swing) swing = length2 / 20;
     const x2 = centerX;
     const y2 = centerY;
-    const wall = { type, centerX, centerY, x: x2, y: y2, thick, length, startAngle, endAngle, period, swing };
+    const wall = { type, centerX, centerY, x: x2, y: y2, thick, length: length2, startAngle, endAngle, period, swing };
     return wall;
   }
   createBall(x2 = this.x, y2 = this.y, r2 = 3) {
@@ -28232,11 +29125,11 @@ class ParticleSystem {
     return dist;
   }
   getCollide(target, wall) {
-    if (wall.type == "arc") {
-      const x2 = target.x - wall.x;
-      const y2 = target.y - wall.y;
-      const dist = Math.sqrt(x2 * x2 + y2 * y2);
-      return dist + target.r >= wall.length - wall.thick && dist < wall.length + wall.thick ? dist : 0;
+    if (wall.type === "arc") {
+      const dist = this.getDist(target, wall);
+      const outerBound = wall.length + wall.thick;
+      const innerBound = wall.length - wall.thick;
+      return dist + target.r >= innerBound && dist <= outerBound ? dist : 0;
     }
     return 0;
   }
@@ -28323,7 +29216,7 @@ class ParticleSystem {
     }
   }
   update() {
-    this.sort.update(this.columns, this.secondColumns);
+    this.sort.update(this.columns);
     this.texts.log.text = this.sort.log.innerText;
     this.columns.forEach((column) => {
       if (column.path != void 0) {
@@ -28608,7 +29501,6 @@ const createGLSL = function() {
     gl2.bindBuffer(gl2.ARRAY_BUFFER, this.positionBuffer);
   };
   this.updateData = (data) => {
-    PathConfig.resetLeap(0, 0, 0);
     PathConfig.resetPath(0.4, 0, 0.6);
     this.useMouse = data.useMouse;
     const frames = 30;
@@ -28670,13 +29562,13 @@ const createGLSL = function() {
     this.gl.vertexAttribPointer(positionAttributeLocation, 2, this.gl.FLOAT, false, 0, 0);
     this.gl.drawArrays(this.gl.POINTS, 0, points.length);
   };
-  this.fillRect = (x2, y2, width, height, color) => {
+  this.fillRect = (x2, y2, width2, height, color) => {
     this.gl.useProgram(this.programRect);
     const positionAttributeLocation = this.gl.getAttribLocation(this.programRect, "a_position");
     const resolutionUniformLocation = this.gl.getUniformLocation(this.programRect, "u_resolution");
     const colorUniformLocation = this.gl.getUniformLocation(this.programRect, "u_color");
     this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.positionBuffer);
-    setRectangle(this.gl, x2, y2, width, height);
+    setRectangle(this.gl, x2, y2, width2, height);
     this.gl.enableVertexAttribArray(positionAttributeLocation);
     const size = 2;
     const type = this.gl.FLOAT;
@@ -28687,10 +29579,10 @@ const createGLSL = function() {
     this.gl.uniform2f(resolutionUniformLocation, this.gl.canvas.width, this.gl.canvas.height);
     this.gl.uniform4f(colorUniformLocation, color[0], color[1], color[2], color[3]);
     this.gl.drawArrays(this.gl.TRIANGLES, 0, 6);
-    function setRectangle(gl2, x3, y3, width2, height2) {
+    function setRectangle(gl2, x3, y3, width3, height2) {
       const x1 = x3;
       const y1 = y3;
-      const x22 = x3 + width2;
+      const x22 = x3 + width3;
       const y22 = y3 + height2;
       gl2.bufferData(gl2.ARRAY_BUFFER, new Float32Array([
         x1,
@@ -29217,9 +30109,9 @@ const ALPHABET = {
 };
 const generateString = (size = 16, alphabet = ALPHABET.ALPHA_DIGIT) => {
   let str = "";
-  const { length } = alphabet;
+  const { length: length2 } = alphabet;
   while (size--) {
-    str += alphabet[Math.random() * length | 0];
+    str += alphabet[Math.random() * length2 | 0];
   }
   return str;
 };
@@ -30546,8 +31438,8 @@ const xhrAdapter = isXHRAdapterSupported && function(config) {
   });
 };
 const composeSignals = (signals, timeout) => {
-  const { length } = signals = signals ? signals.filter(Boolean) : [];
-  if (timeout || length) {
+  const { length: length2 } = signals = signals ? signals.filter(Boolean) : [];
+  if (timeout || length2) {
     let controller = new AbortController();
     let aborted;
     const onabort = function(reason) {
@@ -30712,8 +31604,8 @@ const getBodyLength = async (body) => {
   }
 };
 const resolveBodyLength = async (headers, body) => {
-  const length = utils$1.toFiniteNumber(headers.getContentLength());
-  return length == null ? getBodyLength(body) : length;
+  const length2 = utils$1.toFiniteNumber(headers.getContentLength());
+  return length2 == null ? getBodyLength(body) : length2;
 };
 const fetchAdapter = isFetchSupported && (async (config) => {
   let {
@@ -30834,11 +31726,11 @@ const isResolvedHandle = (adapter) => utils$1.isFunction(adapter) || adapter ===
 const adapters = {
   getAdapter: (adapters2) => {
     adapters2 = utils$1.isArray(adapters2) ? adapters2 : [adapters2];
-    const { length } = adapters2;
+    const { length: length2 } = adapters2;
     let nameOrAdapter;
     let adapter;
     const rejectedReasons = {};
-    for (let i = 0; i < length; i++) {
+    for (let i = 0; i < length2; i++) {
       nameOrAdapter = adapters2[i];
       let id2;
       adapter = nameOrAdapter;
@@ -30857,7 +31749,7 @@ const adapters = {
       const reasons = Object.entries(rejectedReasons).map(
         ([id2, state]) => `adapter ${id2} ` + (state === false ? "is not supported by the environment" : "is not available in the build")
       );
-      let s = length ? reasons.length > 1 ? "since :\n" + reasons.map(renderReason).join("\n") : " " + renderReason(reasons[0]) : "as no adapter specified";
+      let s = length2 ? reasons.length > 1 ? "since :\n" + reasons.map(renderReason).join("\n") : " " + renderReason(reasons[0]) : "as no adapter specified";
       throw new AxiosError(
         `There is no suitable adapter to dispatch the request ` + s,
         "ERR_NOT_SUPPORT"
@@ -31695,16 +32587,16 @@ lodash.exports;
       return func.apply(thisArg, args);
     }
     function arrayAggregator(array, setter, iteratee, accumulator) {
-      var index = -1, length = array == null ? 0 : array.length;
-      while (++index < length) {
+      var index = -1, length2 = array == null ? 0 : array.length;
+      while (++index < length2) {
         var value = array[index];
         setter(accumulator, value, iteratee(value), array);
       }
       return accumulator;
     }
     function arrayEach(array, iteratee) {
-      var index = -1, length = array == null ? 0 : array.length;
-      while (++index < length) {
+      var index = -1, length2 = array == null ? 0 : array.length;
+      while (++index < length2) {
         if (iteratee(array[index], index, array) === false) {
           break;
         }
@@ -31712,17 +32604,17 @@ lodash.exports;
       return array;
     }
     function arrayEachRight(array, iteratee) {
-      var length = array == null ? 0 : array.length;
-      while (length--) {
-        if (iteratee(array[length], length, array) === false) {
+      var length2 = array == null ? 0 : array.length;
+      while (length2--) {
+        if (iteratee(array[length2], length2, array) === false) {
           break;
         }
       }
       return array;
     }
     function arrayEvery(array, predicate) {
-      var index = -1, length = array == null ? 0 : array.length;
-      while (++index < length) {
+      var index = -1, length2 = array == null ? 0 : array.length;
+      while (++index < length2) {
         if (!predicate(array[index], index, array)) {
           return false;
         }
@@ -31730,8 +32622,8 @@ lodash.exports;
       return true;
     }
     function arrayFilter(array, predicate) {
-      var index = -1, length = array == null ? 0 : array.length, resIndex = 0, result = [];
-      while (++index < length) {
+      var index = -1, length2 = array == null ? 0 : array.length, resIndex = 0, result = [];
+      while (++index < length2) {
         var value = array[index];
         if (predicate(value, index, array)) {
           result[resIndex++] = value;
@@ -31740,12 +32632,12 @@ lodash.exports;
       return result;
     }
     function arrayIncludes(array, value) {
-      var length = array == null ? 0 : array.length;
-      return !!length && baseIndexOf(array, value, 0) > -1;
+      var length2 = array == null ? 0 : array.length;
+      return !!length2 && baseIndexOf(array, value, 0) > -1;
     }
     function arrayIncludesWith(array, value, comparator) {
-      var index = -1, length = array == null ? 0 : array.length;
-      while (++index < length) {
+      var index = -1, length2 = array == null ? 0 : array.length;
+      while (++index < length2) {
         if (comparator(value, array[index])) {
           return true;
         }
@@ -31753,42 +32645,42 @@ lodash.exports;
       return false;
     }
     function arrayMap(array, iteratee) {
-      var index = -1, length = array == null ? 0 : array.length, result = Array(length);
-      while (++index < length) {
+      var index = -1, length2 = array == null ? 0 : array.length, result = Array(length2);
+      while (++index < length2) {
         result[index] = iteratee(array[index], index, array);
       }
       return result;
     }
     function arrayPush(array, values) {
-      var index = -1, length = values.length, offset = array.length;
-      while (++index < length) {
+      var index = -1, length2 = values.length, offset = array.length;
+      while (++index < length2) {
         array[offset + index] = values[index];
       }
       return array;
     }
     function arrayReduce(array, iteratee, accumulator, initAccum) {
-      var index = -1, length = array == null ? 0 : array.length;
-      if (initAccum && length) {
+      var index = -1, length2 = array == null ? 0 : array.length;
+      if (initAccum && length2) {
         accumulator = array[++index];
       }
-      while (++index < length) {
+      while (++index < length2) {
         accumulator = iteratee(accumulator, array[index], index, array);
       }
       return accumulator;
     }
     function arrayReduceRight(array, iteratee, accumulator, initAccum) {
-      var length = array == null ? 0 : array.length;
-      if (initAccum && length) {
-        accumulator = array[--length];
+      var length2 = array == null ? 0 : array.length;
+      if (initAccum && length2) {
+        accumulator = array[--length2];
       }
-      while (length--) {
-        accumulator = iteratee(accumulator, array[length], length, array);
+      while (length2--) {
+        accumulator = iteratee(accumulator, array[length2], length2, array);
       }
       return accumulator;
     }
     function arraySome(array, predicate) {
-      var index = -1, length = array == null ? 0 : array.length;
-      while (++index < length) {
+      var index = -1, length2 = array == null ? 0 : array.length;
+      while (++index < length2) {
         if (predicate(array[index], index, array)) {
           return true;
         }
@@ -31813,8 +32705,8 @@ lodash.exports;
       return result;
     }
     function baseFindIndex(array, predicate, fromIndex, fromRight) {
-      var length = array.length, index = fromIndex + (fromRight ? 1 : -1);
-      while (fromRight ? index-- : ++index < length) {
+      var length2 = array.length, index = fromIndex + (fromRight ? 1 : -1);
+      while (fromRight ? index-- : ++index < length2) {
         if (predicate(array[index], index, array)) {
           return index;
         }
@@ -31825,8 +32717,8 @@ lodash.exports;
       return value === value ? strictIndexOf(array, value, fromIndex) : baseFindIndex(array, baseIsNaN, fromIndex);
     }
     function baseIndexOfWith(array, value, fromIndex, comparator) {
-      var index = fromIndex - 1, length = array.length;
-      while (++index < length) {
+      var index = fromIndex - 1, length2 = array.length;
+      while (++index < length2) {
         if (comparator(array[index], value)) {
           return index;
         }
@@ -31837,8 +32729,8 @@ lodash.exports;
       return value !== value;
     }
     function baseMean(array, iteratee) {
-      var length = array == null ? 0 : array.length;
-      return length ? baseSum(array, iteratee) / length : NAN;
+      var length2 = array == null ? 0 : array.length;
+      return length2 ? baseSum(array, iteratee) / length2 : NAN;
     }
     function baseProperty(key) {
       return function(object) {
@@ -31857,16 +32749,16 @@ lodash.exports;
       return accumulator;
     }
     function baseSortBy(array, comparer) {
-      var length = array.length;
+      var length2 = array.length;
       array.sort(comparer);
-      while (length--) {
-        array[length] = array[length].value;
+      while (length2--) {
+        array[length2] = array[length2].value;
       }
       return array;
     }
     function baseSum(array, iteratee) {
-      var result, index = -1, length = array.length;
-      while (++index < length) {
+      var result, index = -1, length2 = array.length;
+      while (++index < length2) {
         var current = iteratee(array[index]);
         if (current !== undefined$1) {
           result = result === undefined$1 ? current : result + current;
@@ -31903,8 +32795,8 @@ lodash.exports;
       return cache.has(key);
     }
     function charsStartIndex(strSymbols, chrSymbols) {
-      var index = -1, length = strSymbols.length;
-      while (++index < length && baseIndexOf(chrSymbols, strSymbols[index], 0) > -1) {
+      var index = -1, length2 = strSymbols.length;
+      while (++index < length2 && baseIndexOf(chrSymbols, strSymbols[index], 0) > -1) {
       }
       return index;
     }
@@ -31915,9 +32807,9 @@ lodash.exports;
       return index;
     }
     function countHolders(array, placeholder) {
-      var length = array.length, result = 0;
-      while (length--) {
-        if (array[length] === placeholder) {
+      var length2 = array.length, result = 0;
+      while (length2--) {
+        if (array[length2] === placeholder) {
           ++result;
         }
       }
@@ -31957,8 +32849,8 @@ lodash.exports;
       };
     }
     function replaceHolders(array, placeholder) {
-      var index = -1, length = array.length, resIndex = 0, result = [];
-      while (++index < length) {
+      var index = -1, length2 = array.length, resIndex = 0, result = [];
+      while (++index < length2) {
         var value = array[index];
         if (value === placeholder || value === PLACEHOLDER) {
           array[index] = PLACEHOLDER;
@@ -31982,8 +32874,8 @@ lodash.exports;
       return result;
     }
     function strictIndexOf(array, value, fromIndex) {
-      var index = fromIndex - 1, length = array.length;
-      while (++index < length) {
+      var index = fromIndex - 1, length2 = array.length;
+      while (++index < length2) {
         if (array[index] === value) {
           return index;
         }
@@ -32175,13 +33067,13 @@ lodash.exports;
         return result2;
       }
       function lazyValue() {
-        var array = this.__wrapped__.value(), dir = this.__dir__, isArr = isArray2(array), isRight = dir < 0, arrLength = isArr ? array.length : 0, view = getView(0, arrLength, this.__views__), start = view.start, end = view.end, length = end - start, index = isRight ? end : start - 1, iteratees = this.__iteratees__, iterLength = iteratees.length, resIndex = 0, takeCount = nativeMin(length, this.__takeCount__);
-        if (!isArr || !isRight && arrLength == length && takeCount == length) {
+        var array = this.__wrapped__.value(), dir = this.__dir__, isArr = isArray2(array), isRight = dir < 0, arrLength = isArr ? array.length : 0, view = getView(0, arrLength, this.__views__), start = view.start, end = view.end, length2 = end - start, index = isRight ? end : start - 1, iteratees = this.__iteratees__, iterLength = iteratees.length, resIndex = 0, takeCount = nativeMin(length2, this.__takeCount__);
+        if (!isArr || !isRight && arrLength == length2 && takeCount == length2) {
           return baseWrapperValue(array, this.__actions__);
         }
         var result2 = [];
         outer:
-          while (length-- && resIndex < takeCount) {
+          while (length2-- && resIndex < takeCount) {
             index += dir;
             var iterIndex = -1, value = array[index];
             while (++iterIndex < iterLength) {
@@ -32203,9 +33095,9 @@ lodash.exports;
       LazyWrapper.prototype = baseCreate(baseLodash.prototype);
       LazyWrapper.prototype.constructor = LazyWrapper;
       function Hash(entries) {
-        var index = -1, length = entries == null ? 0 : entries.length;
+        var index = -1, length2 = entries == null ? 0 : entries.length;
         this.clear();
-        while (++index < length) {
+        while (++index < length2) {
           var entry = entries[index];
           this.set(entry[0], entry[1]);
         }
@@ -32243,9 +33135,9 @@ lodash.exports;
       Hash.prototype.has = hashHas;
       Hash.prototype.set = hashSet;
       function ListCache(entries) {
-        var index = -1, length = entries == null ? 0 : entries.length;
+        var index = -1, length2 = entries == null ? 0 : entries.length;
         this.clear();
-        while (++index < length) {
+        while (++index < length2) {
           var entry = entries[index];
           this.set(entry[0], entry[1]);
         }
@@ -32291,9 +33183,9 @@ lodash.exports;
       ListCache.prototype.has = listCacheHas;
       ListCache.prototype.set = listCacheSet;
       function MapCache(entries) {
-        var index = -1, length = entries == null ? 0 : entries.length;
+        var index = -1, length2 = entries == null ? 0 : entries.length;
         this.clear();
-        while (++index < length) {
+        while (++index < length2) {
           var entry = entries[index];
           this.set(entry[0], entry[1]);
         }
@@ -32329,9 +33221,9 @@ lodash.exports;
       MapCache.prototype.has = mapCacheHas;
       MapCache.prototype.set = mapCacheSet;
       function SetCache(values2) {
-        var index = -1, length = values2 == null ? 0 : values2.length;
+        var index = -1, length2 = values2 == null ? 0 : values2.length;
         this.__data__ = new MapCache();
-        while (++index < length) {
+        while (++index < length2) {
           this.add(values2[index]);
         }
       }
@@ -32384,21 +33276,21 @@ lodash.exports;
       Stack.prototype.has = stackHas;
       Stack.prototype.set = stackSet;
       function arrayLikeKeys(value, inherited) {
-        var isArr = isArray2(value), isArg = !isArr && isArguments(value), isBuff = !isArr && !isArg && isBuffer2(value), isType = !isArr && !isArg && !isBuff && isTypedArray2(value), skipIndexes = isArr || isArg || isBuff || isType, result2 = skipIndexes ? baseTimes(value.length, String2) : [], length = result2.length;
+        var isArr = isArray2(value), isArg = !isArr && isArguments(value), isBuff = !isArr && !isArg && isBuffer2(value), isType = !isArr && !isArg && !isBuff && isTypedArray2(value), skipIndexes = isArr || isArg || isBuff || isType, result2 = skipIndexes ? baseTimes(value.length, String2) : [], length2 = result2.length;
         for (var key in value) {
           if ((inherited || hasOwnProperty2.call(value, key)) && !(skipIndexes && // Safari 9 has enumerable `arguments.length` in strict mode.
           (key == "length" || // Node.js 0.10 has enumerable non-index properties on buffers.
           isBuff && (key == "offset" || key == "parent") || // PhantomJS 2 has enumerable non-index properties on typed arrays.
           isType && (key == "buffer" || key == "byteLength" || key == "byteOffset") || // Skip index properties.
-          isIndex(key, length)))) {
+          isIndex(key, length2)))) {
             result2.push(key);
           }
         }
         return result2;
       }
       function arraySample(array) {
-        var length = array.length;
-        return length ? array[baseRandom(0, length - 1)] : undefined$1;
+        var length2 = array.length;
+        return length2 ? array[baseRandom(0, length2 - 1)] : undefined$1;
       }
       function arraySampleSize(array, n2) {
         return shuffleSelf(copyArray2(array), baseClamp(n2, 0, array.length));
@@ -32418,10 +33310,10 @@ lodash.exports;
         }
       }
       function assocIndexOf(array, key) {
-        var length = array.length;
-        while (length--) {
-          if (eq(array[length][0], key)) {
-            return length;
+        var length2 = array.length;
+        while (length2--) {
+          if (eq(array[length2][0], key)) {
+            return length2;
           }
         }
         return -1;
@@ -32451,8 +33343,8 @@ lodash.exports;
         }
       }
       function baseAt(object, paths) {
-        var index = -1, length = paths.length, result2 = Array2(length), skip = object == null;
-        while (++index < length) {
+        var index = -1, length2 = paths.length, result2 = Array2(length2), skip = object == null;
+        while (++index < length2) {
           result2[index] = skip ? undefined$1 : get(object, paths[index]);
         }
         return result2;
@@ -32535,13 +33427,13 @@ lodash.exports;
         };
       }
       function baseConformsTo(object, source, props) {
-        var length = props.length;
+        var length2 = props.length;
         if (object == null) {
-          return !length;
+          return !length2;
         }
         object = Object2(object);
-        while (length--) {
-          var key = props[length], predicate = source[key], value = object[key];
+        while (length2--) {
+          var key = props[length2], predicate = source[key], value = object[key];
           if (value === undefined$1 && !(key in object) || !predicate(value)) {
             return false;
           }
@@ -32557,8 +33449,8 @@ lodash.exports;
         }, wait);
       }
       function baseDifference(array, values2, iteratee2, comparator) {
-        var index = -1, includes2 = arrayIncludes, isCommon = true, length = array.length, result2 = [], valuesLength = values2.length;
-        if (!length) {
+        var index = -1, includes2 = arrayIncludes, isCommon = true, length2 = array.length, result2 = [], valuesLength = values2.length;
+        if (!length2) {
           return result2;
         }
         if (iteratee2) {
@@ -32573,7 +33465,7 @@ lodash.exports;
           values2 = new SetCache(values2);
         }
         outer:
-          while (++index < length) {
+          while (++index < length2) {
             var value = array[index], computed = iteratee2 == null ? value : iteratee2(value);
             value = comparator || value !== 0 ? value : 0;
             if (isCommon && computed === computed) {
@@ -32601,8 +33493,8 @@ lodash.exports;
         return result2;
       }
       function baseExtremum(array, iteratee2, comparator) {
-        var index = -1, length = array.length;
-        while (++index < length) {
+        var index = -1, length2 = array.length;
+        while (++index < length2) {
           var value = array[index], current = iteratee2(value);
           if (current != null && (computed === undefined$1 ? current === current && !isSymbol(current) : comparator(current, computed))) {
             var computed = current, result2 = value;
@@ -32611,14 +33503,14 @@ lodash.exports;
         return result2;
       }
       function baseFill(array, value, start, end) {
-        var length = array.length;
+        var length2 = array.length;
         start = toInteger(start);
         if (start < 0) {
-          start = -start > length ? 0 : length + start;
+          start = -start > length2 ? 0 : length2 + start;
         }
-        end = end === undefined$1 || end > length ? length : toInteger(end);
+        end = end === undefined$1 || end > length2 ? length2 : toInteger(end);
         if (end < 0) {
-          end += length;
+          end += length2;
         }
         end = start > end ? 0 : toLength(end);
         while (start < end) {
@@ -32635,15 +33527,15 @@ lodash.exports;
         });
         return result2;
       }
-      function baseFlatten(array, depth, predicate, isStrict, result2) {
-        var index = -1, length = array.length;
+      function baseFlatten(array, depth2, predicate, isStrict, result2) {
+        var index = -1, length2 = array.length;
         predicate || (predicate = isFlattenable);
         result2 || (result2 = []);
-        while (++index < length) {
+        while (++index < length2) {
           var value = array[index];
-          if (depth > 0 && predicate(value)) {
-            if (depth > 1) {
-              baseFlatten(value, depth - 1, predicate, isStrict, result2);
+          if (depth2 > 0 && predicate(value)) {
+            if (depth2 > 1) {
+              baseFlatten(value, depth2 - 1, predicate, isStrict, result2);
             } else {
               arrayPush(result2, value);
             }
@@ -32668,11 +33560,11 @@ lodash.exports;
       }
       function baseGet(object, path) {
         path = castPath(path, object);
-        var index = 0, length = path.length;
-        while (object != null && index < length) {
+        var index = 0, length2 = path.length;
+        while (object != null && index < length2) {
           object = object[toKey(path[index++])];
         }
-        return index && index == length ? object : undefined$1;
+        return index && index == length2 ? object : undefined$1;
       }
       function baseGetAllKeys(object, keysFunc, symbolsFunc) {
         var result2 = keysFunc(object);
@@ -32697,19 +33589,19 @@ lodash.exports;
         return number >= nativeMin(start, end) && number < nativeMax(start, end);
       }
       function baseIntersection(arrays, iteratee2, comparator) {
-        var includes2 = comparator ? arrayIncludesWith : arrayIncludes, length = arrays[0].length, othLength = arrays.length, othIndex = othLength, caches = Array2(othLength), maxLength = Infinity, result2 = [];
+        var includes2 = comparator ? arrayIncludesWith : arrayIncludes, length2 = arrays[0].length, othLength = arrays.length, othIndex = othLength, caches = Array2(othLength), maxLength = Infinity, result2 = [];
         while (othIndex--) {
           var array = arrays[othIndex];
           if (othIndex && iteratee2) {
             array = arrayMap(array, baseUnary(iteratee2));
           }
           maxLength = nativeMin(array.length, maxLength);
-          caches[othIndex] = !comparator && (iteratee2 || length >= 120 && array.length >= 120) ? new SetCache(othIndex && array) : undefined$1;
+          caches[othIndex] = !comparator && (iteratee2 || length2 >= 120 && array.length >= 120) ? new SetCache(othIndex && array) : undefined$1;
         }
         array = arrays[0];
         var index = -1, seen = caches[0];
         outer:
-          while (++index < length && result2.length < maxLength) {
+          while (++index < length2 && result2.length < maxLength) {
             var value = array[index], computed = iteratee2 ? iteratee2(value) : value;
             value = comparator || value !== 0 ? value : 0;
             if (!(seen ? cacheHas(seen, computed) : includes2(result2, computed, comparator))) {
@@ -32792,9 +33684,9 @@ lodash.exports;
         return isObjectLike(value) && getTag(value) == mapTag;
       }
       function baseIsMatch(object, source, matchData, customizer) {
-        var index = matchData.length, length = index, noCustomizer = !customizer;
+        var index = matchData.length, length2 = index, noCustomizer = !customizer;
         if (object == null) {
-          return !length;
+          return !length2;
         }
         object = Object2(object);
         while (index--) {
@@ -32803,7 +33695,7 @@ lodash.exports;
             return false;
           }
         }
-        while (++index < length) {
+        while (++index < length2) {
           data = matchData[index];
           var key = data[0], objValue = object[key], srcValue = data[1];
           if (noCustomizer && data[2]) {
@@ -32963,12 +33855,12 @@ lodash.exports;
         assignMergeValue(object, key, newValue);
       }
       function baseNth(array, n2) {
-        var length = array.length;
-        if (!length) {
+        var length2 = array.length;
+        if (!length2) {
           return;
         }
-        n2 += n2 < 0 ? length : 0;
-        return isIndex(n2, length) ? array[n2] : undefined$1;
+        n2 += n2 < 0 ? length2 : 0;
+        return isIndex(n2, length2) ? array[n2] : undefined$1;
       }
       function baseOrderBy(collection, iteratees, orders) {
         if (iteratees.length) {
@@ -33001,8 +33893,8 @@ lodash.exports;
         });
       }
       function basePickBy(object, paths, predicate) {
-        var index = -1, length = paths.length, result2 = {};
-        while (++index < length) {
+        var index = -1, length2 = paths.length, result2 = {};
+        while (++index < length2) {
           var path = paths[index], value = baseGet(object, path);
           if (predicate(value, path)) {
             baseSet(result2, castPath(path, object), value);
@@ -33016,14 +33908,14 @@ lodash.exports;
         };
       }
       function basePullAll(array, values2, iteratee2, comparator) {
-        var indexOf2 = comparator ? baseIndexOfWith : baseIndexOf, index = -1, length = values2.length, seen = array;
+        var indexOf2 = comparator ? baseIndexOfWith : baseIndexOf, index = -1, length2 = values2.length, seen = array;
         if (array === values2) {
           values2 = copyArray2(values2);
         }
         if (iteratee2) {
           seen = arrayMap(array, baseUnary(iteratee2));
         }
-        while (++index < length) {
+        while (++index < length2) {
           var fromIndex = 0, value = values2[index], computed = iteratee2 ? iteratee2(value) : value;
           while ((fromIndex = indexOf2(seen, computed, fromIndex, comparator)) > -1) {
             if (seen !== array) {
@@ -33035,10 +33927,10 @@ lodash.exports;
         return array;
       }
       function basePullAt(array, indexes) {
-        var length = array ? indexes.length : 0, lastIndex = length - 1;
-        while (length--) {
-          var index = indexes[length];
-          if (length == lastIndex || index !== previous) {
+        var length2 = array ? indexes.length : 0, lastIndex = length2 - 1;
+        while (length2--) {
+          var index = indexes[length2];
+          if (length2 == lastIndex || index !== previous) {
             var previous = index;
             if (isIndex(index)) {
               splice.call(array, index, 1);
@@ -33053,9 +33945,9 @@ lodash.exports;
         return lower + nativeFloor(nativeRandom() * (upper - lower + 1));
       }
       function baseRange(start, end, step, fromRight) {
-        var index = -1, length = nativeMax(nativeCeil((end - start) / (step || 1)), 0), result2 = Array2(length);
-        while (length--) {
-          result2[fromRight ? length : ++index] = start;
+        var index = -1, length2 = nativeMax(nativeCeil((end - start) / (step || 1)), 0), result2 = Array2(length2);
+        while (length2--) {
+          result2[fromRight ? length2 : ++index] = start;
           start += step;
         }
         return result2;
@@ -33091,8 +33983,8 @@ lodash.exports;
           return object;
         }
         path = castPath(path, object);
-        var index = -1, length = path.length, lastIndex = length - 1, nested = object;
-        while (nested != null && ++index < length) {
+        var index = -1, length2 = path.length, lastIndex = length2 - 1, nested = object;
+        while (nested != null && ++index < length2) {
           var key = toKey(path[index]), newValue = value;
           if (key === "__proto__" || key === "constructor" || key === "prototype") {
             return object;
@@ -33125,18 +34017,18 @@ lodash.exports;
         return shuffleSelf(values(collection));
       }
       function baseSlice(array, start, end) {
-        var index = -1, length = array.length;
+        var index = -1, length2 = array.length;
         if (start < 0) {
-          start = -start > length ? 0 : length + start;
+          start = -start > length2 ? 0 : length2 + start;
         }
-        end = end > length ? length : end;
+        end = end > length2 ? length2 : end;
         if (end < 0) {
-          end += length;
+          end += length2;
         }
-        length = start > end ? 0 : end - start >>> 0;
+        length2 = start > end ? 0 : end - start >>> 0;
         start >>>= 0;
-        var result2 = Array2(length);
-        while (++index < length) {
+        var result2 = Array2(length2);
+        while (++index < length2) {
           result2[index] = array[index + start];
         }
         return result2;
@@ -33195,8 +34087,8 @@ lodash.exports;
         return nativeMin(high, MAX_ARRAY_INDEX);
       }
       function baseSortedUniq(array, iteratee2) {
-        var index = -1, length = array.length, resIndex = 0, result2 = [];
-        while (++index < length) {
+        var index = -1, length2 = array.length, resIndex = 0, result2 = [];
+        while (++index < length2) {
           var value = array[index], computed = iteratee2 ? iteratee2(value) : value;
           if (!index || !eq(computed, seen)) {
             var seen = computed;
@@ -33228,11 +34120,11 @@ lodash.exports;
         return result2 == "0" && 1 / value == -INFINITY ? "-0" : result2;
       }
       function baseUniq(array, iteratee2, comparator) {
-        var index = -1, includes2 = arrayIncludes, length = array.length, isCommon = true, result2 = [], seen = result2;
+        var index = -1, includes2 = arrayIncludes, length2 = array.length, isCommon = true, result2 = [], seen = result2;
         if (comparator) {
           isCommon = false;
           includes2 = arrayIncludesWith;
-        } else if (length >= LARGE_ARRAY_SIZE) {
+        } else if (length2 >= LARGE_ARRAY_SIZE) {
           var set2 = iteratee2 ? null : createSet(array);
           if (set2) {
             return setToArray(set2);
@@ -33244,7 +34136,7 @@ lodash.exports;
           seen = iteratee2 ? [] : result2;
         }
         outer:
-          while (++index < length) {
+          while (++index < length2) {
             var value = array[index], computed = iteratee2 ? iteratee2(value) : value;
             value = comparator || value !== 0 ? value : 0;
             if (isCommon && computed === computed) {
@@ -33276,10 +34168,10 @@ lodash.exports;
         return baseSet(object, path, updater(baseGet(object, path)), customizer);
       }
       function baseWhile(array, predicate, isDrop, fromRight) {
-        var length = array.length, index = fromRight ? length : -1;
-        while ((fromRight ? index-- : ++index < length) && predicate(array[index], index, array)) {
+        var length2 = array.length, index = fromRight ? length2 : -1;
+        while ((fromRight ? index-- : ++index < length2) && predicate(array[index], index, array)) {
         }
-        return isDrop ? baseSlice(array, fromRight ? 0 : index, fromRight ? index + 1 : length) : baseSlice(array, fromRight ? index + 1 : 0, fromRight ? length : index);
+        return isDrop ? baseSlice(array, fromRight ? 0 : index, fromRight ? index + 1 : length2) : baseSlice(array, fromRight ? index + 1 : 0, fromRight ? length2 : index);
       }
       function baseWrapperValue(value, actions) {
         var result2 = value;
@@ -33291,14 +34183,14 @@ lodash.exports;
         }, result2);
       }
       function baseXor(arrays, iteratee2, comparator) {
-        var length = arrays.length;
-        if (length < 2) {
-          return length ? baseUniq(arrays[0]) : [];
+        var length2 = arrays.length;
+        if (length2 < 2) {
+          return length2 ? baseUniq(arrays[0]) : [];
         }
-        var index = -1, result2 = Array2(length);
-        while (++index < length) {
+        var index = -1, result2 = Array2(length2);
+        while (++index < length2) {
           var array = arrays[index], othIndex = -1;
-          while (++othIndex < length) {
+          while (++othIndex < length2) {
             if (othIndex != index) {
               result2[index] = baseDifference(result2[index] || array, arrays[othIndex], iteratee2, comparator);
             }
@@ -33307,8 +34199,8 @@ lodash.exports;
         return baseUniq(baseFlatten(result2, 1), iteratee2, comparator);
       }
       function baseZipObject(props, values2, assignFunc) {
-        var index = -1, length = props.length, valsLength = values2.length, result2 = {};
-        while (++index < length) {
+        var index = -1, length2 = props.length, valsLength = values2.length, result2 = {};
+        while (++index < length2) {
           var value = index < valsLength ? values2[index] : undefined$1;
           assignFunc(result2, props[index], value);
         }
@@ -33328,9 +34220,9 @@ lodash.exports;
       }
       var castRest = baseRest;
       function castSlice(array, start, end) {
-        var length = array.length;
-        end = end === undefined$1 ? length : end;
-        return !start && end >= length ? array : baseSlice(array, start, end);
+        var length2 = array.length;
+        end = end === undefined$1 ? length2 : end;
+        return !start && end >= length2 ? array : baseSlice(array, start, end);
       }
       var clearTimeout2 = ctxClearTimeout || function(id2) {
         return root2.clearTimeout(id2);
@@ -33339,7 +34231,7 @@ lodash.exports;
         if (isDeep) {
           return buffer.slice();
         }
-        var length = buffer.length, result2 = allocUnsafe ? allocUnsafe(length) : new buffer.constructor(length);
+        var length2 = buffer.length, result2 = allocUnsafe ? allocUnsafe(length2) : new buffer.constructor(length2);
         buffer.copy(result2);
         return result2;
       }
@@ -33378,8 +34270,8 @@ lodash.exports;
         return 0;
       }
       function compareMultiple(object, other, orders) {
-        var index = -1, objCriteria = object.criteria, othCriteria = other.criteria, length = objCriteria.length, ordersLength = orders.length;
-        while (++index < length) {
+        var index = -1, objCriteria = object.criteria, othCriteria = other.criteria, length2 = objCriteria.length, ordersLength = orders.length;
+        while (++index < length2) {
           var result2 = compareAscending(objCriteria[index], othCriteria[index]);
           if (result2) {
             if (index >= ordersLength) {
@@ -33423,9 +34315,9 @@ lodash.exports;
         return result2;
       }
       function copyArray2(source, array) {
-        var index = -1, length = source.length;
-        array || (array = Array2(length));
-        while (++index < length) {
+        var index = -1, length2 = source.length;
+        array || (array = Array2(length2));
+        while (++index < length2) {
           array[index] = source[index];
         }
         return array;
@@ -33433,8 +34325,8 @@ lodash.exports;
       function copyObject(source, props, object, customizer) {
         var isNew = !object;
         object || (object = {});
-        var index = -1, length = props.length;
-        while (++index < length) {
+        var index = -1, length2 = props.length;
+        while (++index < length2) {
           var key = props[index];
           var newValue = customizer ? customizer(object[key], source[key], key, object, source) : undefined$1;
           if (newValue === undefined$1) {
@@ -33462,14 +34354,14 @@ lodash.exports;
       }
       function createAssigner(assigner) {
         return baseRest(function(object, sources) {
-          var index = -1, length = sources.length, customizer = length > 1 ? sources[length - 1] : undefined$1, guard = length > 2 ? sources[2] : undefined$1;
-          customizer = assigner.length > 3 && typeof customizer == "function" ? (length--, customizer) : undefined$1;
+          var index = -1, length2 = sources.length, customizer = length2 > 1 ? sources[length2 - 1] : undefined$1, guard = length2 > 2 ? sources[2] : undefined$1;
+          customizer = assigner.length > 3 && typeof customizer == "function" ? (length2--, customizer) : undefined$1;
           if (guard && isIterateeCall(sources[0], sources[1], guard)) {
-            customizer = length < 3 ? undefined$1 : customizer;
-            length = 1;
+            customizer = length2 < 3 ? undefined$1 : customizer;
+            length2 = 1;
           }
           object = Object2(object);
-          while (++index < length) {
+          while (++index < length2) {
             var source = sources[index];
             if (source) {
               assigner(object, source, index, customizer);
@@ -33486,8 +34378,8 @@ lodash.exports;
           if (!isArrayLike(collection)) {
             return eachFunc(collection, iteratee2);
           }
-          var length = collection.length, index = fromRight ? length : -1, iterable = Object2(collection);
-          while (fromRight ? index-- : ++index < length) {
+          var length2 = collection.length, index = fromRight ? length2 : -1, iterable = Object2(collection);
+          while (fromRight ? index-- : ++index < length2) {
             if (iteratee2(iterable[index], index, iterable) === false) {
               break;
             }
@@ -33497,9 +34389,9 @@ lodash.exports;
       }
       function createBaseFor(fromRight) {
         return function(object, iteratee2, keysFunc) {
-          var index = -1, iterable = Object2(object), props = keysFunc(object), length = props.length;
-          while (length--) {
-            var key = props[fromRight ? length : ++index];
+          var index = -1, iterable = Object2(object), props = keysFunc(object), length2 = props.length;
+          while (length2--) {
+            var key = props[fromRight ? length2 : ++index];
             if (iteratee2(iterable[key], key, iterable) === false) {
               break;
             }
@@ -33557,13 +34449,13 @@ lodash.exports;
       function createCurry(func, bitmask, arity) {
         var Ctor = createCtor(func);
         function wrapper() {
-          var length = arguments.length, args = Array2(length), index = length, placeholder = getHolder(wrapper);
+          var length2 = arguments.length, args = Array2(length2), index = length2, placeholder = getHolder(wrapper);
           while (index--) {
             args[index] = arguments[index];
           }
-          var holders = length < 3 && args[0] !== placeholder && args[length - 1] !== placeholder ? [] : replaceHolders(args, placeholder);
-          length -= holders.length;
-          if (length < arity) {
+          var holders = length2 < 3 && args[0] !== placeholder && args[length2 - 1] !== placeholder ? [] : replaceHolders(args, placeholder);
+          length2 -= holders.length;
+          if (length2 < arity) {
             return createRecurry(
               func,
               bitmask,
@@ -33574,7 +34466,7 @@ lodash.exports;
               holders,
               undefined$1,
               undefined$1,
-              arity - length
+              arity - length2
             );
           }
           var fn = this && this !== root2 && this instanceof wrapper ? Ctor : func;
@@ -33598,7 +34490,7 @@ lodash.exports;
       }
       function createFlow(fromRight) {
         return flatRest(function(funcs) {
-          var length = funcs.length, index = length, prereq = LodashWrapper.prototype.thru;
+          var length2 = funcs.length, index = length2, prereq = LodashWrapper.prototype.thru;
           if (fromRight) {
             funcs.reverse();
           }
@@ -33611,8 +34503,8 @@ lodash.exports;
               var wrapper = new LodashWrapper([], true);
             }
           }
-          index = wrapper ? index : length;
-          while (++index < length) {
+          index = wrapper ? index : length2;
+          while (++index < length2) {
             func = funcs[index];
             var funcName = getFuncName(func), data = funcName == "wrapper" ? getData(func) : undefined$1;
             if (data && isLaziable(data[0]) && data[1] == (WRAP_ARY_FLAG | WRAP_CURRY_FLAG | WRAP_PARTIAL_FLAG | WRAP_REARG_FLAG) && !data[4].length && data[9] == 1) {
@@ -33626,8 +34518,8 @@ lodash.exports;
             if (wrapper && args.length == 1 && isArray2(value)) {
               return wrapper.plant(value).value();
             }
-            var index2 = 0, result2 = length ? funcs[index2].apply(this, args) : value;
-            while (++index2 < length) {
+            var index2 = 0, result2 = length2 ? funcs[index2].apply(this, args) : value;
+            while (++index2 < length2) {
               result2 = funcs[index2].call(this, result2);
             }
             return result2;
@@ -33637,7 +34529,7 @@ lodash.exports;
       function createHybrid(func, bitmask, thisArg, partials, holders, partialsRight, holdersRight, argPos, ary2, arity) {
         var isAry = bitmask & WRAP_ARY_FLAG, isBind = bitmask & WRAP_BIND_FLAG, isBindKey = bitmask & WRAP_BIND_KEY_FLAG, isCurried = bitmask & (WRAP_CURRY_FLAG | WRAP_CURRY_RIGHT_FLAG), isFlip = bitmask & WRAP_FLIP_FLAG, Ctor = isBindKey ? undefined$1 : createCtor(func);
         function wrapper() {
-          var length = arguments.length, args = Array2(length), index = length;
+          var length2 = arguments.length, args = Array2(length2), index = length2;
           while (index--) {
             args[index] = arguments[index];
           }
@@ -33650,8 +34542,8 @@ lodash.exports;
           if (partialsRight) {
             args = composeArgsRight(args, partialsRight, holdersRight, isCurried);
           }
-          length -= holdersCount;
-          if (isCurried && length < arity) {
+          length2 -= holdersCount;
+          if (isCurried && length2 < arity) {
             var newHolders = replaceHolders(args, placeholder);
             return createRecurry(
               func,
@@ -33663,17 +34555,17 @@ lodash.exports;
               newHolders,
               argPos,
               ary2,
-              arity - length
+              arity - length2
             );
           }
           var thisBinding = isBind ? thisArg : this, fn = isBindKey ? thisBinding[func] : func;
-          length = args.length;
+          length2 = args.length;
           if (argPos) {
             args = reorder(args, argPos);
-          } else if (isFlip && length > 1) {
+          } else if (isFlip && length2 > 1) {
             args.reverse();
           }
-          if (isAry && ary2 < length) {
+          if (isAry && ary2 < length2) {
             args.length = ary2;
           }
           if (this && this !== root2 && this instanceof wrapper) {
@@ -33724,14 +34616,14 @@ lodash.exports;
           });
         });
       }
-      function createPadding(length, chars) {
+      function createPadding(length2, chars) {
         chars = chars === undefined$1 ? " " : baseToString(chars);
         var charsLength = chars.length;
         if (charsLength < 2) {
-          return charsLength ? baseRepeat(chars, length) : chars;
+          return charsLength ? baseRepeat(chars, length2) : chars;
         }
-        var result2 = baseRepeat(chars, nativeCeil(length / stringSize(chars)));
-        return hasUnicode(chars) ? castSlice(stringToArray(result2), 0, length).join("") : result2.slice(0, length);
+        var result2 = baseRepeat(chars, nativeCeil(length2 / stringSize(chars)));
+        return hasUnicode(chars) ? castSlice(stringToArray(result2), 0, length2).join("") : result2.slice(0, length2);
       }
       function createPartial(func, bitmask, thisArg, partials) {
         var isBind = bitmask & WRAP_BIND_FLAG, Ctor = createCtor(func);
@@ -33831,14 +34723,14 @@ lodash.exports;
         if (!isBindKey && typeof func != "function") {
           throw new TypeError2(FUNC_ERROR_TEXT);
         }
-        var length = partials ? partials.length : 0;
-        if (!length) {
+        var length2 = partials ? partials.length : 0;
+        if (!length2) {
           bitmask &= ~(WRAP_PARTIAL_FLAG | WRAP_PARTIAL_RIGHT_FLAG);
           partials = holders = undefined$1;
         }
         ary2 = ary2 === undefined$1 ? ary2 : nativeMax(toInteger(ary2), 0);
         arity = arity === undefined$1 ? arity : toInteger(arity);
-        length -= holders ? holders.length : 0;
+        length2 -= holders ? holders.length : 0;
         if (bitmask & WRAP_PARTIAL_RIGHT_FLAG) {
           var partialsRight = partials, holdersRight = holders;
           partials = holders = undefined$1;
@@ -33864,7 +34756,7 @@ lodash.exports;
         thisArg = newData[2];
         partials = newData[3];
         holders = newData[4];
-        arity = newData[9] = newData[9] === undefined$1 ? isBindKey ? 0 : func.length : nativeMax(newData[9] - length, 0);
+        arity = newData[9] = newData[9] === undefined$1 ? isBindKey ? 0 : func.length : nativeMax(newData[9] - length2, 0);
         if (!arity && bitmask & (WRAP_CURRY_FLAG | WRAP_CURRY_RIGHT_FLAG)) {
           bitmask &= ~(WRAP_CURRY_FLAG | WRAP_CURRY_RIGHT_FLAG);
         }
@@ -34042,9 +34934,9 @@ lodash.exports;
         return metaMap.get(func);
       };
       function getFuncName(func) {
-        var result2 = func.name + "", array = realNames[result2], length = hasOwnProperty2.call(realNames, result2) ? array.length : 0;
-        while (length--) {
-          var data = array[length], otherFunc = data.func;
+        var result2 = func.name + "", array = realNames[result2], length2 = hasOwnProperty2.call(realNames, result2) ? array.length : 0;
+        while (length2--) {
+          var data = array[length2], otherFunc = data.func;
           if (otherFunc == null || otherFunc == func) {
             return data.name;
           }
@@ -34065,10 +34957,10 @@ lodash.exports;
         return isKeyable(key) ? data[typeof key == "string" ? "string" : "hash"] : data.map;
       }
       function getMatchData(object) {
-        var result2 = keys(object), length = result2.length;
-        while (length--) {
-          var key = result2[length], value = object[key];
-          result2[length] = [key, value, isStrictComparable(value)];
+        var result2 = keys(object), length2 = result2.length;
+        while (length2--) {
+          var key = result2[length2], value = object[key];
+          result2[length2] = [key, value, isStrictComparable(value)];
         }
         return result2;
       }
@@ -34132,8 +35024,8 @@ lodash.exports;
         };
       }
       function getView(start, end, transforms) {
-        var index = -1, length = transforms.length;
-        while (++index < length) {
+        var index = -1, length2 = transforms.length;
+        while (++index < length2) {
           var data = transforms[index], size2 = data.size;
           switch (data.type) {
             case "drop":
@@ -34158,23 +35050,23 @@ lodash.exports;
       }
       function hasPath(object, path, hasFunc) {
         path = castPath(path, object);
-        var index = -1, length = path.length, result2 = false;
-        while (++index < length) {
+        var index = -1, length2 = path.length, result2 = false;
+        while (++index < length2) {
           var key = toKey(path[index]);
           if (!(result2 = object != null && hasFunc(object, key))) {
             break;
           }
           object = object[key];
         }
-        if (result2 || ++index != length) {
+        if (result2 || ++index != length2) {
           return result2;
         }
-        length = object == null ? 0 : object.length;
-        return !!length && isLength(length) && isIndex(key, length) && (isArray2(object) || isArguments(object));
+        length2 = object == null ? 0 : object.length;
+        return !!length2 && isLength(length2) && isIndex(key, length2) && (isArray2(object) || isArguments(object));
       }
       function initCloneArray(array) {
-        var length = array.length, result2 = new array.constructor(length);
-        if (length && typeof array[0] == "string" && hasOwnProperty2.call(array, "index")) {
+        var length2 = array.length, result2 = new array.constructor(length2);
+        if (length2 && typeof array[0] == "string" && hasOwnProperty2.call(array, "index")) {
           result2.index = array.index;
           result2.input = array.input;
         }
@@ -34217,22 +35109,22 @@ lodash.exports;
         }
       }
       function insertWrapDetails(source, details) {
-        var length = details.length;
-        if (!length) {
+        var length2 = details.length;
+        if (!length2) {
           return source;
         }
-        var lastIndex = length - 1;
-        details[lastIndex] = (length > 1 ? "& " : "") + details[lastIndex];
-        details = details.join(length > 2 ? ", " : " ");
+        var lastIndex = length2 - 1;
+        details[lastIndex] = (length2 > 1 ? "& " : "") + details[lastIndex];
+        details = details.join(length2 > 2 ? ", " : " ");
         return source.replace(reWrapComment, "{\n/* [wrapped with " + details + "] */\n");
       }
       function isFlattenable(value) {
         return isArray2(value) || isArguments(value) || !!(spreadableSymbol && value && value[spreadableSymbol]);
       }
-      function isIndex(value, length) {
+      function isIndex(value, length2) {
         var type = typeof value;
-        length = length == null ? MAX_SAFE_INTEGER : length;
-        return !!length && (type == "number" || type != "symbol" && reIsUint.test(value)) && (value > -1 && value % 1 == 0 && value < length);
+        length2 = length2 == null ? MAX_SAFE_INTEGER : length2;
+        return !!length2 && (type == "number" || type != "symbol" && reIsUint.test(value)) && (value > -1 && value % 1 == 0 && value < length2);
       }
       function isIterateeCall(value, index, object) {
         if (!isObject2(object)) {
@@ -34349,8 +35241,8 @@ lodash.exports;
       function overRest(func, start, transform2) {
         start = nativeMax(start === undefined$1 ? func.length - 1 : start, 0);
         return function() {
-          var args = arguments, index = -1, length = nativeMax(args.length - start, 0), array = Array2(length);
-          while (++index < length) {
+          var args = arguments, index = -1, length2 = nativeMax(args.length - start, 0), array = Array2(length2);
+          while (++index < length2) {
             array[index] = args[start + index];
           }
           index = -1;
@@ -34366,10 +35258,10 @@ lodash.exports;
         return path.length < 2 ? object : baseGet(object, baseSlice(path, 0, -1));
       }
       function reorder(array, indexes) {
-        var arrLength = array.length, length = nativeMin(indexes.length, arrLength), oldArray = copyArray2(array);
-        while (length--) {
-          var index = indexes[length];
-          array[length] = isIndex(index, arrLength) ? oldArray[index] : undefined$1;
+        var arrLength = array.length, length2 = nativeMin(indexes.length, arrLength), oldArray = copyArray2(array);
+        while (length2--) {
+          var index = indexes[length2];
+          array[length2] = isIndex(index, arrLength) ? oldArray[index] : undefined$1;
         }
         return array;
       }
@@ -34407,8 +35299,8 @@ lodash.exports;
         };
       }
       function shuffleSelf(array, size2) {
-        var index = -1, length = array.length, lastIndex = length - 1;
-        size2 = size2 === undefined$1 ? length : size2;
+        var index = -1, length2 = array.length, lastIndex = length2 - 1;
+        size2 = size2 === undefined$1 ? length2 : size2;
         while (++index < size2) {
           var rand = baseRandom(index, lastIndex), value = array[rand];
           array[rand] = array[index];
@@ -34472,19 +35364,19 @@ lodash.exports;
         } else {
           size2 = nativeMax(toInteger(size2), 0);
         }
-        var length = array == null ? 0 : array.length;
-        if (!length || size2 < 1) {
+        var length2 = array == null ? 0 : array.length;
+        if (!length2 || size2 < 1) {
           return [];
         }
-        var index = 0, resIndex = 0, result2 = Array2(nativeCeil(length / size2));
-        while (index < length) {
+        var index = 0, resIndex = 0, result2 = Array2(nativeCeil(length2 / size2));
+        while (index < length2) {
           result2[resIndex++] = baseSlice(array, index, index += size2);
         }
         return result2;
       }
       function compact(array) {
-        var index = -1, length = array == null ? 0 : array.length, resIndex = 0, result2 = [];
-        while (++index < length) {
+        var index = -1, length2 = array == null ? 0 : array.length, resIndex = 0, result2 = [];
+        while (++index < length2) {
           var value = array[index];
           if (value) {
             result2[resIndex++] = value;
@@ -34493,11 +35385,11 @@ lodash.exports;
         return result2;
       }
       function concat() {
-        var length = arguments.length;
-        if (!length) {
+        var length2 = arguments.length;
+        if (!length2) {
           return [];
         }
-        var args = Array2(length - 1), array = arguments[0], index = length;
+        var args = Array2(length2 - 1), array = arguments[0], index = length2;
         while (index--) {
           args[index - 1] = arguments[index];
         }
@@ -34521,20 +35413,20 @@ lodash.exports;
         return isArrayLikeObject(array) ? baseDifference(array, baseFlatten(values2, 1, isArrayLikeObject, true), undefined$1, comparator) : [];
       });
       function drop(array, n2, guard) {
-        var length = array == null ? 0 : array.length;
-        if (!length) {
+        var length2 = array == null ? 0 : array.length;
+        if (!length2) {
           return [];
         }
         n2 = guard || n2 === undefined$1 ? 1 : toInteger(n2);
-        return baseSlice(array, n2 < 0 ? 0 : n2, length);
+        return baseSlice(array, n2 < 0 ? 0 : n2, length2);
       }
       function dropRight(array, n2, guard) {
-        var length = array == null ? 0 : array.length;
-        if (!length) {
+        var length2 = array == null ? 0 : array.length;
+        if (!length2) {
           return [];
         }
         n2 = guard || n2 === undefined$1 ? 1 : toInteger(n2);
-        n2 = length - n2;
+        n2 = length2 - n2;
         return baseSlice(array, 0, n2 < 0 ? 0 : n2);
       }
       function dropRightWhile(array, predicate) {
@@ -34544,58 +35436,58 @@ lodash.exports;
         return array && array.length ? baseWhile(array, getIteratee(predicate, 3), true) : [];
       }
       function fill(array, value, start, end) {
-        var length = array == null ? 0 : array.length;
-        if (!length) {
+        var length2 = array == null ? 0 : array.length;
+        if (!length2) {
           return [];
         }
         if (start && typeof start != "number" && isIterateeCall(array, value, start)) {
           start = 0;
-          end = length;
+          end = length2;
         }
         return baseFill(array, value, start, end);
       }
       function findIndex(array, predicate, fromIndex) {
-        var length = array == null ? 0 : array.length;
-        if (!length) {
+        var length2 = array == null ? 0 : array.length;
+        if (!length2) {
           return -1;
         }
         var index = fromIndex == null ? 0 : toInteger(fromIndex);
         if (index < 0) {
-          index = nativeMax(length + index, 0);
+          index = nativeMax(length2 + index, 0);
         }
         return baseFindIndex(array, getIteratee(predicate, 3), index);
       }
       function findLastIndex(array, predicate, fromIndex) {
-        var length = array == null ? 0 : array.length;
-        if (!length) {
+        var length2 = array == null ? 0 : array.length;
+        if (!length2) {
           return -1;
         }
-        var index = length - 1;
+        var index = length2 - 1;
         if (fromIndex !== undefined$1) {
           index = toInteger(fromIndex);
-          index = fromIndex < 0 ? nativeMax(length + index, 0) : nativeMin(index, length - 1);
+          index = fromIndex < 0 ? nativeMax(length2 + index, 0) : nativeMin(index, length2 - 1);
         }
         return baseFindIndex(array, getIteratee(predicate, 3), index, true);
       }
       function flatten2(array) {
-        var length = array == null ? 0 : array.length;
-        return length ? baseFlatten(array, 1) : [];
+        var length2 = array == null ? 0 : array.length;
+        return length2 ? baseFlatten(array, 1) : [];
       }
       function flattenDeep(array) {
-        var length = array == null ? 0 : array.length;
-        return length ? baseFlatten(array, INFINITY) : [];
+        var length2 = array == null ? 0 : array.length;
+        return length2 ? baseFlatten(array, INFINITY) : [];
       }
-      function flattenDepth(array, depth) {
-        var length = array == null ? 0 : array.length;
-        if (!length) {
+      function flattenDepth(array, depth2) {
+        var length2 = array == null ? 0 : array.length;
+        if (!length2) {
           return [];
         }
-        depth = depth === undefined$1 ? 1 : toInteger(depth);
-        return baseFlatten(array, depth);
+        depth2 = depth2 === undefined$1 ? 1 : toInteger(depth2);
+        return baseFlatten(array, depth2);
       }
       function fromPairs(pairs) {
-        var index = -1, length = pairs == null ? 0 : pairs.length, result2 = {};
-        while (++index < length) {
+        var index = -1, length2 = pairs == null ? 0 : pairs.length, result2 = {};
+        while (++index < length2) {
           var pair = pairs[index];
           result2[pair[0]] = pair[1];
         }
@@ -34605,19 +35497,19 @@ lodash.exports;
         return array && array.length ? array[0] : undefined$1;
       }
       function indexOf(array, value, fromIndex) {
-        var length = array == null ? 0 : array.length;
-        if (!length) {
+        var length2 = array == null ? 0 : array.length;
+        if (!length2) {
           return -1;
         }
         var index = fromIndex == null ? 0 : toInteger(fromIndex);
         if (index < 0) {
-          index = nativeMax(length + index, 0);
+          index = nativeMax(length2 + index, 0);
         }
         return baseIndexOf(array, value, index);
       }
       function initial(array) {
-        var length = array == null ? 0 : array.length;
-        return length ? baseSlice(array, 0, -1) : [];
+        var length2 = array == null ? 0 : array.length;
+        return length2 ? baseSlice(array, 0, -1) : [];
       }
       var intersection = baseRest(function(arrays) {
         var mapped = arrayMap(arrays, castArrayLikeObject);
@@ -34644,18 +35536,18 @@ lodash.exports;
         return array == null ? "" : nativeJoin.call(array, separator);
       }
       function last(array) {
-        var length = array == null ? 0 : array.length;
-        return length ? array[length - 1] : undefined$1;
+        var length2 = array == null ? 0 : array.length;
+        return length2 ? array[length2 - 1] : undefined$1;
       }
       function lastIndexOf(array, value, fromIndex) {
-        var length = array == null ? 0 : array.length;
-        if (!length) {
+        var length2 = array == null ? 0 : array.length;
+        if (!length2) {
           return -1;
         }
-        var index = length;
+        var index = length2;
         if (fromIndex !== undefined$1) {
           index = toInteger(fromIndex);
-          index = index < 0 ? nativeMax(length + index, 0) : nativeMin(index, length - 1);
+          index = index < 0 ? nativeMax(length2 + index, 0) : nativeMin(index, length2 - 1);
         }
         return value === value ? strictLastIndexOf(array, value, index) : baseFindIndex(array, baseIsNaN, index, true);
       }
@@ -34673,9 +35565,9 @@ lodash.exports;
         return array && array.length && values2 && values2.length ? basePullAll(array, values2, undefined$1, comparator) : array;
       }
       var pullAt = flatRest(function(array, indexes) {
-        var length = array == null ? 0 : array.length, result2 = baseAt(array, indexes);
+        var length2 = array == null ? 0 : array.length, result2 = baseAt(array, indexes);
         basePullAt(array, arrayMap(indexes, function(index) {
-          return isIndex(index, length) ? +index : index;
+          return isIndex(index, length2) ? +index : index;
         }).sort(compareAscending));
         return result2;
       });
@@ -34684,9 +35576,9 @@ lodash.exports;
         if (!(array && array.length)) {
           return result2;
         }
-        var index = -1, indexes = [], length = array.length;
+        var index = -1, indexes = [], length2 = array.length;
         predicate = getIteratee(predicate, 3);
-        while (++index < length) {
+        while (++index < length2) {
           var value = array[index];
           if (predicate(value, index, array)) {
             result2.push(value);
@@ -34700,16 +35592,16 @@ lodash.exports;
         return array == null ? array : nativeReverse.call(array);
       }
       function slice(array, start, end) {
-        var length = array == null ? 0 : array.length;
-        if (!length) {
+        var length2 = array == null ? 0 : array.length;
+        if (!length2) {
           return [];
         }
         if (end && typeof end != "number" && isIterateeCall(array, start, end)) {
           start = 0;
-          end = length;
+          end = length2;
         } else {
           start = start == null ? 0 : toInteger(start);
-          end = end === undefined$1 ? length : toInteger(end);
+          end = end === undefined$1 ? length2 : toInteger(end);
         }
         return baseSlice(array, start, end);
       }
@@ -34720,10 +35612,10 @@ lodash.exports;
         return baseSortedIndexBy(array, value, getIteratee(iteratee2, 2));
       }
       function sortedIndexOf(array, value) {
-        var length = array == null ? 0 : array.length;
-        if (length) {
+        var length2 = array == null ? 0 : array.length;
+        if (length2) {
           var index = baseSortedIndex(array, value);
-          if (index < length && eq(array[index], value)) {
+          if (index < length2 && eq(array[index], value)) {
             return index;
           }
         }
@@ -34736,8 +35628,8 @@ lodash.exports;
         return baseSortedIndexBy(array, value, getIteratee(iteratee2, 2), true);
       }
       function sortedLastIndexOf(array, value) {
-        var length = array == null ? 0 : array.length;
-        if (length) {
+        var length2 = array == null ? 0 : array.length;
+        if (length2) {
           var index = baseSortedIndex(array, value, true) - 1;
           if (eq(array[index], value)) {
             return index;
@@ -34752,8 +35644,8 @@ lodash.exports;
         return array && array.length ? baseSortedUniq(array, getIteratee(iteratee2, 2)) : [];
       }
       function tail(array) {
-        var length = array == null ? 0 : array.length;
-        return length ? baseSlice(array, 1, length) : [];
+        var length2 = array == null ? 0 : array.length;
+        return length2 ? baseSlice(array, 1, length2) : [];
       }
       function take(array, n2, guard) {
         if (!(array && array.length)) {
@@ -34763,13 +35655,13 @@ lodash.exports;
         return baseSlice(array, 0, n2 < 0 ? 0 : n2);
       }
       function takeRight(array, n2, guard) {
-        var length = array == null ? 0 : array.length;
-        if (!length) {
+        var length2 = array == null ? 0 : array.length;
+        if (!length2) {
           return [];
         }
         n2 = guard || n2 === undefined$1 ? 1 : toInteger(n2);
-        n2 = length - n2;
-        return baseSlice(array, n2 < 0 ? 0 : n2, length);
+        n2 = length2 - n2;
+        return baseSlice(array, n2 < 0 ? 0 : n2, length2);
       }
       function takeRightWhile(array, predicate) {
         return array && array.length ? baseWhile(array, getIteratee(predicate, 3), false, true) : [];
@@ -34806,14 +35698,14 @@ lodash.exports;
         if (!(array && array.length)) {
           return [];
         }
-        var length = 0;
+        var length2 = 0;
         array = arrayFilter(array, function(group) {
           if (isArrayLikeObject(group)) {
-            length = nativeMax(group.length, length);
+            length2 = nativeMax(group.length, length2);
             return true;
           }
         });
-        return baseTimes(length, function(index) {
+        return baseTimes(length2, function(index) {
           return arrayMap(array, baseProperty(index));
         });
       }
@@ -34855,7 +35747,7 @@ lodash.exports;
         return baseZipObject(props || [], values2 || [], baseSet);
       }
       var zipWith = baseRest(function(arrays) {
-        var length = arrays.length, iteratee2 = length > 1 ? arrays[length - 1] : undefined$1;
+        var length2 = arrays.length, iteratee2 = length2 > 1 ? arrays[length2 - 1] : undefined$1;
         iteratee2 = typeof iteratee2 == "function" ? (arrays.pop(), iteratee2) : undefined$1;
         return unzipWith(arrays, iteratee2);
       });
@@ -34872,20 +35764,20 @@ lodash.exports;
         return interceptor(value);
       }
       var wrapperAt = flatRest(function(paths) {
-        var length = paths.length, start = length ? paths[0] : 0, value = this.__wrapped__, interceptor = function(object) {
+        var length2 = paths.length, start = length2 ? paths[0] : 0, value = this.__wrapped__, interceptor = function(object) {
           return baseAt(object, paths);
         };
-        if (length > 1 || this.__actions__.length || !(value instanceof LazyWrapper) || !isIndex(start)) {
+        if (length2 > 1 || this.__actions__.length || !(value instanceof LazyWrapper) || !isIndex(start)) {
           return this.thru(interceptor);
         }
-        value = value.slice(start, +start + (length ? 1 : 0));
+        value = value.slice(start, +start + (length2 ? 1 : 0));
         value.__actions__.push({
           "func": thru,
           "args": [interceptor],
           "thisArg": undefined$1
         });
         return new LodashWrapper(value, this.__chain__).thru(function(array) {
-          if (length && !array.length) {
+          if (length2 && !array.length) {
             array.push(undefined$1);
           }
           return array;
@@ -34970,9 +35862,9 @@ lodash.exports;
       function flatMapDeep(collection, iteratee2) {
         return baseFlatten(map(collection, iteratee2), INFINITY);
       }
-      function flatMapDepth(collection, iteratee2, depth) {
-        depth = depth === undefined$1 ? 1 : toInteger(depth);
-        return baseFlatten(map(collection, iteratee2), depth);
+      function flatMapDepth(collection, iteratee2, depth2) {
+        depth2 = depth2 === undefined$1 ? 1 : toInteger(depth2);
+        return baseFlatten(map(collection, iteratee2), depth2);
       }
       function forEach2(collection, iteratee2) {
         var func = isArray2(collection) ? arrayEach : baseEach;
@@ -34992,11 +35884,11 @@ lodash.exports;
       function includes(collection, value, fromIndex, guard) {
         collection = isArrayLike(collection) ? collection : values(collection);
         fromIndex = fromIndex && !guard ? toInteger(fromIndex) : 0;
-        var length = collection.length;
+        var length2 = collection.length;
         if (fromIndex < 0) {
-          fromIndex = nativeMax(length + fromIndex, 0);
+          fromIndex = nativeMax(length2 + fromIndex, 0);
         }
-        return isString2(collection) ? fromIndex <= length && collection.indexOf(value, fromIndex) > -1 : !!length && baseIndexOf(collection, value, fromIndex) > -1;
+        return isString2(collection) ? fromIndex <= length2 && collection.indexOf(value, fromIndex) > -1 : !!length2 && baseIndexOf(collection, value, fromIndex) > -1;
       }
       var invokeMap = baseRest(function(collection, path, args) {
         var index = -1, isFunc = typeof path == "function", result2 = isArrayLike(collection) ? Array2(collection.length) : [];
@@ -35083,10 +35975,10 @@ lodash.exports;
         if (collection == null) {
           return [];
         }
-        var length = iteratees.length;
-        if (length > 1 && isIterateeCall(collection, iteratees[0], iteratees[1])) {
+        var length2 = iteratees.length;
+        if (length2 > 1 && isIterateeCall(collection, iteratees[0], iteratees[1])) {
           iteratees = [];
-        } else if (length > 2 && isIterateeCall(iteratees[0], iteratees[1], iteratees[2])) {
+        } else if (length2 > 2 && isIterateeCall(iteratees[0], iteratees[1], iteratees[2])) {
           iteratees = [iteratees[0]];
         }
         return baseOrderBy(collection, baseFlatten(iteratees, 1), []);
@@ -35287,8 +36179,8 @@ lodash.exports;
         transforms = transforms.length == 1 && isArray2(transforms[0]) ? arrayMap(transforms[0], baseUnary(getIteratee())) : arrayMap(baseFlatten(transforms, 1), baseUnary(getIteratee()));
         var funcsLength = transforms.length;
         return baseRest(function(args) {
-          var index = -1, length = nativeMin(args.length, funcsLength);
-          while (++index < length) {
+          var index = -1, length2 = nativeMin(args.length, funcsLength);
+          while (++index < length2) {
             args[index] = transforms[index].call(this, args[index]);
           }
           return apply(func, this, args);
@@ -35605,12 +36497,12 @@ lodash.exports;
       var defaults2 = baseRest(function(object, sources) {
         object = Object2(object);
         var index = -1;
-        var length = sources.length;
-        var guard = length > 2 ? sources[2] : undefined$1;
+        var length2 = sources.length;
+        var guard = length2 > 2 ? sources[2] : undefined$1;
         if (guard && isIterateeCall(sources[0], sources[1], guard)) {
-          length = 1;
+          length2 = 1;
         }
-        while (++index < length) {
+        while (++index < length2) {
           var source = sources[index];
           var props = keysIn(source);
           var propsIndex = -1;
@@ -35723,9 +36615,9 @@ lodash.exports;
         if (isDeep) {
           result2 = baseClone(result2, CLONE_DEEP_FLAG | CLONE_FLAT_FLAG | CLONE_SYMBOLS_FLAG, customOmitClone);
         }
-        var length = paths.length;
-        while (length--) {
-          baseUnset(result2, paths[length]);
+        var length2 = paths.length;
+        while (length2--) {
+          baseUnset(result2, paths[length2]);
         }
         return result2;
       });
@@ -35749,15 +36641,15 @@ lodash.exports;
       }
       function result(object, path, defaultValue) {
         path = castPath(path, object);
-        var index = -1, length = path.length;
-        if (!length) {
-          length = 1;
+        var index = -1, length2 = path.length;
+        if (!length2) {
+          length2 = 1;
           object = undefined$1;
         }
-        while (++index < length) {
+        while (++index < length2) {
           var value = object == null ? undefined$1 : object[toKey(path[index])];
           if (value === undefined$1) {
-            index = length;
+            index = length2;
             value = defaultValue;
           }
           object = isFunction2(value) ? value.call(object) : value;
@@ -35883,8 +36775,8 @@ lodash.exports;
       function endsWith2(string, target, position) {
         string = toString3(string);
         target = baseToString(target);
-        var length = string.length;
-        position = position === undefined$1 ? length : baseClamp(toInteger(position), 0, length);
+        var length2 = string.length;
+        position = position === undefined$1 ? length2 : baseClamp(toInteger(position), 0, length2);
         var end = position;
         position -= target.length;
         return position >= 0 && string.slice(position, end) == target;
@@ -35904,27 +36796,27 @@ lodash.exports;
         return result2 + (index ? " " : "") + word.toLowerCase();
       });
       var lowerFirst = createCaseFirst("toLowerCase");
-      function pad(string, length, chars) {
+      function pad(string, length2, chars) {
         string = toString3(string);
-        length = toInteger(length);
-        var strLength = length ? stringSize(string) : 0;
-        if (!length || strLength >= length) {
+        length2 = toInteger(length2);
+        var strLength = length2 ? stringSize(string) : 0;
+        if (!length2 || strLength >= length2) {
           return string;
         }
-        var mid = (length - strLength) / 2;
+        var mid = (length2 - strLength) / 2;
         return createPadding(nativeFloor(mid), chars) + string + createPadding(nativeCeil(mid), chars);
       }
-      function padEnd(string, length, chars) {
+      function padEnd(string, length2, chars) {
         string = toString3(string);
-        length = toInteger(length);
-        var strLength = length ? stringSize(string) : 0;
-        return length && strLength < length ? string + createPadding(length - strLength, chars) : string;
+        length2 = toInteger(length2);
+        var strLength = length2 ? stringSize(string) : 0;
+        return length2 && strLength < length2 ? string + createPadding(length2 - strLength, chars) : string;
       }
-      function padStart(string, length, chars) {
+      function padStart(string, length2, chars) {
         string = toString3(string);
-        length = toInteger(length);
-        var strLength = length ? stringSize(string) : 0;
-        return length && strLength < length ? createPadding(length - strLength, chars) + string : string;
+        length2 = toInteger(length2);
+        var strLength = length2 ? stringSize(string) : 0;
+        return length2 && strLength < length2 ? createPadding(length2 - strLength, chars) + string : string;
       }
       function parseInt2(string, radix, guard) {
         if (guard || radix == null) {
@@ -36064,10 +36956,10 @@ lodash.exports;
         return castSlice(strSymbols, start).join("");
       }
       function truncate(string, options) {
-        var length = DEFAULT_TRUNC_LENGTH, omission = DEFAULT_TRUNC_OMISSION;
+        var length2 = DEFAULT_TRUNC_LENGTH, omission = DEFAULT_TRUNC_OMISSION;
         if (isObject2(options)) {
           var separator = "separator" in options ? options.separator : separator;
-          length = "length" in options ? toInteger(options.length) : length;
+          length2 = "length" in options ? toInteger(options.length) : length2;
           omission = "omission" in options ? baseToString(options.omission) : omission;
         }
         string = toString3(string);
@@ -36076,10 +36968,10 @@ lodash.exports;
           var strSymbols = stringToArray(string);
           strLength = strSymbols.length;
         }
-        if (length >= strLength) {
+        if (length2 >= strLength) {
           return string;
         }
-        var end = length - stringSize(omission);
+        var end = length2 - stringSize(omission);
         if (end < 1) {
           return omission;
         }
@@ -36141,8 +37033,8 @@ lodash.exports;
         return object;
       });
       function cond(pairs) {
-        var length = pairs == null ? 0 : pairs.length, toIteratee = getIteratee();
-        pairs = !length ? [] : arrayMap(pairs, function(pair) {
+        var length2 = pairs == null ? 0 : pairs.length, toIteratee = getIteratee();
+        pairs = !length2 ? [] : arrayMap(pairs, function(pair) {
           if (typeof pair[1] != "function") {
             throw new TypeError2(FUNC_ERROR_TEXT);
           }
@@ -36150,7 +37042,7 @@ lodash.exports;
         });
         return baseRest(function(args) {
           var index = -1;
-          while (++index < length) {
+          while (++index < length2) {
             var pair = pairs[index];
             if (apply(pair[0], this, args)) {
               return apply(pair[1], this, args);
@@ -36267,10 +37159,10 @@ lodash.exports;
         if (n2 < 1 || n2 > MAX_SAFE_INTEGER) {
           return [];
         }
-        var index = MAX_ARRAY_LENGTH, length = nativeMin(n2, MAX_ARRAY_LENGTH);
+        var index = MAX_ARRAY_LENGTH, length2 = nativeMin(n2, MAX_ARRAY_LENGTH);
         iteratee2 = getIteratee(iteratee2);
         n2 -= MAX_ARRAY_LENGTH;
-        var result2 = baseTimes(length, iteratee2);
+        var result2 = baseTimes(length2, iteratee2);
         while (++index < n2) {
           iteratee2(index);
         }
@@ -37018,7 +37910,17 @@ function GetHyperLink({ divRef }) {
     const sections = divRef.current.getElementsByTagName("section");
     setHyperlink(Object.keys(sections).map((key) => {
       const ID = sections[key].id;
-      return /* @__PURE__ */ jsxRuntimeExports.jsx("a", { className: "list", href: "#" + ID, id: "to" + ID, children: ID }, ID);
+      return /* @__PURE__ */ jsxRuntimeExports.jsx(
+        "a",
+        {
+          className: "list",
+          href: "#" + ID,
+          id: "to" + ID,
+          onClick: (e) => document.getElementById(ID).scrollIntoView({ behavior: "smooth" }),
+          children: ID
+        },
+        ID
+      );
     }));
   }, []);
   return hyperlink;
@@ -37030,7 +37932,7 @@ function handleHashChange() {
   if (!targetElement) return;
   targetElement.scrollIntoView({ behavior: "smooth" });
 }
-function NavigationBar({ width, divRef }) {
+function NavigationBar({ width: width2, divRef }) {
   reactExports.useEffect(() => {
     handleHashChange();
     window.addEventListener("hashchange", handleHashChange);
@@ -37040,8 +37942,8 @@ function NavigationBar({ width, divRef }) {
   }, []);
   const [isOpen, setIsOpen] = reactExports.useState(false);
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("nav", { id: "nav", style: {
-    "left": (isOpen ? 0 : -width) + "px",
-    "width": width
+    "left": (isOpen ? 0 : -width2) + "px",
+    "width": width2
   }, children: [
     /* @__PURE__ */ jsxRuntimeExports.jsx(GetHyperLink, { divRef }),
     /* @__PURE__ */ jsxRuntimeExports.jsx("div", { onClick: () => setIsOpen(!isOpen), id: "navSlider", children: /* @__PURE__ */ jsxRuntimeExports.jsx("p", { children: isOpen ? "X" : "≡" }) })
@@ -37049,9 +37951,9 @@ function NavigationBar({ width, divRef }) {
 }
 function Playground({ margin }) {
   const breakpoint = 992 - margin * 2;
-  const [width, height] = useWindowSize(margin);
-  const ratio = width > breakpoint ? 1 : 2;
-  const min = getMin(width, height);
+  const [width2, height] = useWindowSize(margin);
+  const ratio = width2 > breakpoint ? 1 : 2;
+  const min = getMin(width2, height);
   function getMin(w2, h) {
     const min2 = w2 > breakpoint ? w2 < h ? w2 : h : w2 < h * 0.5 ? w2 : h * 0.5;
     return min2;
@@ -37091,6 +37993,7 @@ function Playground({ margin }) {
         children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx(CanvasSectionS4, { ratio, min }),
           /* @__PURE__ */ jsxRuntimeExports.jsx(CanvasSectionS1, { ratio, min }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(CanvasSectionS2A, { ratio, min }),
           /* @__PURE__ */ jsxRuntimeExports.jsx(CanvasSectionS2, { ratio, min }),
           /* @__PURE__ */ jsxRuntimeExports.jsx(CanvasSectionS3, { ratio, min }),
           /* @__PURE__ */ jsxRuntimeExports.jsx(CookieTable, {})
@@ -37106,4 +38009,4 @@ function App() {
 const domNode = document.getElementById("root");
 const root = createRoot(domNode);
 root.render(/* @__PURE__ */ jsxRuntimeExports.jsx(App, {}));
-//# sourceMappingURL=index-Bb0osWxY.js.map
+//# sourceMappingURL=index-cNEXPWpa.js.map
