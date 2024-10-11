@@ -19,7 +19,7 @@ export default class ParticleSystem3D{
             depth: 10,
             
         };
-        const {length, maxHeight, radius, depth} = this.parameter;
+        const length = 32, maxHeight = 255, radius = 100, depth = 100;
 
         this.column = this.createColumn(length, maxHeight, radius, depth);
 
@@ -58,17 +58,6 @@ export default class ParticleSystem3D{
         switch(id){
             case "length":
                 this.expandVertices(this.column, value);
-                
-                // this.column.geometryData.forEach((data, index) => {
-                //     const angle = (index / value) * Math.PI * 2; 
-                //     data.x = radius * Math.cos(angle);
-                //     data.y = radius * Math.sin(angle);
-                //     data.height = data.height * length / value;
-                //     data.path.NewTarget(data.x, data.y, 120);
-                //     // this.column.updateVertices(index);
-                // });
-
-                
                 break;
             default :
                 this.column[id] = value;
@@ -117,22 +106,16 @@ export default class ParticleSystem3D{
     }
     // 建立 3D 實體和幾何體
     createColumn(length, maxHeight, radius, depth){
-        // const vector = this.getPosition(data, width, 10);
-        // const vertices = this.getVertices(vector);
-        // const colorVertices = this.getColorVertices(data, vertices);
 
-        // const attribute = new THREE.BufferAttribute(vertices, 3);
-        // const colorAttribute = new THREE.BufferAttribute(colorVertices, 3);
-        const attribute = new THREE.BufferAttribute(new Float32Array(length * 36 * 3), 3);
-        const colorAttribute = new THREE.BufferAttribute(new Float32Array(length * 36 * 3), 3);
-
-        const column = {length, radius, depth, maxHeight};
+        const column = {length, maxHeight, radius, depth};
         Object.defineProperty(column, 'unitHeight', {
             get() {
                 return column.maxHeight / column.length;
             }
         }); 
 
+        const attribute = new THREE.BufferAttribute(new Float32Array(length * 36 * 3), 3);
+        const colorAttribute = new THREE.BufferAttribute(new Float32Array(length * 36 * 3), 3);
         column.geometry = new THREE.BufferGeometry();
         column.geometry.setAttribute('position', attribute);
         column.geometry.setAttribute('color', colorAttribute);
