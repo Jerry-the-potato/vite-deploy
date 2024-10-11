@@ -199,7 +199,7 @@ export default class ParticleSystem3D{
         //             if (isUpdating) return; // 如果正在更新，則直接返回
         //             isUpdating = true; // 設置為正在更新
         //             requestAnimationFrame(() => {
-        //                 column.update(index, path);
+        //                 column.updateVertices(index);
         //                 isUpdating = false; // 更新結束
         //             });
         //         }
@@ -215,7 +215,7 @@ export default class ParticleSystem3D{
         //             if (isUpdating) return; // 如果正在更新，則直接返回
         //             isUpdating = true; // 設置為正在更新
         //             requestAnimationFrame(() => {
-        //                 column.update(index, path);
+        //                 column.updateVertices(index);
         //                 isUpdating = false; // 更新結束
         //             });
         //         }
