@@ -98,6 +98,12 @@ const createThreeParticle = function(){
         }
         this.system.sort.start(ID, this.system.getSortData());
     }
+    this.cancel = () => {
+        this.system.sort.isSorting = false;
+    }
+    this.stepByStep = () => {
+        this.system.sort.setStepByStep();
+    }
     this.update = () => {
         this.controls.update();
         this.system.update();
