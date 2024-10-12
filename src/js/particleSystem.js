@@ -269,8 +269,9 @@ export default class ParticleSystem{
             ctx.beginPath();
             // ctx.moveTo(column.x, column.y);
             // ctx.lineTo(column.x, column.y - column.height);
-            ctx.moveTo(column.path.pointX, column.path.pointY);
-            ctx.lineTo(column.path.pointX, column.path.pointY - column.height);
+            const {pointX, pointY, z, timer, period} = column.path;
+            ctx.moveTo(pointX, pointY + z);
+            ctx.lineTo(pointX, pointY + z - column.height);
             const c = column.height / 865 * 2;
             // const r = 100 + c * (202 - 100);
             // const g = 50 + c * (254 - 50);
@@ -278,7 +279,7 @@ export default class ParticleSystem{
             // const r = 246 + c * (195 - 246);
             // const g = 211 + c * (160 - 211);
             // const b = 101 + c * (133 - 101);
-            const t = 1 - column.path.timer / column.path.period * 0.5;
+            const t = 1 - timer / period * 0.5;
             const r = mix(t, 255, mix(c, 246, 195));
             const g = mix(t, 100, mix(c, 211, 160));
             const b = mix(t, 100, mix(c, 71, 133));

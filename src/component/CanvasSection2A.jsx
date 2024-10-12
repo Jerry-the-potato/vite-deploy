@@ -3,6 +3,7 @@ import threeParticle from '../js/threeParticle';
 import manager from '../js/animateManager';
 import SlideMenuBtn from "./SlideMenuBtn";
 import RecordBtn from './RecordBtn';
+import { clamp } from 'three/src/math/MathUtils.js';
 
 const CanvasSectionS2A = ({ratio, min, sectinoID = "Sort3D"}) => {
     const canvas = useRef(null);
@@ -34,22 +35,26 @@ const CanvasSectionS2A = ({ratio, min, sectinoID = "Sort3D"}) => {
         threeParticle.start(ID)
     }
     function handleParameterChange(e){
-        const id = e.target.id;
-        const value = e.target.value * 1;
-        threeParticle.system.setParameter(id, value);
+        const {id, value, min, max} = e.target;
+        let newValue = value * 1;
+        
+        if (max != "" && newValue > max * 1) newValue = max;
+        if (min != "" && newValue < min * 1) newValue = min;
+        // newValue = clamp(value, min * 1, max * 1)
+
+        e.target.value = newValue;
+        threeParticle.system.setParameter(id, newValue * 1);
     }
     return (
         <section ref={section} className="section" id={sectinoID}>
             <canvas ref={canvas} width={min * ratio} height={ratio * min * ratio}></canvas>
-            <div ref={menu} className="gamemenu">
+            <div ref={menu} className="gamemenu">   
                 <header id="header"><h3>threeParticle</h3></header>
                 <div className="parameter">
-                    <label>長度</label><input onChange={handleParameterChange} type="number" id="length" defaultValue="32"></input>
-                    <label>Beta</label><input onChange={handleParameterChange} type="number" id="" defaultValue="10"></input>
-                    <label>Gamma</label><input onChange={handleParameterChange} type="number" id="" defaultValue="10"></input>
-                    <label>Delta</label><input onChange={handleParameterChange} type="number" id="" defaultValue="10"></input>
-                    <label>Vector Size</label><input onChange={handleParameterChange} type="number" id="" defaultValue="10"></input>
-                    <label>Transform Speed</label><input onChange={handleParameterChange} type="number" id="" defaultValue="10"></input>
+                    <label>長度</label><input onChange={handleParameterChange} type="number" id="length" defaultValue="64" min="3" max="4096"></input>
+                    <label>高度</label><input onChange={handleParameterChange} type="number" id="maxHeight" defaultValue="255"  min="50" max="350"></input>
+                    <label>半徑</label><input onChange={handleParameterChange} type="number" id="radius" defaultValue="150" min="50" max="300"></input>
+                    <label>深度</label><input onChange={handleParameterChange} type="number" id="depth" defaultValue="10" min="-100" max="100"></input>
                 </div>
                 <div className="controlpanel">
                     <RecordBtn canvas={canvas} audio={audio}></RecordBtn>

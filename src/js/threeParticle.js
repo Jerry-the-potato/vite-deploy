@@ -15,8 +15,8 @@ const createThreeParticle = function(){
         this.renderer = new THREE.WebGLRenderer({"alpha": true, "canvas": canvas});
         // 設置鏡頭
         this.camera = new THREE.PerspectiveCamera( 75, canvas.width / canvas.height, 0.1, 1000 );
-        const radius = 1024;
-        this.camera.position.set(radius * 0.1, radius * 0.4, radius * 0.4);
+        const radius = 800;
+        this.camera.position.set(radius * 0.0, radius * 0.4, radius * 0.4);
 
         // 光
         // const light = new THREE.AmbientLight( 0xffffff );
@@ -24,8 +24,10 @@ const createThreeParticle = function(){
 
         // 添加控制和座標軸
         this.controls = new OrbitControls(this.camera, this.renderer.domElement);
-        this.controls.target.set(0, -radius * 0.1, -radius * 0.2);
-        this.controls.update();
+        this.controls.target.set(0, radius * 0.1, -radius * 0.);
+        this.controls.autoRotate = true;  // 啟用自動旋轉
+        this.controls.autoRotateSpeed = 2;  // 設置旋轉速度
+
         window.c = this.controls;
         // this.axis = new THREE.AxesHelper(300);
         // this.scene.add(this.axis);
@@ -97,6 +99,7 @@ const createThreeParticle = function(){
         this.system.sort.start(ID, this.system.getSortData());
     }
     this.update = () => {
+        this.controls.update();
         this.system.update();
         frame.updateValue(clock.getDelta());
         window.fps = frame.getFPS();

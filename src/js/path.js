@@ -88,7 +88,7 @@ class Path extends PathConfig{
         const [d, e, f] = this.getLeap();
         this.pointX+= (a * linear + b * easein + c * easeout) * dX;
         this.pointY+= (a * linear + b * easein + c * easeout) * dY;
-        // if(dX + dY != 0) this.z+= (d * linear + e * easein + f * easeout) * (-(dX + dY)/5 + 10 * -(dX + dY)/Math.abs(dX + dY));
+        if(dX + dY != 0) this.z+= (d * linear + e * easein + f * easeout) * (-(dX + dY)/5 + 10 * -(dX + dY)/Math.abs(dX + dY));
         this.ID = requestAnimationFrame(this.NextFrame);  
     }.bind(this);
 }

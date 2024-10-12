@@ -1,6 +1,7 @@
 import {Path} from './path.js';
 import * as THREE from 'three'
 import { SortAlgorithm, SortAlgorithmIterable } from './sortAlgorithm.js';
+import { clamp } from 'three/src/math/MathUtils.js';
 
 export default class ParticleSystem3D{
     #transitionRadian = 0;
@@ -13,13 +14,13 @@ export default class ParticleSystem3D{
         this.maxValue = 865*0.4;
 
         this.parameter = {
-            length: 32,
+            length: 64,
             maxHeight: 255,
             radius: 150,
             depth: 10,
             
         };
-        const length = 32, maxHeight = 255, radius = 100, depth = 100;
+        const length = 64, maxHeight = 255, radius = 150, depth = 10;
 
         this.column = this.createColumn(length, maxHeight, radius, depth);
 
@@ -55,16 +56,28 @@ export default class ParticleSystem3D{
         return this.column.geometryData;
     }
     setParameter = (id, value) => {
+        const {length, maxHeight} = this.column;
         switch(id){
             case "length":
-                this.expandVertices(this.column, value);
+                this.expandVertices(this.column, value, maxHeight);
+                break;
+            case "maxHeight":
+                this.expandVertices(this.column, length, value);
                 break;
             default :
                 this.column[id] = value;
-                
+                this.expandVertices(this.column, length, maxHeight);
+                // const {radius} = this.column;
+                // column.geometryData.forEach((data, index) =>{
+                //     data.x = 
+                //     this.column.updateVertices(index);
+                // })
+                // for(let N = 0; N < this.column.length; N++){
+                //     this.column.updateVertices(N);
+                // }
         }
     }
-    expandVertices(column, newLength){
+    expandVertices(column, newLength, newMaxHeight){
         const {length, radius, maxHeight} = column;
         const vertices = column.geometry.attributes.position.array;
         const color = column.geometry.attributes.color.array;
@@ -83,9 +96,11 @@ export default class ParticleSystem3D{
         column.geometry.setAttribute('color', colorAttribute);
 
         column.length = newLength;
-        // 如果新長度較長，迭代建立新的幾何資料
+        column.maxHeight = newMaxHeight;
+        // 2. 更新原有的幾何資料和頂點
         for(let N = 0; N < length; N++){
             if(N >= newLength){
+                // 如果變短，刪除多餘的幾何資料
                 column.geometryData.pop();
                 continue;
             }
@@ -95,12 +110,17 @@ export default class ParticleSystem3D{
             data.y = radius * Math.sin(angle);
             data.height = data.height * length / newLength;
             if(data.height > maxHeight) data.height = maxHeight;
+            data.height*= newMaxHeight / maxHeight;
             data.path.ResetTo(data.x, data.y);
             // data.path.NewTarget(data.x, data.y, 30);
             column.updateVertices(N);
         }
+        // 如果新長度較長，迭代建立新的幾何資料
         for(let N = length; N < newLength; N++){
             column.geometryData[N] = this.createGeometryData(column, N);
+            const data = column.geometryData[N];
+            data.path.ResetTo(data.x, data.y);
+            // data.path.NewTarget(data.x, data.y, 30);
             column.updateVertices(N);
         }
     }
@@ -124,11 +144,7 @@ export default class ParticleSystem3D{
         column.mesh = new THREE.Mesh( column.geometry, material ); 
 
         column.updateVertices = (index) => {
-            const cubeVertexCount = 36;  // 每個立方體的頂點數量
-            const vertexIndex = index * cubeVertexCount * 3; // 乘以 3 是因為每個頂點有 x, y, z
 
-            const vertices = column.geometry.attributes.position.array;
-            const color = column.geometry.attributes.color.array;
             const startAngle = (index / column.length) * Math.PI * 2;
             const endAngle = ((index + 1) / column.length) * Math.PI * 2;
             const height = column.geometryData[index].height;
@@ -145,6 +161,11 @@ export default class ParticleSystem3D{
                 startAngle, endAngle, transition
             );
 
+            const cubeVertexCount = 36;
+            const vertexIndex = index * cubeVertexCount * 3; 
+
+            const vertices = column.geometry.attributes.position.array;
+            const color = column.geometry.attributes.color.array;
             for(let N = 0; N < cubeVertexCount * 3; N ++){
                 vertices[vertexIndex + N] = newVertices[N];
             }
@@ -171,7 +192,7 @@ export default class ParticleSystem3D{
         const angle = (index / length) * Math.PI * 2;
         const x = radius * Math.cos(angle);
         const y = radius * Math.sin(angle);
-        const height = index * unitHeight;
+        const height = (index + 1) * unitHeight;
         const path = new Path(x, y);
         const geometryData = {x, y, height, path};
 
@@ -509,7 +530,8 @@ export default class ParticleSystem3D{
             addColor[point]();
         })
 
-        return [vertices, colorVertices]; // 返回圓餅切片－長方體的 36 個頂點坐標
+        // 返回圓餅切片－長方體的 36 個頂點坐標、頂點顏色
+        return [vertices, colorVertices];
     }
     
 
