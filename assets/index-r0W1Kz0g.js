@@ -28990,6 +28990,12 @@ const createThreeParticle = function() {
     }
     this.system.sort.start(ID, this.system.getSortData());
   };
+  this.cancel = () => {
+    this.system.sort.isSorting = false;
+  };
+  this.stepByStep = () => {
+    this.system.sort.setStepByStep();
+  };
   this.update = () => {
     this.controls.update();
     this.system.update();
@@ -38021,4 +38027,4 @@ function App() {
 const domNode = document.getElementById("root");
 const root = createRoot(domNode);
 root.render(/* @__PURE__ */ jsxRuntimeExports.jsx(App, {}));
-//# sourceMappingURL=index-B7iHzBw9.js.map
+//# sourceMappingURL=index-r0W1Kz0g.js.map
