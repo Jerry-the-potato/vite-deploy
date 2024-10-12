@@ -7025,7 +7025,7 @@ function useWindowSize(margin) {
 }
 function WorkerWrapper(options) {
   return new Worker(
-    "/vite-deploy/assets/worker-DaG30cOA.js",
+    "/vite-deploy/assets/worker-C1z2Go_o.js",
     {
       name: options == null ? void 0 : options.name
     }
@@ -7187,9 +7187,10 @@ class Path extends PathConfig {
       const easeout = Math.pow((t2 + 1) / p2, 2) - Math.pow(t2 / p2, 2);
       const easein = Math.pow(1 - (t2 - 1) / p2, 2) - Math.pow(1 - t2 / p2, 2);
       const [a, b, c] = this.getPath();
-      this.getLeap();
+      const [d, e, f2] = this.getLeap();
       this.pointX += (a * linear + b * easein + c * easeout) * dX;
       this.pointY += (a * linear + b * easein + c * easeout) * dY;
+      if (dX + dY != 0) this.z += (d * linear + e * easein + f2 * easeout) * (-(dX + dY) / 5 + 10 * -(dX + dY) / Math.abs(dX + dY));
       this.ID = requestAnimationFrame(this.NextFrame);
     }).bind(this));
     this.pointX = x2;
@@ -28211,12 +28212,17 @@ class ParticleSystem3D {
     __privateAdd(this, _transitionRadian2, 0);
     __privateAdd(this, _trasitionOmega2, Math.PI / 300);
     __publicField(this, "setParameter", (id2, value) => {
+      const { length: length2, maxHeight } = this.column;
       switch (id2) {
         case "length":
-          this.expandVertices(this.column, value);
+          this.expandVertices(this.column, value, maxHeight);
+          break;
+        case "maxHeight":
+          this.expandVertices(this.column, length2, value);
           break;
         default:
           this.column[id2] = value;
+          this.expandVertices(this.column, length2, maxHeight);
       }
     });
     this.sort = new SortAlgorithm();
@@ -28225,12 +28231,12 @@ class ParticleSystem3D {
     this.friction = 0.997;
     this.maxValue = 865 * 0.4;
     this.parameter = {
-      length: 32,
+      length: 64,
       maxHeight: 255,
       radius: 150,
       depth: 10
     };
-    const length2 = 32, maxHeight = 255, radius = 100, depth2 = 100;
+    const length2 = 64, maxHeight = 255, radius = 150, depth2 = 10;
     this.column = this.createColumn(length2, maxHeight, radius, depth2);
     this.mesh.add(this.column.mesh);
     this.walls = [];
@@ -28257,7 +28263,7 @@ class ParticleSystem3D {
   getSortData() {
     return this.column.geometryData;
   }
-  expandVertices(column, newLength) {
+  expandVertices(column, newLength, newMaxHeight) {
     const { length: length2, radius, maxHeight } = column;
     const vertices = column.geometry.attributes.position.array;
     const color = column.geometry.attributes.color.array;
@@ -28273,6 +28279,7 @@ class ParticleSystem3D {
     column.geometry.setAttribute("position", attribute);
     column.geometry.setAttribute("color", colorAttribute);
     column.length = newLength;
+    column.maxHeight = newMaxHeight;
     for (let N2 = 0; N2 < length2; N2++) {
       if (N2 >= newLength) {
         column.geometryData.pop();
@@ -28284,11 +28291,14 @@ class ParticleSystem3D {
       data.y = radius * Math.sin(angle);
       data.height = data.height * length2 / newLength;
       if (data.height > maxHeight) data.height = maxHeight;
+      data.height *= newMaxHeight / maxHeight;
       data.path.ResetTo(data.x, data.y);
       column.updateVertices(N2);
     }
     for (let N2 = length2; N2 < newLength; N2++) {
       column.geometryData[N2] = this.createGeometryData(column, N2);
+      const data = column.geometryData[N2];
+      data.path.ResetTo(data.x, data.y);
       column.updateVertices(N2);
     }
   }
@@ -28308,10 +28318,6 @@ class ParticleSystem3D {
     const material = new MeshBasicMaterial({ "vertexColors": true });
     column.mesh = new Mesh(column.geometry, material);
     column.updateVertices = (index) => {
-      const cubeVertexCount = 36;
-      const vertexIndex = index * cubeVertexCount * 3;
-      const vertices = column.geometry.attributes.position.array;
-      const color = column.geometry.attributes.color.array;
       const startAngle = index / column.length * Math.PI * 2;
       const endAngle = (index + 1) / column.length * Math.PI * 2;
       const height = column.geometryData[index].height;
@@ -28332,6 +28338,10 @@ class ParticleSystem3D {
         endAngle,
         transition
       );
+      const cubeVertexCount = 36;
+      const vertexIndex = index * cubeVertexCount * 3;
+      const vertices = column.geometry.attributes.position.array;
+      const color = column.geometry.attributes.color.array;
       for (let N2 = 0; N2 < cubeVertexCount * 3; N2++) {
         vertices[vertexIndex + N2] = newVertices[N2];
       }
@@ -28354,7 +28364,7 @@ class ParticleSystem3D {
     const angle = index / length2 * Math.PI * 2;
     const x2 = radius * Math.cos(angle);
     const y2 = radius * Math.sin(angle);
-    const height = index * unitHeight;
+    const height = (index + 1) * unitHeight;
     const path = new Path(x2, y2);
     const geometryData = { x: x2, y: y2, height, path };
     let _timer = path.timer;
@@ -28916,11 +28926,12 @@ const createThreeParticle = function() {
     this.scene = new Scene();
     this.renderer = new WebGLRenderer({ "alpha": true, "canvas": canvas });
     this.camera = new PerspectiveCamera(75, canvas.width / canvas.height, 0.1, 1e3);
-    const radius = 1024;
-    this.camera.position.set(radius * 0.1, radius * 0.4, radius * 0.4);
+    const radius = 800;
+    this.camera.position.set(radius * 0, radius * 0.4, radius * 0.4);
     this.controls = new OrbitControls(this.camera, this.renderer.domElement);
-    this.controls.target.set(0, -radius * 0.1, -radius * 0.2);
-    this.controls.update();
+    this.controls.target.set(0, radius * 0.1, -radius * 0);
+    this.controls.autoRotate = true;
+    this.controls.autoRotateSpeed = 2;
     window.c = this.controls;
     this.system = new ParticleSystem3D();
     const mesh = this.system.getMesh();
@@ -28980,6 +28991,7 @@ const createThreeParticle = function() {
     this.system.sort.start(ID, this.system.getSortData());
   };
   this.update = () => {
+    this.controls.update();
     this.system.update();
     frame.updateValue(clock.getDelta());
     window.fps = frame.getFPS();
@@ -29020,9 +29032,12 @@ const CanvasSectionS2A = ({ ratio, min, sectinoID = "Sort3D" }) => {
     threeParticle.start(ID);
   }
   function handleParameterChange(e) {
-    const id2 = e.target.id;
-    const value = e.target.value * 1;
-    threeParticle.system.setParameter(id2, value);
+    const { id: id2, value, min: min2, max } = e.target;
+    let newValue = value * 1;
+    if (max != "" && newValue > max * 1) newValue = max;
+    if (min2 != "" && newValue < min2 * 1) newValue = min2;
+    e.target.value = newValue;
+    threeParticle.system.setParameter(id2, newValue * 1);
   }
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("section", { ref: section, className: "section", id: sectinoID, children: [
     /* @__PURE__ */ jsxRuntimeExports.jsx("canvas", { ref: canvas, width: min * ratio, height: ratio * min * ratio }),
@@ -29030,17 +29045,13 @@ const CanvasSectionS2A = ({ ratio, min, sectinoID = "Sort3D" }) => {
       /* @__PURE__ */ jsxRuntimeExports.jsx("header", { id: "header", children: /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { children: "threeParticle" }) }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "parameter", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx("label", { children: "長度" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("input", { onChange: handleParameterChange, type: "number", id: "length", defaultValue: "32" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("label", { children: "Beta" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("input", { onChange: handleParameterChange, type: "number", id: "", defaultValue: "10" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("label", { children: "Gamma" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("input", { onChange: handleParameterChange, type: "number", id: "", defaultValue: "10" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("label", { children: "Delta" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("input", { onChange: handleParameterChange, type: "number", id: "", defaultValue: "10" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("label", { children: "Vector Size" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("input", { onChange: handleParameterChange, type: "number", id: "", defaultValue: "10" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("label", { children: "Transform Speed" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("input", { onChange: handleParameterChange, type: "number", id: "", defaultValue: "10" })
+        /* @__PURE__ */ jsxRuntimeExports.jsx("input", { onChange: handleParameterChange, type: "number", id: "length", defaultValue: "64", min: "3", max: "4096" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("label", { children: "高度" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("input", { onChange: handleParameterChange, type: "number", id: "maxHeight", defaultValue: "255", min: "50", max: "350" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("label", { children: "半徑" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("input", { onChange: handleParameterChange, type: "number", id: "radius", defaultValue: "150", min: "50", max: "300" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("label", { children: "深度" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("input", { onChange: handleParameterChange, type: "number", id: "depth", defaultValue: "10", min: "-100", max: "100" })
       ] }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "controlpanel", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx(RecordBtn, { canvas, audio }),
@@ -29277,10 +29288,11 @@ class ParticleSystem {
     }
     function drawColumn(column) {
       ctx.beginPath();
-      ctx.moveTo(column.path.pointX, column.path.pointY);
-      ctx.lineTo(column.path.pointX, column.path.pointY - column.height);
+      const { pointX, pointY, z: z2, timer, period } = column.path;
+      ctx.moveTo(pointX, pointY + z2);
+      ctx.lineTo(pointX, pointY + z2 - column.height);
       const c = column.height / 865 * 2;
-      const t2 = 1 - column.path.timer / column.path.period * 0.5;
+      const t2 = 1 - timer / period * 0.5;
       const r2 = mix(t2, 255, mix(c, 246, 195));
       const g = mix(t2, 100, mix(c, 211, 160));
       const b = mix(t2, 100, mix(c, 71, 133));
@@ -38009,4 +38021,4 @@ function App() {
 const domNode = document.getElementById("root");
 const root = createRoot(domNode);
 root.render(/* @__PURE__ */ jsxRuntimeExports.jsx(App, {}));
-//# sourceMappingURL=index-cNEXPWpa.js.map
+//# sourceMappingURL=index-B7iHzBw9.js.map

@@ -159,9 +159,10 @@ var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "sy
         const easeout = Math.pow((t + 1) / p, 2) - Math.pow(t / p, 2);
         const easein = Math.pow(1 - (t - 1) / p, 2) - Math.pow(1 - t / p, 2);
         const [a, b, c] = this.getPath();
-        this.getLeap();
+        const [d, e, f] = this.getLeap();
         this.pointX += (a * linear + b * easein + c * easeout) * dX;
         this.pointY += (a * linear + b * easein + c * easeout) * dY;
+        if (dX + dY != 0) this.z += (d * linear + e * easein + f * easeout) * (-(dX + dY) / 5 + 10 * -(dX + dY) / Math.abs(dX + dY));
         this.ID = requestAnimationFrame(this.NextFrame);
       }).bind(this));
       this.pointX = x;
@@ -481,4 +482,4 @@ var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "sy
     requestID = requestAnimationFrame(main);
   }
 })();
-//# sourceMappingURL=worker-DaG30cOA.js.map
+//# sourceMappingURL=worker-C1z2Go_o.js.map
