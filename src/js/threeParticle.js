@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+
 import Averager from './averager';
 import ParticleSystem3D from './particleSystem3D';
 import { makeBall } from './customGeometry';
@@ -28,7 +29,6 @@ const createThreeParticle = function(){
         this.controls.autoRotate = true;  // 啟用自動旋轉
         this.controls.autoRotateSpeed = 2;  // 設置旋轉速度
 
-        window.c = this.controls;
         // this.axis = new THREE.AxesHelper(300);
         // this.scene.add(this.axis);
 
@@ -39,6 +39,11 @@ const createThreeParticle = function(){
         const group = new THREE.Group();
         group.add(ball, mesh);
         this.scene.add(group);
+
+        // 添加光源
+        const light = new THREE.DirectionalLight(0xffffff, 3);
+        light.position.set(radius, radius * 2, radius);
+        this.scene.add(light);
     }
     this.cleanup = () => {
         // 移除場景中的對象
