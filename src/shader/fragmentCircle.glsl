@@ -12,6 +12,6 @@ void main() {
     if (dist < u_radius) {
         gl_FragColor = u_color;
     } else {
-        discard;
+        gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);
     }
 }

@@ -212,12 +212,18 @@ const createGLSL = function(){
     this.fillCircle = () => {
         this.gl.useProgram(this.programCircle);
     
-        const positionAttributeLocation = this.gl.getAttribLocation(this.programCircle, "a_position");
         const resolutionUniformLocation = this.gl.getUniformLocation(this.programCircle, "u_resolution");
         const colorUniformLocation = this.gl.getUniformLocation(this.programCircle, "u_color");
         const centerUniformLocation = this.gl.getUniformLocation(this.programCircle, "u_center");
         const radiusUniformLocation = this.gl.getUniformLocation(this.programCircle, "u_radius");
     
+
+        this.gl.uniform2f(resolutionUniformLocation, this.gl.canvas.width, this.gl.canvas.height);
+        this.gl.uniform2f(centerUniformLocation, 0.5, 0.5);
+        this.gl.uniform1f(radiusUniformLocation, 0.2);
+        this.gl.uniform4f(colorUniformLocation, 0.9, 0.9, 0.5, 1);
+
+        const positionAttributeLocation = this.gl.getAttribLocation(this.programCircle, "a_position");
         this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.positionBuffer);
         this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array([
             0, 0,
@@ -227,16 +233,26 @@ const createGLSL = function(){
             0, this.gl.canvas.height,
             this.gl.canvas.width, this.gl.canvas.height,
         ]), this.gl.STATIC_DRAW);
+        const x = this.gl.canvas.width / 2, y = this.gl.canvas.height / 2;
+        const radius = x * 0.5;
+        const segment = 32;
+        const vertices = new Float32Array(segment * 3 * 2);
+        for(let N = 0; N < segment; N++){
+            const startAngle = 2 * Math.PI * N / segment;
+            const endAngle = 2 * Math.PI * (N+1) / segment;
+            vertices[N * 6] = x;
+            vertices[N * 6 + 1] = y;
+            vertices[N * 6 + 2] = x + radius * Math.cos(startAngle);
+            vertices[N * 6 + 3] = y + radius * Math.sin(startAngle);
+            vertices[N * 6 + 4] = x + radius * Math.cos(endAngle);
+            vertices[N * 6 + 5] = y + radius * Math.sin(endAngle);
+        }
+        this.gl.bufferData(this.gl.ARRAY_BUFFER, vertices, this.gl.STATIC_DRAW);
 
         this.gl.enableVertexAttribArray(positionAttributeLocation);
         this.gl.vertexAttribPointer(positionAttributeLocation, 2, this.gl.FLOAT, false, 0, 0);
     
-        this.gl.uniform2f(resolutionUniformLocation, this.gl.canvas.width, this.gl.canvas.height);
-        this.gl.uniform2f(centerUniformLocation, 0.5, 0.5);
-        this.gl.uniform1f(radiusUniformLocation, 0.2);
-        this.gl.uniform4f(colorUniformLocation, Math.random(), Math.random(), Math.random(), 1);
-    
-        this.gl.drawArrays(this.gl.TRIANGLES, 0, 6);
+        this.gl.drawArrays(this.gl.POINTS, 0, segment * 3);
     }
     this.update = () => {
         if(this.transform < 100) this.transform+= 0.1;
@@ -245,9 +261,11 @@ const createGLSL = function(){
         this.gl.clearColor(0, 0, 0, 0);
         this.gl.clear(this.gl.COLOR_BUFFER_BIT);
         this.fillJulia();
+        // this.fillCircle();
         
         frame.updateValue(Date.now() - this.timestamp);
         this.timestamp = Date.now();
+        window.t = Math.floor(10 / frame.getAverage()) / 100;
         // console.log(Math.floor(1000 / frame.getAverage()));
     }
     this.dispose = () => {

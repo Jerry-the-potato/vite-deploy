@@ -13,7 +13,7 @@ const worker = new Worker('./worker.js');
 
 worker.postMessage(可轉移對象);
 
-myWorker.onmessage = function (e) {
+worker.onmessage = function (e) {
     console.log(e.data);
 };
 ```
