@@ -36939,11 +36939,11 @@ const CanvasSectionS3 = ({ ratio, min, sectinoID = "SortAlgorithm" }) => {
     ] })
   ] });
 };
-const vertexShaderSourceTexture = "attribute vec2 a_position;\nuniform mediump vec2 u_resolution;\nuniform mediump float u_radius;\n\nvoid main() {\n    gl_PointSize = u_radius; \n    vec2 zeroToOne = a_position / u_resolution;\n    vec2 clipSpace = zeroToOne * 2.0 - 1.0;\n    gl_Position = vec4(clipSpace * vec2(1, -1), 0, 1);\n}";
+const vertexShaderSourceTexture = "attribute vec2 a_position;\nuniform mediump vec2 u_resolution;\n\nvec3 rotateByQuaternion(vec3 position, vec4 q) {\n    // 四元數乘法公式，用於旋轉一個向量\n    vec3 q_xyz = q.xyz;\n    float q_w = q.w;\n\n    // 計算旋轉後的位置\n    vec3 uv = cross(q_xyz, position);\n    vec3 uuv = cross(q_xyz, uv);\n    uv *= 2.0 * q_w;\n    uuv *= 2.0;\n\n    return position + uv + uuv;\n}\n\nvoid main() {\n    gl_PointSize = 10.0; // 設置點的半徑範圍\n    vec2 zeroToOne = a_position / u_resolution;\n    vec2 clipSpace = zeroToOne * 2.0 - 1.0;\n    gl_Position = vec4(clipSpace * vec2(1, -1), 0, 1);\n    // vec4 u_quaternion = vec4(0.34, 0., 0.34, 0.34);\n    // vec3 rotatedPosition = rotateByQuaternion(vec3(clipSpace, 0.0), u_quaternion);\n    // gl_Position = vec4(rotatedPosition * vec3(1, -1, 1), 1);\n}";
 const fragmentShaderSourceRect = "precision mediump float;\nuniform vec4 u_color;\nuniform vec2 u_resolution;\n\nvoid main() {\n    gl_FragColor = u_color * vec4(gl_FragCoord.xy / u_resolution, 1.0, 0.0);\n}";
-const fragmentShaderSourceCircle = "precision mediump float;\nuniform vec2 u_resolution;\nuniform vec2 u_center;\nuniform float u_radius;\nuniform vec4 u_color;\n\nvoid main() {\n    vec2 st = gl_FragCoord.xy / u_resolution;\n    vec2 aspectRatio = vec2(u_resolution.x / u_resolution.y, 1.0);\n\n    float dist = distance(st * aspectRatio, u_center * aspectRatio);\n    if (dist < u_radius) {\n        gl_FragColor = u_color;\n    } else {\n        discard;\n    }\n}";
+const fragmentShaderSourceCircle = "precision mediump float;\nuniform vec2 u_resolution;\nuniform vec2 u_center;\nuniform float u_radius;\nuniform vec4 u_color;\n\nvoid main() {\n    vec2 st = gl_FragCoord.xy / u_resolution;\n    vec2 aspectRatio = vec2(u_resolution.x / u_resolution.y, 1.0);\n\n    float dist = distance(st * aspectRatio, u_center * aspectRatio);\n    if (dist < u_radius) {\n        gl_FragColor = u_color;\n    } else {\n        gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);\n    }\n}";
 const fragmentShaderSourcePoint = "precision mediump float;\nuniform vec2 u_resolution;\nuniform float u_radius;\n\nvoid main() {\n    vec2 coord = gl_PointCoord - vec2(0.5);  // 計算當前像素相對於點中心的座標\n    float dist = length(coord);  // 計算當前像素與點中心的距離\n    float edge = min(2.0 / u_radius, 0.2);\n    float radius = 0.5; // 在點相對空間中，gl_PointSize默認範圍[0, 1]\n    float alpha = smoothstep(radius - edge, radius + edge * 0.1, dist);  // 使用 smoothstep 來處理反鋸齒\n    \n    if (dist > radius) {\n        discard;  // 如果超過半徑，丟棄該片段\n    }\n    // gl_FragColor = vec4(1.0, 1.0, 0.0, 1.0);\n    gl_FragColor = vec4(vec3(1.0, gl_FragCoord.xy / u_resolution), 1.0 - alpha);  // 顏色為紅色，帶有反鋸齒效果的透明度\n}";
-const fragmentShaderSourceJuila = "precision highp float;\n\nuniform mediump vec2 u_resolution; // 畫布的解析度\nuniform vec2 u_offset;\nuniform float u_zoom;\nuniform vec2 u_c; // 常數c的值 \n\nvec2 complexMul(vec2 a, vec2 b) {\n    return vec2(a.x * b.x - a.y * b.y, a.x * b.y + a.y * b.x);\n}\n\nvoid main() {\n    vec2 z = (gl_FragCoord.xy - u_resolution * 0.5) / u_zoom + u_offset;\n    const int maxIterations = 100;\n    for(int i = 0; i < maxIterations; i++) {\n        z = complexMul(z, z) + u_c + u_offset;\n        if(dot(z, z) > 4.0){\n            float color = 0.1 + 0.7 * float(i) / float(maxIterations);\n            gl_FragColor = vec4(vec3(color), 1.0);\n\n            float n1 = (sin(pow(float(i), 0.6) * 50.0 / 100.0) * 0.35) + 0.65;\n            float n2 = (cos(pow(float(i), 0.6) * 50.0 / 100.0) * 0.35) + 0.65;\n            gl_FragColor = vec4(clamp(vec3(n1, 0.85 * n1, 0.55 * n1), 0.0, 1.0), 1.0);\n            break;\n        }\n    }\n}";
+const fragmentShaderSourceJuila = "precision highp float;\n\nuniform mediump vec2 u_resolution; // 畫布的解析度\nuniform vec2 u_c; // 常數c的值 \nuniform vec2 u_offset;\nuniform float u_zoom;\n\nvec2 complexMul(vec2 a, vec2 b) {\n    return vec2(a.x * b.x - a.y * b.y, a.x * b.y + a.y * b.x);\n}\n\nvoid main() {\n    vec2 z = (gl_FragCoord.xy - u_resolution * 0.5) / u_zoom + u_offset;\n    const int maxIterations = 100;\n    for(int i = 0; i < maxIterations; i++) {\n        z = complexMul(z, z) + u_c + u_offset;\n        if(dot(z, z) > 4.0){\n            // 方法一\n            // float color = 0.3 + 0.7 * float(i) / float(maxIterations);\n            // gl_FragColor = vec4(vec3(color), 1.0);\n\n            // 方法二\n            float n1 = (sin(pow(float(i), 0.6) * 50.0 / 100.0) * 0.35) + 0.65;\n            float n2 = (cos(pow(float(i), 0.6) * 50.0 / 100.0) * 0.35) + 0.65;\n            gl_FragColor = vec4(vec3(n1, 0.85 * n1, 0.55 * n1), 1.0);\n            break;\n        }\n    }\n}";
 const fragmentShaderSourceManderbrot = "precision highp float;\n\nuniform mediump vec2 u_resolution;\nuniform vec2 u_offset;\nuniform float u_zoom;\n\nstruct DoubleVec2 {\n    float high;\n    float low;\n};\n\nfloat decimalPlaces = 30.0;\nfloat scale = pow(10.0, decimalPlaces);\nfloat scaleReverse = pow(10.0, -decimalPlaces);\nfloat scaleSqrt = pow(10.0, decimalPlaces / 2.0);\n\nfloat getHigh(float value){\n    float scaledValue = value * scale;\n    float truncatedValue = floor(scaledValue);\n    float result = truncatedValue * scaleReverse;\n    return result;\n    // return value;\n}\n\n// 雙精度加法\nDoubleVec2 dadd(DoubleVec2 a, DoubleVec2 b) {\n    // 使用高位和低位加法\n    float sumHigh = getHigh(a.high + b.high);\n    float sumLow = a.low + b.low;\n\n    // 計算進位\n    float carry = floor(sumLow) * scaleReverse;\n\n    // 分配尾數\n    DoubleVec2 result;\n    result.high = sumHigh + 0.0;\n    result.low = sumLow - floor(sumLow);\n\n    if(floor(sumLow) > 1.0) result.high = 0.0;\n\n    return result;\n}\n\n//雙精度減法\nDoubleVec2 dminus(DoubleVec2 a, DoubleVec2 b) {\n    float sumHigh = getHigh(a.high - b.high);\n    float sumLow = a.low - b.low;\n    \n    // 分配尾數\n    DoubleVec2 result;\n    result.high = sumHigh + 0.0;\n    result.low = sumLow - floor(sumLow);\n\n    return result;\n}\n\nfloat fmul(float a, float b){\n    float left = (a * scaleSqrt - floor(a * scaleSqrt)) ;\n    float right = (b * scaleSqrt - floor(b * scaleSqrt)) ;\n    return left * right;\n}\n\n// 雙精度乘法\nDoubleVec2 dmul(DoubleVec2 a, DoubleVec2 b) {\n\n    // 0, 1, 2 表示單位，有多少次 2^(24)\n    // 其中 high 是 0，low 是 1，因此2會進位到1，1會進位到0\n    float hh0 = a.high * b.high; // 標準乘法\n    float hh1 = fmul(a.high, b.high); // 溢出小數\n    float hl1 = a.high * b.low + a.low * b.high; // 高位進位\n    float ll2 = a.low * b.low; // 低位進位\n\n    // 單位: n0 = n1 * scaleReverse; n1 = n2 * scaleReverse;\n    float high0 = hh0;\n    float low1 = hh1 + hl1 + floor(ll2) * scaleReverse;\n    // 返回結果\n    DoubleVec2 result;\n    result.high = getHigh(high0 + floor(low1) * scaleReverse);\n    result.low = low1 - floor(low1);\n\n    return result;\n}\n\n\nfloat getExponent(float num){\n    float exponent = floor(log(abs(num)) / log(10.0));\n    return pow(10.0, exponent);\n}\n\n// 雙精度除單精度\nDoubleVec2 ddiv(DoubleVec2 a, float b) {\n\n    float e = getExponent(b);\n    float hh0 = a.high / b;\n    float hh1 = (a.high) / floor(b / e) / e;\n    float hl1 = a.low / b;\n\n    float high0 = hh0;\n    float low1 = hh1 + hl1;\n\n    DoubleVec2 result;\n    result.high = getHigh(high0 + floor(low1) * scaleReverse);\n    result.low = low1 - floor(low1);\n\n    // if(low1 > 0.8) result.high = 0.0;\n    // if(floor(a.high / 100.0) * 100.0 == a.high) result.high = 0.0;\n\n    // if(hh0 / scaleReverse == hh1){\n    //     result.low = hh1;\n    // }\n    // else{\n    //     // result.low = hh1;\n    // }\n\n\n\n    return result;\n}\n\n// 將單精度浮點數轉換為倍精度結構\nDoubleVec2 floatToDoubleVec2(float f) {\n    DoubleVec2 result;\n    result.high = f;\n    result.low = 0.0;\n    return result;\n}\n\n// 將 DoubleVec2 結構轉換為單一浮點數\nfloat DoubleVec2ToFloat(DoubleVec2 d) {\n    return d.high;\n}\n\n// 161789956.22774595\n// 161789956.22774595\n// 546041102.2686427\n// 31958509.872147348\n\n// 2623956791.0043197\n// 802316031.8259898\n// 75031682.7451647\n\nvoid main(){\n\n    const bool isDouble = true;\n    const bool isDouble2 = false;\n    if(isDouble2){\n        \n        DoubleVec2 cX = floatToDoubleVec2(gl_FragCoord.x - u_resolution.x * 0.5 + u_offset.x);\n        DoubleVec2 cY = floatToDoubleVec2(gl_FragCoord.y - u_resolution.y * 0.5 + u_offset.y);\n        cX = ddiv(cX, u_zoom);\n        cY = ddiv(cY, u_zoom);\n        // if(u_offset.x > floor(u_offset.x)) return;\n\n        // if(cX.low == 0.0 && cY.low == 0.0) return;\n        // if(gl_FragCoord.x < 500.0) return;\n        // if(pow(10.0, -44.) == 0.0) return;\n        \n        DoubleVec2 zX = floatToDoubleVec2(0.0);\n        DoubleVec2 zY = floatToDoubleVec2(0.0);\n\n        for (float i = 0.0; i < 100.0; i++) {\n\n            // z = z^2 + c\n            DoubleVec2 zX2 = dmul(zX, zX);\n            DoubleVec2 zY2 = dmul(zY, zY);\n            DoubleVec2 zXY = dmul(zX, zY);\n\n            zX = dadd(dminus(zX2, zY2), cX);\n            zY = dadd(dadd(zXY, zXY), cY);\n\n            // if(zX.low == 0.0 && zY.low == 0.0) return;\n\n            // 使用倍精度計算長度\n            DoubleVec2 len2 = dadd(dmul(zX, zX), dmul(zY, zY));\n            if (DoubleVec2ToFloat(len2) > 4.0) {\n                float color = i / 100.0;\n                gl_FragColor = vec4(color * 0.9, color * 0.8, color * 0.25, 1.0);\n                break;\n            }\n        }\n        return;\n    }\n\n    vec2 c = (gl_FragCoord.xy - u_resolution * 0.5) / u_zoom + u_offset;\n    // vec2 c = (gl_FragCoord.xy - u_resolution * 0.5  + u_offset) / u_zoom;\n    vec2 z = vec2(0.0, 0.0);\n    \n    for (float i = 0.0; i < 100.0; i++) {\n\n        z = vec2(z.x * z.x - z.y * z.y, 2.0 * z.x * z.y) + c;\n        if (length(z) > 2.0){\n            float color = i / 100.0;\n            gl_FragColor = vec4(color, color * 0.5, color * 0.25, 1.0);\n            break;\n        }\n    }\n}\n";
 const fragmentShaderSourceBurningShip = "precision highp float;\n\nuniform mediump vec2 u_resolution;\nuniform vec2 u_offset;\nuniform float u_zoom;\nuniform float u_transform;\n\nfloat rand(float s) {\n  return fract(sin(s*12.9898) * 43758.5453);\n}\n\nvoid main() {\n    vec3 color = vec3(0.0, 0.0, 0.0);\n    vec2 c = (gl_FragCoord.xy - u_resolution * 0.5) / u_zoom + u_offset;\n    c.y *= -1.0; // 翻轉 y 軸\n\n    // 反鋸齒 & 隨機取樣\n    const float AA_LEVEL = 2.0;\n    for (float I = 0.; I < AA_LEVEL; I++) {\n        \n        float dx = u_offset.x - floor(u_offset.x);\n        float dy = u_offset.y - floor(u_offset.y);\n        vec2 dc = vec2(rand(dx * I * 0.54321 ), rand(dy * I * 0.12345 )) / u_zoom;\n        if(I == 0.0) dc *= 0.0;\n        vec2 z = vec2(0.0);\n        float iteration = 0.0;\n        const float max_iterations = 100.0;\n\n        // 比較迭代前後的差異進行顏色渲染\n        vec3 sum = vec3(0.0, 0.0, 0.0);\n        vec2 pz = z;\n        vec2 ppz = z;\n\n        // Burning Ship 分形迭代\n        iteration = max_iterations;\n        for (float i = 0.0; i < max_iterations; i++) {\n            if(i < u_transform) z = vec2(abs(z.x), abs(z.y)); // 將實部與虛部取絕對值\n            z = vec2(z.x * z.x - z.y * z.y, 2.0 * z.x * z.y) + c + dc;\n            \n            if (length(z) > 4.0){\n                iteration = i;\n                break; // 如果距離超過閾值，退出迴圈\n            }\n            ppz = pz;\n            pz = z;\n            sum.x += dot(z - pz, pz - ppz);\n            sum.y += dot(z - pz, z - pz);\n            sum.z += dot(z - ppz, pz - ppz);\n        }\n\n        // 計算顏色\n        // float color = 0.1 + 0.7 * (iteration / max_iterations);\n        // gl_FragColor = vec4(vec3(color, color * 0.75, color * 0.25), 1.0);\n        if(iteration < max_iterations){\n            float n1 = sin((iteration) * 0.15) * 0.35 + 0.65;\n            float n2 = cos((iteration) * 1.50) * 0.15 + 0.65;\n            color+= vec3(clamp(vec3(n1, n2, (n1 + n2) / 2.0), 0.0, 1.0));\n        }\n        else{\n            sum = abs(sum) / max_iterations;\n            vec3 color = sin(abs(sum * 5.0)) * 0.45 + 0.5;\n            color+= vec3(clamp(color, 0.0, 1.0));\n            if(I == 0.) break;\n        }\n    }\n    color /= AA_LEVEL;\n\n     // 使用硬邊界\n    float width = 1.0 / u_zoom;\n    float axisX = step(width / 2.0, abs(c.y));\n    float axisY = step(width / 2.0, abs(c.x));\n    \n    vec3 axisColor = vec3(0.0, 0.0, 0.0);\n    vec3 finalColor = mix(axisColor, color, (axisX + axisY) / 2.0);\n    gl_FragColor = vec4(finalColor, 1.0);\n}";
 const fragmentShaderSourceAntiAliasing = "precision highp float;\n\nuniform sampler2D u_texture;  // 接收上一步的 texture\nvarying vec2 v_texCoord;  // 傳遞紋理坐標\n\nvoid main() {\n    // 獲取當前像素以及周圍的像素值進行抗鋸齒處理\n    vec3 color = texture2D(u_texture, v_texCoord).rgb;\n\n    // 動態應用 FXAA 或其他抗鋸齒技術\n    // vec3 antiAliasedColor = applyFXAA(u_texture, v_texCoord);\n\n    // 最終輸出\n    gl_FragColor = vec4(color, 1.0);\n}";
@@ -37114,11 +37114,15 @@ const createGLSL = function() {
   };
   this.fillCircle = () => {
     this.gl.useProgram(this.programCircle);
-    const positionAttributeLocation = this.gl.getAttribLocation(this.programCircle, "a_position");
     const resolutionUniformLocation = this.gl.getUniformLocation(this.programCircle, "u_resolution");
     const colorUniformLocation = this.gl.getUniformLocation(this.programCircle, "u_color");
     const centerUniformLocation = this.gl.getUniformLocation(this.programCircle, "u_center");
     const radiusUniformLocation = this.gl.getUniformLocation(this.programCircle, "u_radius");
+    this.gl.uniform2f(resolutionUniformLocation, this.gl.canvas.width, this.gl.canvas.height);
+    this.gl.uniform2f(centerUniformLocation, 0.5, 0.5);
+    this.gl.uniform1f(radiusUniformLocation, 0.2);
+    this.gl.uniform4f(colorUniformLocation, 0.9, 0.9, 0.5, 1);
+    const positionAttributeLocation = this.gl.getAttribLocation(this.programCircle, "a_position");
     this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.positionBuffer);
     this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array([
       0,
@@ -37134,13 +37138,24 @@ const createGLSL = function() {
       this.gl.canvas.width,
       this.gl.canvas.height
     ]), this.gl.STATIC_DRAW);
+    const x2 = this.gl.canvas.width / 2, y2 = this.gl.canvas.height / 2;
+    const radius = x2 * 0.5;
+    const segment = 32;
+    const vertices = new Float32Array(segment * 3 * 2);
+    for (let N2 = 0; N2 < segment; N2++) {
+      const startAngle = 2 * Math.PI * N2 / segment;
+      const endAngle = 2 * Math.PI * (N2 + 1) / segment;
+      vertices[N2 * 6] = x2;
+      vertices[N2 * 6 + 1] = y2;
+      vertices[N2 * 6 + 2] = x2 + radius * Math.cos(startAngle);
+      vertices[N2 * 6 + 3] = y2 + radius * Math.sin(startAngle);
+      vertices[N2 * 6 + 4] = x2 + radius * Math.cos(endAngle);
+      vertices[N2 * 6 + 5] = y2 + radius * Math.sin(endAngle);
+    }
+    this.gl.bufferData(this.gl.ARRAY_BUFFER, vertices, this.gl.STATIC_DRAW);
     this.gl.enableVertexAttribArray(positionAttributeLocation);
     this.gl.vertexAttribPointer(positionAttributeLocation, 2, this.gl.FLOAT, false, 0, 0);
-    this.gl.uniform2f(resolutionUniformLocation, this.gl.canvas.width, this.gl.canvas.height);
-    this.gl.uniform2f(centerUniformLocation, 0.5, 0.5);
-    this.gl.uniform1f(radiusUniformLocation, 0.2);
-    this.gl.uniform4f(colorUniformLocation, Math.random(), Math.random(), Math.random(), 1);
-    this.gl.drawArrays(this.gl.TRIANGLES, 0, 6);
+    this.gl.drawArrays(this.gl.POINTS, 0, segment * 3);
   };
   this.update = () => {
     if (this.transform < 100) this.transform += 0.1;
@@ -37151,6 +37166,7 @@ const createGLSL = function() {
     this.fillJulia();
     frame.updateValue(Date.now() - this.timestamp);
     this.timestamp = Date.now();
+    window.t = Math.floor(10 / frame.getAverage()) / 100;
   };
   this.dispose = () => {
     if (this.gl) {
@@ -37217,13 +37233,13 @@ const CanvasSectionS4 = ({ ratio, min, sectinoID = "JuliaSet" }) => {
     setOffsetY(offsetY + addOffsetY / zommIn - addOffsetY);
   }
   const [isMouseDown, setIsMouseDown] = reactExports.useState(false);
-  const preMouse = reactExports.useRef([0, 0]);
+  const preMouse = reactExports.useRef({ x: 0, y: 0 });
   const logRef = reactExports.useRef(null);
   function handleMouseDown(e) {
     if (e.target.tagName == "BUTTON" || e.target.tagName == "INPUT") return;
     setIsWheel(false);
     setIsMouseDown(true);
-    preMouse.current = [myMouse.targetX, myMouse.targetY];
+    preMouse.current = { x: myMouse.targetX, y: myMouse.targetY };
     canvas.current.classList.remove("cursor-grab");
     canvas.current.classList.add("cursor-grabbing");
   }
@@ -37235,9 +37251,9 @@ const CanvasSectionS4 = ({ ratio, min, sectinoID = "JuliaSet" }) => {
   function handleMouseMove() {
     if (!useMouse) return;
     if (isMouseDown) {
-      const addOffsetX = (myMouse.targetX - preMouse.current[0]) / zoom * 50;
-      const addOffsetY = (myMouse.targetY - preMouse.current[1]) / zoom * 50;
-      preMouse.current = [myMouse.targetX, myMouse.targetY];
+      const addOffsetX = (myMouse.targetX - preMouse.current.x) / zoom * 50;
+      const addOffsetY = (myMouse.targetY - preMouse.current.y) / zoom * 50;
+      preMouse.current = { x: myMouse.targetX, y: myMouse.targetY };
       setOffsetX(offsetX - addOffsetX);
       setOffsetY(offsetY + addOffsetY);
     }
@@ -37251,7 +37267,7 @@ const CanvasSectionS4 = ({ ratio, min, sectinoID = "JuliaSet" }) => {
     return Math.sqrt(dx * dx + dy * dy);
   }
   function handleTouchStart(e) {
-    preMouse.current = [myMouse.targetX, myMouse.targetY];
+    preMouse.current = { x: myMouse.targetX, y: myMouse.targetY };
     setIsMouseDown(true);
     if (e.touches.length === 2) {
       setIsWheel(true);
@@ -37275,9 +37291,9 @@ const CanvasSectionS4 = ({ ratio, min, sectinoID = "JuliaSet" }) => {
       initialDistance.current = newDistance;
       e.preventDefault();
     } else {
-      const addOffsetX = (myMouse.targetX - preMouse.current[0]) / zoom * 50;
-      const addOffsetY = (myMouse.targetY - preMouse.current[1]) / zoom * 50;
-      preMouse.current = [myMouse.targetX, myMouse.targetY];
+      const addOffsetX = (myMouse.targetX - preMouse.current[0].x) / zoom * 50;
+      const addOffsetY = (myMouse.targetY - preMouse.current[1].y) / zoom * 50;
+      preMouse.current = { x: myMouse.targetX, y: myMouse.targetY };
       setOffsetX(offsetX - addOffsetX);
       setOffsetY(offsetY + addOffsetY);
       setReal((myMouse.targetX - canvas.current.width / 2) / zoom * 50);
@@ -45521,4 +45537,4 @@ function App() {
 const domNode = document.getElementById("root");
 const root = createRoot(domNode);
 root.render(/* @__PURE__ */ jsxRuntimeExports.jsx(App, {}));
-//# sourceMappingURL=index-C52mtu43.js.map
+//# sourceMappingURL=index-BSkdxNTB.js.map
