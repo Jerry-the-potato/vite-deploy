@@ -78,6 +78,8 @@ export default class ParticleSystem3D{
             mass: 0, // 靜態物體
             material: this.groundMaterial,
             shape: new CANNON.Plane(),
+            collisionFilterGroup: 2, // 所屬組為 2
+            collisionFilterMask: 1,  // 只與其他組碰撞，不與同一組的物體碰撞
         });
         groundBody.quaternion.setFromEuler(-Math.PI / 2, 0, 0);
         this.world.addBody(groundBody);
@@ -120,6 +122,8 @@ export default class ParticleSystem3D{
             shape: new CANNON.Sphere(radius),
             material: this.sphereMaterial,
             position: new CANNON.Vec3(position.x, position.y, position.z),
+            collisionFilterGroup: 1, // 所屬組為 2
+            collisionFilterMask: 2 | 1,
         });
         this.world.addBody(sphereBody);
         
@@ -223,15 +227,28 @@ export default class ParticleSystem3D{
         //     const body = new CANNON.Body({
         //         mass: 0, // 靜態物體
         //         material: this.groundMaterial,
+        //         collisionFilterGroup: 2, // 所屬組為 1
+        //         collisionFilterMask: 1,  // 只與其他組碰撞，不與同一組的物體碰撞
         //     })
         //     this.world.addBody(body);
-        //     return body
+        //     return body;
         // });
-        column.body = new CANNON.Body({
-            mass: 0, // 靜態物體
-            material: this.groundMaterial,
-        });
-        this.world.add(column.body);
+        // column.box = new Array(length).fill().map(() =>{
+        //     const geometry = new THREE.BoxGeometry(10, 100, 10);
+        //     console.log(geometry);
+        //     const material = new THREE.MeshBasicMaterial({ color: 0x00ff00, wireframe: true });
+        //     const box = new THREE.Mesh(geometry, material);
+        //     this.mesh.add(box)
+        //     return box;
+        // });
+
+        // column.body = new CANNON.Body({
+        //     mass: 0, // 靜態物體
+        //     material: this.groundMaterial,
+        //     collisionFilterGroup: 2, // 所屬組為 1
+        //     collisionFilterMask: 1,  // 只與其他組碰撞，不與同一組的物體碰撞
+        // });
+        // this.world.add(column.body);
 
         column.updateVertices = (index) => {
             const startAngle = (index / column.length) * Math.PI * 2;
@@ -243,21 +260,29 @@ export default class ParticleSystem3D{
             const y = pointY - z * Math.sin(startAngle);
             
             const transition = 1 - timer / period;
-            const [newVertices, colorVertices] = this.getColumnVerticesByAngle(
+            const [newVertices, colorVertices, shape] = this.getColumnVerticesByAngle(
                 x, y, z * 0.1, 
                 column.radius, column.depth, 
                 height, column.unitHeight, 
                 startAngle, endAngle, transition
             );
-            // const newBoxShape = new CANNON.Box(new CANNON.Vec3(column.depth, 2 * Math.PI / column.length, height));
+            // const w = column.depth;
+            // const h = height;
+            // const d = 2 * Math.PI * column.radius / column.length;
+            // const newBoxShape = new CANNON.Box(new CANNON.Vec3(w, h, d));
             // column.body[index].shape = [];
             // column.body[index].addShape(newBoxShape);
-            // column.body[index].position.set(x, y, z * 0.1);
-            // column.body[index].quaternion.setFromEuler(0, 0, startAngle + Math.PI / 2);
+            // column.body[index].position.set(x , z * 0.1 + h / 2, y);
+            // column.body[index].quaternion.setFromEuler(0, -startAngle + Math.PI / 2, 0);
 
-            // if(column.body.shape) column.body.shape.length = 0;
+            // const geometry = new THREE.BoxGeometry(w, h, d);
+            // column.box[index].geometry.dispose();
+            // column.box[index].geometry = geometry;
+            // column.box[index].position.copy(column.body[index].position);
+            // column.box[index].quaternion.copy(column.body[index].quaternion);
+
+            // column.body.shape = [];
             // column.body.addShape(shape);
-            // column.body.updateMassProperties();
 
             const cubeVertexCount = 36;
             const vertexIndex = index * cubeVertexCount * 3; 
@@ -270,6 +295,9 @@ export default class ParticleSystem3D{
             for(let N = 0; N < cubeVertexCount * 3; N ++){
                 color[vertexIndex + N] = colorVertices[N];
             }
+
+            column.geometry.attributes.position.needsUpdate = true;
+            column.geometry.attributes.color.needsUpdate = true;
         }
 
         column.geometryData = new Array(length).fill().map((v, index) => {
@@ -544,34 +572,34 @@ export default class ParticleSystem3D{
 
         return vertices; // 返回長方體的 36 個頂點坐標
     }
-    getColumnVerticesByAngle(centerX, centerY, z, r, depth, height, unitHeight, startAngle, endAngle, transition) {
+    getColumnVerticesByAngle(centerX, centerZ, y, r, depth, height, unitHeight, startAngle, endAngle, transition) {
         const vertices = new Float32Array(36 * 3);
         let idx = 0;
-        const push = (x, y, z) => {
+        const push = (x, z, y) => {
             vertices[idx++] = x;
-            vertices[idx++] = z;
             vertices[idx++] = y;
+            vertices[idx++] = z;
         }
         const getXY = (radius, angle) => {
             const x = centerX + radius * Math.cos(angle) - r * Math.cos(startAngle);
-            const y = centerY + radius * Math.sin(angle) - r * Math.sin(startAngle);
-            return [x, y];
+            const z = centerZ + radius * Math.sin(angle) - r * Math.sin(startAngle);
+            return [x, z];
         }
-        const [x1, y1] = getXY(r - depth, startAngle);
-        const [x2, y2] = getXY(r - depth, endAngle);
-        const [x3, y3] = getXY(r, endAngle);
-        const [x4, y4] = getXY(r, startAngle);
+        const [x1, z1] = getXY(r - depth, startAngle);
+        const [x2, z2] = getXY(r - depth, endAngle);
+        const [x3, z3] = getXY(r, endAngle);
+        const [x4, z4] = getXY(r, startAngle);
 
         const addPoint = {};
         const h = unitHeight / 2; 
-        addPoint[1] = () => { push(x1, y1, z + height - h + 10) }; // 上面左側
-        addPoint[2] = () => { push(x2, y2, z + height + h + 10) }; // 上面右側
-        addPoint[3] = () => { push(x3, y3, z + height + h) }; // 上面右側外側
-        addPoint[4] = () => { push(x4, y4, z + height - h) }; // 上面左側外側
-        addPoint[5] = () => { push(x1, y1, z) }; // 下面左側
-        addPoint[6] = () => { push(x4, y4, z) }; // 下面左側外側
-        addPoint[7] = () => { push(x3, y3, z) }; // 下面右側外側
-        addPoint[8] = () => { push(x2, y2, z) }; // 下面右側
+        addPoint[1] = () => { push(x1, z1, y + height - h + 10) }; // 上面左側
+        addPoint[2] = () => { push(x2, z2, y + height + h + 10) }; // 上面右側
+        addPoint[3] = () => { push(x3, z3, y + height + h) }; // 上面右側外側
+        addPoint[4] = () => { push(x4, z4, y + height - h) }; // 上面左側外側
+        addPoint[5] = () => { push(x1, z1, y) }; // 下面左側
+        addPoint[6] = () => { push(x4, z4, y) }; // 下面左側外側
+        addPoint[7] = () => { push(x3, z3, y) }; // 下面右側外側
+        addPoint[8] = () => { push(x2, z2, y) }; // 下面右側
 
         let idx2 = 0;
         const colorVertices = new Float32Array(36 * 3);
@@ -627,22 +655,22 @@ export default class ParticleSystem3D{
         
         // const cannonVertices = [
         //     new CANNON.Vec3(0, 0, 0),
-        //     new CANNON.Vec3(x1, y1, z + height - h + 10), // 上面左側
-        //     new CANNON.Vec3(x2, y2, z + height + h + 10), // 上面右側
-        //     new CANNON.Vec3(x3, y3, z + height + h), // 上面右側外側
-        //     new CANNON.Vec3(x4, y4, z + height - h), // 上面左側外側
-        //     new CANNON.Vec3(x1, y1, z), // 下面左側
-        //     new CANNON.Vec3(x4, y4, z), // 下面左側外側
-        //     new CANNON.Vec3(x3, y3, z), // 下面右側外側
-        //     new CANNON.Vec3(x2, y2, z), // 下面右側
+        //     new CANNON.Vec3(x1, y + height - h + 10, z1), // 上面左側
+        //     new CANNON.Vec3(x2, y + height + h + 10, z2), // 上面右側
+        //     new CANNON.Vec3(x3, y + height + h, z3), // 上面右側外側
+        //     new CANNON.Vec3(x4, y + height - h, z4), // 上面左側外側
+        //     new CANNON.Vec3(x1, y, z1), // 下面左側
+        //     new CANNON.Vec3(x4, y, z4), // 下面左側外側
+        //     new CANNON.Vec3(x3, y, z3), // 下面右側外側
+        //     new CANNON.Vec3(x2, y, z2), // 下面右側
         // ]
         // const faces = [
-        //     [3, 2, 1, 0],
-        //     [4, 5, 6, 7],
-        //     [4, 5, 3, 0],
-        //     [1, 7, 6, 2],
-        //     [3, 5, 6, 2],
-        //     [0, 4, 7, 1]
+        //     [1,2,3,4],
+        //     [5, 6, 7, 8],
+        //     [1,4,6,5],
+        //     [2,8,7,3],
+        //     [3, 7, 6, 4],
+        //     [1,5,8,2]
         // ];
         // const shape = new CANNON.ConvexPolyhedron(
         //     cannonVertices, 

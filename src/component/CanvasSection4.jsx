@@ -172,6 +172,12 @@ const CanvasSectionS4 = ({ ratio, min, sectinoID = "JuliaSet"}) => {
     function getPreciseOffset(offset){
         return Math.floor(offset * step) / step;
     }
+    const [transform, setTransform] = useState(0);
+    function handleClick(value){
+        myGLSL.setTransform(value);
+        setTransform(value);
+    }
+
     return (
         <section ref={section} className="section" id={sectinoID}
             onMouseMove={handleMouseMove} onWheel={handleWheel}
@@ -200,10 +206,10 @@ const CanvasSectionS4 = ({ ratio, min, sectinoID = "JuliaSet"}) => {
                     <button onClick={() => setUseMouse(!useMouse)} id="useMouse">{useMouse ? "只允許使用面板" : "還是用滑鼠好了"}</button>
                     <button onClick={resetScreen}>畫面置中</button>
                     <RecordBtn canvas={canvas}/>
-                    <button onClick={() => setIsJulia(!isJulia)}>{isJulia == true ? "觀看更多" : "回到Julia"}</button>
+                    <button onClick={() => setIsJulia(!isJulia)}>{isJulia == true ? "其他圖形" : "回到Julia"}</button>
                     {!isJulia && <>
-                        <button onClick={() => myGLSL.setTransform(0)} disabled={0 ? true : false}>查看Manderbrot</button>
-                        <button onClick={() => myGLSL.setTransform(100)} disabled={0 ? true : false}>查看BurningShip</button>
+                        <button onClick={() => handleClick(0)} disabled={!transform ? true : false}>查看Manderbrot</button>
+                        <button onClick={() => handleClick(100)} disabled={transform ? true : false}>查看BurningShip</button>
                     </>}
                 </div>
                 <div ref={logRef}><p id="dialog">
