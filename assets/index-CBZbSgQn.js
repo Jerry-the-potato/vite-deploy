@@ -35697,7 +35697,11 @@ class ParticleSystem3D {
       mass: 0,
       // 靜態物體
       material: this.groundMaterial,
-      shape: new cannonExports.Plane()
+      shape: new cannonExports.Plane(),
+      collisionFilterGroup: 2,
+      // 所屬組為 2
+      collisionFilterMask: 1
+      // 只與其他組碰撞，不與同一組的物體碰撞
     });
     groundBody.quaternion.setFromEuler(-Math.PI / 2, 0, 0);
     this.world.addBody(groundBody);
@@ -35731,7 +35735,10 @@ class ParticleSystem3D {
       // 動態物體
       shape: new cannonExports.Sphere(radius),
       material: this.sphereMaterial,
-      position: new cannonExports.Vec3(position.x, position.y, position.z)
+      position: new cannonExports.Vec3(position.x, position.y, position.z),
+      collisionFilterGroup: 1,
+      // 所屬組為 2
+      collisionFilterMask: 2 | 1
     });
     this.world.addBody(sphereBody);
     return { mesh: sphereMesh, body: sphereBody };
@@ -35796,12 +35803,6 @@ class ParticleSystem3D {
     column.geometry.setAttribute("color", colorAttribute);
     const material = new MeshBasicMaterial({ "vertexColors": true });
     column.mesh = new Mesh(column.geometry, material);
-    column.body = new cannonExports.Body({
-      mass: 0,
-      // 靜態物體
-      material: this.groundMaterial
-    });
-    this.world.add(column.body);
     column.updateVertices = (index) => {
       const startAngle = index / column.length * Math.PI * 2;
       const endAngle = (index + 1) / column.length * Math.PI * 2;
@@ -35811,7 +35812,7 @@ class ParticleSystem3D {
       const x2 = pointX - z2 * Math.cos(startAngle);
       const y2 = pointY - z2 * Math.sin(startAngle);
       const transition = 1 - timer / period;
-      const [newVertices, colorVertices] = this.getColumnVerticesByAngle(
+      const [newVertices, colorVertices, shape] = this.getColumnVerticesByAngle(
         x2,
         y2,
         z2 * 0.1,
@@ -35833,6 +35834,8 @@ class ParticleSystem3D {
       for (let N2 = 0; N2 < cubeVertexCount * 3; N2++) {
         color[vertexIndex + N2] = colorVertices[N2];
       }
+      column.geometry.attributes.position.needsUpdate = true;
+      column.geometry.attributes.color.needsUpdate = true;
     };
     column.geometryData = new Array(length2).fill().map((v2, index) => {
       return this.createGeometryData(column, index);
@@ -36099,55 +36102,55 @@ class ParticleSystem3D {
     });
     return vertices;
   }
-  getColumnVerticesByAngle(centerX, centerY, z2, r2, depth2, height, unitHeight, startAngle, endAngle, transition) {
+  getColumnVerticesByAngle(centerX, centerZ, y2, r2, depth2, height, unitHeight, startAngle, endAngle, transition) {
     const vertices = new Float32Array(36 * 3);
     let idx = 0;
-    const push = (x5, y5, z3) => {
+    const push = (x5, z5, y3) => {
       vertices[idx++] = x5;
-      vertices[idx++] = z3;
-      vertices[idx++] = y5;
+      vertices[idx++] = y3;
+      vertices[idx++] = z5;
     };
     const getXY = (radius, angle) => {
       const x5 = centerX + radius * Math.cos(angle) - r2 * Math.cos(startAngle);
-      const y5 = centerY + radius * Math.sin(angle) - r2 * Math.sin(startAngle);
-      return [x5, y5];
+      const z5 = centerZ + radius * Math.sin(angle) - r2 * Math.sin(startAngle);
+      return [x5, z5];
     };
-    const [x1, y1] = getXY(r2 - depth2, startAngle);
-    const [x2, y2] = getXY(r2 - depth2, endAngle);
-    const [x3, y3] = getXY(r2, endAngle);
-    const [x4, y4] = getXY(r2, startAngle);
+    const [x1, z1] = getXY(r2 - depth2, startAngle);
+    const [x2, z2] = getXY(r2 - depth2, endAngle);
+    const [x3, z3] = getXY(r2, endAngle);
+    const [x4, z4] = getXY(r2, startAngle);
     const addPoint = {};
     const h = unitHeight / 2;
     addPoint[1] = () => {
-      push(x1, y1, z2 + height - h + 10);
+      push(x1, z1, y2 + height - h + 10);
     };
     addPoint[2] = () => {
-      push(x2, y2, z2 + height + h + 10);
+      push(x2, z2, y2 + height + h + 10);
     };
     addPoint[3] = () => {
-      push(x3, y3, z2 + height + h);
+      push(x3, z3, y2 + height + h);
     };
     addPoint[4] = () => {
-      push(x4, y4, z2 + height - h);
+      push(x4, z4, y2 + height - h);
     };
     addPoint[5] = () => {
-      push(x1, y1, z2);
+      push(x1, z1, y2);
     };
     addPoint[6] = () => {
-      push(x4, y4, z2);
+      push(x4, z4, y2);
     };
     addPoint[7] = () => {
-      push(x3, y3, z2);
+      push(x3, z3, y2);
     };
     addPoint[8] = () => {
-      push(x2, y2, z2);
+      push(x2, z2, y2);
     };
     let idx2 = 0;
     const colorVertices = new Float32Array(36 * 3);
-    const pushBRG = (x5, y5, z3) => {
+    const pushBRG = (x5, y3, z5) => {
       colorVertices[idx2++] = x5;
-      colorVertices[idx2++] = y5;
-      colorVertices[idx2++] = z3;
+      colorVertices[idx2++] = y3;
+      colorVertices[idx2++] = z5;
     };
     const tran = Math.sin(__privateGet(this, _transitionRadian2));
     const r1 = 0.2 + height / 255 * (0.816 - 0.2);
@@ -36945,7 +36948,7 @@ const fragmentShaderSourceCircle = "precision mediump float;\nuniform vec2 u_res
 const fragmentShaderSourcePoint = "precision mediump float;\nuniform vec2 u_resolution;\nuniform float u_radius;\n\nvoid main() {\n    vec2 coord = gl_PointCoord - vec2(0.5);  // 計算當前像素相對於點中心的座標\n    float dist = length(coord);  // 計算當前像素與點中心的距離\n    float edge = min(2.0 / u_radius, 0.2);\n    float radius = 0.5; // 在點相對空間中，gl_PointSize默認範圍[0, 1]\n    float alpha = smoothstep(radius - edge, radius + edge * 0.1, dist);  // 使用 smoothstep 來處理反鋸齒\n    \n    if (dist > radius) {\n        discard;  // 如果超過半徑，丟棄該片段\n    }\n    // gl_FragColor = vec4(1.0, 1.0, 0.0, 1.0);\n    gl_FragColor = vec4(vec3(1.0, gl_FragCoord.xy / u_resolution), 1.0 - alpha);  // 顏色為紅色，帶有反鋸齒效果的透明度\n}";
 const fragmentShaderSourceJuila = "precision highp float;\n\nuniform mediump vec2 u_resolution; // 畫布的解析度\nuniform vec2 u_c; // 常數c的值 \nuniform vec2 u_offset;\nuniform float u_zoom;\n\nvec2 complexMul(vec2 a, vec2 b) {\n    return vec2(a.x * b.x - a.y * b.y, a.x * b.y + a.y * b.x);\n}\n\nvoid main() {\n    vec2 z = (gl_FragCoord.xy - u_resolution * 0.5) / u_zoom + u_offset;\n    const int maxIterations = 100;\n    for(int i = 0; i < maxIterations; i++) {\n        z = complexMul(z, z) + u_c + u_offset;\n        if(dot(z, z) > 4.0){\n            // 方法一\n            // float color = 0.3 + 0.7 * float(i) / float(maxIterations);\n            // gl_FragColor = vec4(vec3(color), 1.0);\n\n            // 方法二\n            float n1 = (sin(pow(float(i), 0.6) * 50.0 / 100.0) * 0.35) + 0.65;\n            float n2 = (cos(pow(float(i), 0.6) * 50.0 / 100.0) * 0.35) + 0.65;\n            gl_FragColor = vec4(vec3(n1, 0.85 * n1, 0.55 * n1), 1.0);\n            break;\n        }\n    }\n}";
 const fragmentShaderSourceManderbrot = "precision highp float;\n\nuniform mediump vec2 u_resolution;\nuniform vec2 u_offset;\nuniform float u_zoom;\n\nstruct DoubleVec2 {\n    float high;\n    float low;\n};\n\nfloat decimalPlaces = 30.0;\nfloat scale = pow(10.0, decimalPlaces);\nfloat scaleReverse = pow(10.0, -decimalPlaces);\nfloat scaleSqrt = pow(10.0, decimalPlaces / 2.0);\n\nfloat getHigh(float value){\n    float scaledValue = value * scale;\n    float truncatedValue = floor(scaledValue);\n    float result = truncatedValue * scaleReverse;\n    return result;\n    // return value;\n}\n\n// 雙精度加法\nDoubleVec2 dadd(DoubleVec2 a, DoubleVec2 b) {\n    // 使用高位和低位加法\n    float sumHigh = getHigh(a.high + b.high);\n    float sumLow = a.low + b.low;\n\n    // 計算進位\n    float carry = floor(sumLow) * scaleReverse;\n\n    // 分配尾數\n    DoubleVec2 result;\n    result.high = sumHigh + 0.0;\n    result.low = sumLow - floor(sumLow);\n\n    if(floor(sumLow) > 1.0) result.high = 0.0;\n\n    return result;\n}\n\n//雙精度減法\nDoubleVec2 dminus(DoubleVec2 a, DoubleVec2 b) {\n    float sumHigh = getHigh(a.high - b.high);\n    float sumLow = a.low - b.low;\n    \n    // 分配尾數\n    DoubleVec2 result;\n    result.high = sumHigh + 0.0;\n    result.low = sumLow - floor(sumLow);\n\n    return result;\n}\n\nfloat fmul(float a, float b){\n    float left = (a * scaleSqrt - floor(a * scaleSqrt)) ;\n    float right = (b * scaleSqrt - floor(b * scaleSqrt)) ;\n    return left * right;\n}\n\n// 雙精度乘法\nDoubleVec2 dmul(DoubleVec2 a, DoubleVec2 b) {\n\n    // 0, 1, 2 表示單位，有多少次 2^(24)\n    // 其中 high 是 0，low 是 1，因此2會進位到1，1會進位到0\n    float hh0 = a.high * b.high; // 標準乘法\n    float hh1 = fmul(a.high, b.high); // 溢出小數\n    float hl1 = a.high * b.low + a.low * b.high; // 高位進位\n    float ll2 = a.low * b.low; // 低位進位\n\n    // 單位: n0 = n1 * scaleReverse; n1 = n2 * scaleReverse;\n    float high0 = hh0;\n    float low1 = hh1 + hl1 + floor(ll2) * scaleReverse;\n    // 返回結果\n    DoubleVec2 result;\n    result.high = getHigh(high0 + floor(low1) * scaleReverse);\n    result.low = low1 - floor(low1);\n\n    return result;\n}\n\n\nfloat getExponent(float num){\n    float exponent = floor(log(abs(num)) / log(10.0));\n    return pow(10.0, exponent);\n}\n\n// 雙精度除單精度\nDoubleVec2 ddiv(DoubleVec2 a, float b) {\n\n    float e = getExponent(b);\n    float hh0 = a.high / b;\n    float hh1 = (a.high) / floor(b / e) / e;\n    float hl1 = a.low / b;\n\n    float high0 = hh0;\n    float low1 = hh1 + hl1;\n\n    DoubleVec2 result;\n    result.high = getHigh(high0 + floor(low1) * scaleReverse);\n    result.low = low1 - floor(low1);\n\n    // if(low1 > 0.8) result.high = 0.0;\n    // if(floor(a.high / 100.0) * 100.0 == a.high) result.high = 0.0;\n\n    // if(hh0 / scaleReverse == hh1){\n    //     result.low = hh1;\n    // }\n    // else{\n    //     // result.low = hh1;\n    // }\n\n\n\n    return result;\n}\n\n// 將單精度浮點數轉換為倍精度結構\nDoubleVec2 floatToDoubleVec2(float f) {\n    DoubleVec2 result;\n    result.high = f;\n    result.low = 0.0;\n    return result;\n}\n\n// 將 DoubleVec2 結構轉換為單一浮點數\nfloat DoubleVec2ToFloat(DoubleVec2 d) {\n    return d.high;\n}\n\n// 161789956.22774595\n// 161789956.22774595\n// 546041102.2686427\n// 31958509.872147348\n\n// 2623956791.0043197\n// 802316031.8259898\n// 75031682.7451647\n\nvoid main(){\n\n    const bool isDouble = true;\n    const bool isDouble2 = false;\n    if(isDouble2){\n        \n        DoubleVec2 cX = floatToDoubleVec2(gl_FragCoord.x - u_resolution.x * 0.5 + u_offset.x);\n        DoubleVec2 cY = floatToDoubleVec2(gl_FragCoord.y - u_resolution.y * 0.5 + u_offset.y);\n        cX = ddiv(cX, u_zoom);\n        cY = ddiv(cY, u_zoom);\n        // if(u_offset.x > floor(u_offset.x)) return;\n\n        // if(cX.low == 0.0 && cY.low == 0.0) return;\n        // if(gl_FragCoord.x < 500.0) return;\n        // if(pow(10.0, -44.) == 0.0) return;\n        \n        DoubleVec2 zX = floatToDoubleVec2(0.0);\n        DoubleVec2 zY = floatToDoubleVec2(0.0);\n\n        for (float i = 0.0; i < 100.0; i++) {\n\n            // z = z^2 + c\n            DoubleVec2 zX2 = dmul(zX, zX);\n            DoubleVec2 zY2 = dmul(zY, zY);\n            DoubleVec2 zXY = dmul(zX, zY);\n\n            zX = dadd(dminus(zX2, zY2), cX);\n            zY = dadd(dadd(zXY, zXY), cY);\n\n            // if(zX.low == 0.0 && zY.low == 0.0) return;\n\n            // 使用倍精度計算長度\n            DoubleVec2 len2 = dadd(dmul(zX, zX), dmul(zY, zY));\n            if (DoubleVec2ToFloat(len2) > 4.0) {\n                float color = i / 100.0;\n                gl_FragColor = vec4(color * 0.9, color * 0.8, color * 0.25, 1.0);\n                break;\n            }\n        }\n        return;\n    }\n\n    vec2 c = (gl_FragCoord.xy - u_resolution * 0.5) / u_zoom + u_offset;\n    // vec2 c = (gl_FragCoord.xy - u_resolution * 0.5  + u_offset) / u_zoom;\n    vec2 z = vec2(0.0, 0.0);\n    \n    for (float i = 0.0; i < 100.0; i++) {\n\n        z = vec2(z.x * z.x - z.y * z.y, 2.0 * z.x * z.y) + c;\n        if (length(z) > 2.0){\n            float color = i / 100.0;\n            gl_FragColor = vec4(color, color * 0.5, color * 0.25, 1.0);\n            break;\n        }\n    }\n}\n";
-const fragmentShaderSourceBurningShip = "precision highp float;\n\nuniform mediump vec2 u_resolution;\nuniform vec2 u_offset;\nuniform float u_zoom;\nuniform float u_transform;\n\nfloat rand(float s) {\n  return fract(sin(s*12.9898) * 43758.5453);\n}\n\nvoid main() {\n    vec3 color = vec3(0.0, 0.0, 0.0);\n    vec2 c = (gl_FragCoord.xy - u_resolution * 0.5) / u_zoom + u_offset;\n    c.y *= -1.0; // 翻轉 y 軸\n\n    // 反鋸齒 & 隨機取樣\n    const float AA_LEVEL = 2.0;\n    for (float I = 0.; I < AA_LEVEL; I++) {\n        \n        float dx = u_offset.x - floor(u_offset.x);\n        float dy = u_offset.y - floor(u_offset.y);\n        vec2 dc = vec2(rand(dx * I * 0.54321 ), rand(dy * I * 0.12345 )) / u_zoom;\n        if(I == 0.0) dc *= 0.0;\n        vec2 z = vec2(0.0);\n        float iteration = 0.0;\n        const float max_iterations = 100.0;\n\n        // 比較迭代前後的差異進行顏色渲染\n        vec3 sum = vec3(0.0, 0.0, 0.0);\n        vec2 pz = z;\n        vec2 ppz = z;\n\n        // Burning Ship 分形迭代\n        iteration = max_iterations;\n        for (float i = 0.0; i < max_iterations; i++) {\n            if(i < u_transform) z = vec2(abs(z.x), abs(z.y)); // 將實部與虛部取絕對值\n            z = vec2(z.x * z.x - z.y * z.y, 2.0 * z.x * z.y) + c + dc;\n            \n            if (length(z) > 4.0){\n                iteration = i;\n                break; // 如果距離超過閾值，退出迴圈\n            }\n            ppz = pz;\n            pz = z;\n            sum.x += dot(z - pz, pz - ppz);\n            sum.y += dot(z - pz, z - pz);\n            sum.z += dot(z - ppz, pz - ppz);\n        }\n\n        // 計算顏色\n        // float color = 0.1 + 0.7 * (iteration / max_iterations);\n        // gl_FragColor = vec4(vec3(color, color * 0.75, color * 0.25), 1.0);\n        if(iteration < max_iterations){\n            float n1 = sin((iteration) * 0.15) * 0.35 + 0.65;\n            float n2 = cos((iteration) * 1.50) * 0.15 + 0.65;\n            color+= vec3(clamp(vec3(n1, n2, (n1 + n2) / 2.0), 0.0, 1.0));\n        }\n        else{\n            sum = abs(sum) / max_iterations;\n            vec3 color = sin(abs(sum * 5.0)) * 0.45 + 0.5;\n            color+= vec3(clamp(color, 0.0, 1.0));\n            if(I == 0.) break;\n        }\n    }\n    color /= AA_LEVEL;\n\n     // 使用硬邊界\n    float width = 1.0 / u_zoom;\n    float axisX = step(width / 2.0, abs(c.y));\n    float axisY = step(width / 2.0, abs(c.x));\n    \n    vec3 axisColor = vec3(0.0, 0.0, 0.0);\n    vec3 finalColor = mix(axisColor, color, (axisX + axisY) / 2.0);\n    gl_FragColor = vec4(finalColor, 1.0);\n}";
+const fragmentShaderSourceBurningShip = "precision highp float;\n\nuniform mediump vec2 u_resolution;\nuniform vec2 u_offset;\nuniform float u_zoom;\nuniform float u_transform;\n\nfloat rand(float s) {\n  return fract(sin(s*12.9898) * 43758.5453);\n}\n\nvoid main() {\n    vec3 color = vec3(0.0, 0.0, 0.0);\n    vec2 c = (gl_FragCoord.xy - u_resolution * 0.5) / u_zoom + u_offset;\n    c.y *= -1.0; // 翻轉 y 軸\n\n    // 反鋸齒\n    const float AA_LEVEL = 2.0;\n    for (float I = 0.; I < AA_LEVEL; I++) {\n        // 隨機取樣\n        float dx = u_offset.x - floor(u_offset.x);\n        float dy = u_offset.y - floor(u_offset.y);\n        vec2 dc = vec2(rand(dx * I * 0.54321 ), rand(dy * I * 0.12345 )) / u_zoom;\n        if(I == 0.0) dc *= 0.0;\n        vec2 z = vec2(0.0);\n\n        // 比較迭代前後的差異進行顏色渲染\n        // vec3 sum = vec3(0.0, 0.0, 0.0);\n        // vec2 pz = z;\n        // vec2 ppz = z;\n\n        // Burning Ship 分形迭代\n        const float max_iterations = 100.0;\n        float iteration = max_iterations;\n        for (float i = 0.0; i < max_iterations; i++) {\n            if(i < u_transform) z = vec2(abs(z.x), abs(z.y));\n            z = vec2(z.x * z.x - z.y * z.y, 2.0 * z.x * z.y) + c + dc;\n            \n            if (length(z) > 4.0){\n                iteration = i;\n                break; // 如果距離超過閾值，退出迴圈\n            }\n            // ppz = pz;\n            // pz = z;\n            // sum.x += dot(z - pz, pz - ppz);\n            // sum.y += dot(z - pz, z - pz);\n            // sum.z += dot(z - ppz, pz - ppz);\n        }\n\n        // 計算顏色\n        if(iteration < max_iterations){\n            float n1 = sin((iteration) * 0.15) * 0.35 + 0.65;\n            float n2 = cos((iteration) * 1.50) * 0.15 + 0.65;\n            float r = n1 + 0.2 * n2;\n            float g = n2 + 0.2 * n1;\n            float b = (n1 + n2) * 0.4;\n            color+= vec3(clamp(vec3(r, g, b), 0.0, 1.0));\n        }\n        // else{\n        //     sum = abs(sum) / max_iterations;\n        //     vec3 color = sin(abs(sum * 5.0)) * 0.45 + 0.5;\n        //     color+= vec3(clamp(color, 0.0, 1.0));\n        //     if(I == 0.) break;\n        // }\n        \n        // float col = 0.1 + 0.7 * (iteration / max_iterations);\n        // color+= vec3(col, col * 0.75, col * 0.25);\n        // float n1 = (sin(pow(iteration, 0.6) * 50.0 / 100.0) * 0.35) + 0.65;\n        // color+= vec3(n1, 0.85 * n1, 0.55 * n1);\n    }\n    color /= AA_LEVEL;\n\n    // 使用硬邊界\n    float width = 2.0 / u_zoom;\n    float axisX = step(width / 2.0, abs(c.y));\n    float axisY = step(width / 2.0, abs(c.x));\n    \n    vec3 axisColor = vec3(1.0, 1.0, 1.0);\n    vec3 finalColor = mix(axisColor, color, (axisX + axisY) / 2.0);\n    gl_FragColor = vec4(finalColor, 1.0);\n}";
 const fragmentShaderSourceAntiAliasing = "precision highp float;\n\nuniform sampler2D u_texture;  // 接收上一步的 texture\nvarying vec2 v_texCoord;  // 傳遞紋理坐標\n\nvoid main() {\n    // 獲取當前像素以及周圍的像素值進行抗鋸齒處理\n    vec3 color = texture2D(u_texture, v_texCoord).rgb;\n\n    // 動態應用 FXAA 或其他抗鋸齒技術\n    // vec3 antiAliasedColor = applyFXAA(u_texture, v_texCoord);\n\n    // 最終輸出\n    gl_FragColor = vec4(color, 1.0);\n}";
 function createShader(gl2, type, source) {
   const shader = gl2.createShader(type);
@@ -37315,6 +37318,11 @@ const CanvasSectionS4 = ({ ratio, min, sectinoID = "JuliaSet" }) => {
   function getPreciseOffset(offset) {
     return Math.floor(offset * step) / step;
   }
+  const [transform, setTransform] = reactExports.useState(0);
+  function handleClick(value) {
+    myGLSL.setTransform(value);
+    setTransform(value);
+  }
   return /* @__PURE__ */ jsxRuntimeExports.jsxs(
     "section",
     {
@@ -37355,10 +37363,10 @@ const CanvasSectionS4 = ({ ratio, min, sectinoID = "JuliaSet" }) => {
             /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: () => setUseMouse(!useMouse), id: "useMouse", children: useMouse ? "只允許使用面板" : "還是用滑鼠好了" }),
             /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: resetScreen, children: "畫面置中" }),
             /* @__PURE__ */ jsxRuntimeExports.jsx(RecordBtn, { canvas }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: () => setIsJulia(!isJulia), children: isJulia == true ? "觀看更多" : "回到Julia" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: () => setIsJulia(!isJulia), children: isJulia == true ? "其他圖形" : "回到Julia" }),
             !isJulia && /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: () => myGLSL.setTransform(0), disabled: false, children: "查看Manderbrot" }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: () => myGLSL.setTransform(100), disabled: false, children: "查看BurningShip" })
+              /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: () => handleClick(0), disabled: !transform ? true : false, children: "查看Manderbrot" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: () => handleClick(100), disabled: transform ? true : false, children: "查看BurningShip" })
             ] })
           ] }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("div", { ref: logRef, children: /* @__PURE__ */ jsxRuntimeExports.jsx("p", { id: "dialog", children: useMouse ? MESSAGE_MOUSE_READY + (isWheel ? MESSAGE_ZOOMING : isMouseDown ? MESSAGE_DRAGGING : "") : MESSAGE_MOUSE_LOCKED }) }),
@@ -45537,4 +45545,4 @@ function App() {
 const domNode = document.getElementById("root");
 const root = createRoot(domNode);
 root.render(/* @__PURE__ */ jsxRuntimeExports.jsx(App, {}));
-//# sourceMappingURL=index-BSkdxNTB.js.map
+//# sourceMappingURL=index-CBZbSgQn.js.map
