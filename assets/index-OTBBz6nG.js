@@ -35686,6 +35686,8 @@ class ParticleSystem3D {
     this.world.gravity.set(0, -9.82 * 10, 0);
     this.groundMaterial = new cannonExports.Material();
     this.sphereMaterial = new cannonExports.Material();
+    this.sphereMaterial.friction = 0;
+    this.sphereMaterial.restitution = 1;
     const contactMaterial = new cannonExports.ContactMaterial(this.sphereMaterial, this.groundMaterial, {
       friction: 0.1,
       // 低摩擦
@@ -35714,7 +35716,7 @@ class ParticleSystem3D {
       const x2 = r2 * Math.sin(phi) * Math.cos(theta);
       const y2 = 100 + r2 * Math.sin(phi) * Math.sin(theta);
       const z2 = r2 * Math.cos(phi);
-      const radius = 5;
+      const radius = 10;
       const position = new Vector3(x2, y2, z2);
       this.spheres.push(this.createSphere(radius, position));
     }
@@ -35803,6 +35805,19 @@ class ParticleSystem3D {
     column.geometry.setAttribute("color", colorAttribute);
     const material = new MeshBasicMaterial({ "vertexColors": true });
     column.mesh = new Mesh(column.geometry, material);
+    column.body = new Array(length2).fill().map(() => {
+      const body = new cannonExports.Body({
+        mass: 0,
+        // 靜態物體
+        material: this.groundMaterial,
+        collisionFilterGroup: 2,
+        // 所屬組為 1
+        collisionFilterMask: 1
+        // 只與其他組碰撞，不與同一組的物體碰撞
+      });
+      this.world.addBody(body);
+      return body;
+    });
     column.updateVertices = (index) => {
       const startAngle = index / column.length * Math.PI * 2;
       const endAngle = (index + 1) / column.length * Math.PI * 2;
@@ -35824,6 +35839,8 @@ class ParticleSystem3D {
         endAngle,
         transition
       );
+      column.body[index].shape = [];
+      if (shape) column.body[index].addShape(shape);
       const cubeVertexCount = 36;
       const vertexIndex = index * cubeVertexCount * 3;
       const vertices = column.geometry.attributes.position.array;
@@ -36105,52 +36122,54 @@ class ParticleSystem3D {
   getColumnVerticesByAngle(centerX, centerZ, y2, r2, depth2, height, unitHeight, startAngle, endAngle, transition) {
     const vertices = new Float32Array(36 * 3);
     let idx = 0;
-    const push = (x5, z5, y3) => {
-      vertices[idx++] = x5;
+    const push = (x2, z2, y3) => {
+      vertices[idx++] = x2;
       vertices[idx++] = y3;
-      vertices[idx++] = z5;
+      vertices[idx++] = z2;
     };
     const getXY = (radius, angle) => {
-      const x5 = centerX + radius * Math.cos(angle) - r2 * Math.cos(startAngle);
-      const z5 = centerZ + radius * Math.sin(angle) - r2 * Math.sin(startAngle);
-      return [x5, z5];
+      const x2 = centerX + radius * Math.cos(angle) - r2 * Math.cos(startAngle);
+      const z2 = centerZ + radius * Math.sin(angle) - r2 * Math.sin(startAngle);
+      return [x2, z2];
     };
-    const [x1, z1] = getXY(r2 - depth2, startAngle);
-    const [x2, z2] = getXY(r2 - depth2, endAngle);
-    const [x3, z3] = getXY(r2, endAngle);
-    const [x4, z4] = getXY(r2, startAngle);
     const addPoint = {};
     const h = unitHeight / 2;
-    addPoint[1] = () => {
-      push(x1, z1, y2 + height - h + 10);
-    };
-    addPoint[2] = () => {
-      push(x2, z2, y2 + height + h + 10);
-    };
-    addPoint[3] = () => {
-      push(x3, z3, y2 + height + h);
-    };
-    addPoint[4] = () => {
-      push(x4, z4, y2 + height - h);
-    };
-    addPoint[5] = () => {
-      push(x1, z1, y2);
-    };
-    addPoint[6] = () => {
-      push(x4, z4, y2);
-    };
-    addPoint[7] = () => {
-      push(x3, z3, y2);
-    };
-    addPoint[8] = () => {
-      push(x2, z2, y2);
-    };
+    {
+      const [x1, z1] = getXY(r2 - depth2, startAngle);
+      const [x2, z2] = getXY(r2 - depth2, endAngle);
+      const [x3, z3] = getXY(r2, endAngle);
+      const [x4, z4] = getXY(r2, startAngle);
+      addPoint[1] = () => {
+        push(x1, z1, y2 + height - h + 10);
+      };
+      addPoint[2] = () => {
+        push(x2, z2, y2 + height + h + 10);
+      };
+      addPoint[3] = () => {
+        push(x3, z3, y2 + height + h);
+      };
+      addPoint[4] = () => {
+        push(x4, z4, y2 + height - h);
+      };
+      addPoint[5] = () => {
+        push(x1, z1, y2);
+      };
+      addPoint[6] = () => {
+        push(x4, z4, y2);
+      };
+      addPoint[7] = () => {
+        push(x3, z3, y2);
+      };
+      addPoint[8] = () => {
+        push(x2, z2, y2);
+      };
+    }
     let idx2 = 0;
     const colorVertices = new Float32Array(36 * 3);
-    const pushBRG = (x5, y3, z5) => {
-      colorVertices[idx2++] = x5;
+    const pushBRG = (x2, y3, z2) => {
+      colorVertices[idx2++] = x2;
       colorVertices[idx2++] = y3;
-      colorVertices[idx2++] = z5;
+      colorVertices[idx2++] = z2;
     };
     const tran = Math.sin(__privateGet(this, _transitionRadian2));
     const r1 = 0.2 + height / 255 * (0.816 - 0.2);
@@ -37226,8 +37245,8 @@ const CanvasSectionS4 = ({ ratio, min, sectinoID = "JuliaSet" }) => {
   const menu = reactExports.useRef(null);
   const [isWheel, setIsWheel] = reactExports.useState(false);
   function handleWheel(e) {
-    setIsWheel(true);
     if (!useMouse) return;
+    setIsWheel(true);
     const zommIn = e.deltaY > 0 ? 0.5 : 1.5;
     const addOffsetX = (canvas.current.width / 2 - myMouse.targetX) / zoom * 50;
     const addOffsetY = -(canvas.current.height / 2 - myMouse.targetY) / zoom * 50;
@@ -37282,20 +37301,20 @@ const CanvasSectionS4 = ({ ratio, min, sectinoID = "JuliaSet" }) => {
   function handleTouchMove(e) {
     if (e.target.tagName == "BUTTON" || e.target.tagName == "INPUT") return;
     if (e.touches.length === 2) {
-      const newDistance = getDistance(e.touches[0], e.touches[1]);
-      const zoomIn = newDistance / initialDistance.current;
       const centerX = (myMouse.targetX + e.touches[1].clientX) / 2;
       const centerY = (myMouse.targetY + e.touches[1].clientY) / 2;
       const addOffsetX = (canvas.current.width / 2 - centerX) / zoom * 50;
       const addOffsetY = -(canvas.current.height / 2 - centerY) / zoom * 50;
+      const newDistance = getDistance(e.touches[0], e.touches[1]);
+      const zoomIn = newDistance / initialDistance.current;
       setZoom(zoom * zoomIn);
       setOffsetX(offsetX + addOffsetX / zoomIn - addOffsetX);
       setOffsetY(offsetY + addOffsetY / zoomIn - addOffsetY);
       initialDistance.current = newDistance;
       e.preventDefault();
     } else {
-      const addOffsetX = (myMouse.targetX - preMouse.current[0].x) / zoom * 50;
-      const addOffsetY = (myMouse.targetY - preMouse.current[1].y) / zoom * 50;
+      const addOffsetX = (myMouse.targetX - preMouse.current.x) / zoom * 50;
+      const addOffsetY = (myMouse.targetY - preMouse.current.y) / zoom * 50;
       preMouse.current = { x: myMouse.targetX, y: myMouse.targetY };
       setOffsetX(offsetX - addOffsetX);
       setOffsetY(offsetY + addOffsetY);
@@ -37306,8 +37325,7 @@ const CanvasSectionS4 = ({ ratio, min, sectinoID = "JuliaSet" }) => {
   function handleTouchEnd(e) {
     if (e.touches.length < 2) {
       setIsWheel(false);
-      initialDistance.current = 0;
-    } else if (e.touches.length < 1) {
+    } else if (e.touches.length === 1) {
       setIsMouseDown(false);
     }
   }
@@ -45545,4 +45563,4 @@ function App() {
 const domNode = document.getElementById("root");
 const root = createRoot(domNode);
 root.render(/* @__PURE__ */ jsxRuntimeExports.jsx(App, {}));
-//# sourceMappingURL=index-CBZbSgQn.js.map
+//# sourceMappingURL=index-OTBBz6nG.js.map
