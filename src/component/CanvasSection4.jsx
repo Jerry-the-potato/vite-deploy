@@ -64,8 +64,8 @@ const CanvasSectionS4 = ({ ratio, min, sectinoID = "JuliaSet"}) => {
     
     const [isWheel, setIsWheel] = useState(false);
     function handleWheel(e){
-        setIsWheel(true);
         if(!useMouse) return;
+        setIsWheel(true);
         const zommIn = (e.deltaY > 0) ? 0.5 : 1.5;
         const addOffsetX = (canvas.current.width / 2 - myMouse.targetX) / zoom * 50;
         const addOffsetY = -(canvas.current.height / 2 - myMouse.targetY) / zoom * 50;
@@ -127,16 +127,14 @@ const CanvasSectionS4 = ({ ratio, min, sectinoID = "JuliaSet"}) => {
         if(e.target.tagName == "BUTTON" || e.target.tagName == "INPUT") return;
         if (e.touches.length === 2) {
             // 兩個手指，判定縮放
-            const newDistance = getDistance(e.touches[0], e.touches[1]);
-            const zoomIn = newDistance / initialDistance.current;
-
             // myMouse 儲存的是父層PlayGround的Touchmove事件中的第一個手指頭
-            // const addOffsetX = (canvas.current.width / 2 - myMouse.targetX) / zoom * 50;
-            // const addOffsetY = -(canvas.current.height / 2 - myMouse.targetY) / zoom * 50;
             const centerX = (myMouse.targetX + e.touches[1].clientX) / 2;
             const centerY = (myMouse.targetY + e.touches[1].clientY) / 2;
             const addOffsetX = (canvas.current.width / 2 - centerX) / zoom * 50;
             const addOffsetY = -(canvas.current.height / 2 - centerY) / zoom * 50;
+
+            const newDistance = getDistance(e.touches[0], e.touches[1]);
+            const zoomIn = newDistance / initialDistance.current;
             setZoom(zoom * zoomIn);
             setOffsetX(offsetX + addOffsetX / zoomIn - addOffsetX);
             setOffsetY(offsetY + addOffsetY / zoomIn - addOffsetY);
@@ -146,8 +144,8 @@ const CanvasSectionS4 = ({ ratio, min, sectinoID = "JuliaSet"}) => {
         }
         else{
             // 預設為一個手指
-            const addOffsetX = (myMouse.targetX - preMouse.current[0].x) / zoom * 50;
-            const addOffsetY = (myMouse.targetY - preMouse.current[1].y) / zoom * 50;
+            const addOffsetX = (myMouse.targetX - preMouse.current.x) / zoom * 50;
+            const addOffsetY = (myMouse.targetY - preMouse.current.y) / zoom * 50;
             preMouse.current = {x: myMouse.targetX, y: myMouse.targetY};
             setOffsetX(offsetX - addOffsetX);
             setOffsetY(offsetY + addOffsetY);
@@ -158,9 +156,8 @@ const CanvasSectionS4 = ({ ratio, min, sectinoID = "JuliaSet"}) => {
     function handleTouchEnd(e) {
         if (e.touches.length < 2) {
             setIsWheel(false);
-            initialDistance.current = 0;
         }
-        else if(e.touches.length < 1){
+        else if(e.touches.length === 1){
             setIsMouseDown(false);
         }
     }

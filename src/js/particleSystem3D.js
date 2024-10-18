@@ -65,8 +65,8 @@ export default class ParticleSystem3D{
 
         // this.groundMaterial.friction = 0; // 無摩擦
         // this.groundMaterial.restitution = 1; // 完全彈性
-        // this.sphereMaterial.friction = 0;
-        // this.sphereMaterial.restitution = 1;
+        this.sphereMaterial.friction = 0;
+        this.sphereMaterial.restitution = 1;
 
         const contactMaterial = new CANNON.ContactMaterial(this.sphereMaterial, this.groundMaterial, {
             friction: 0.1, // 低摩擦
@@ -95,10 +95,7 @@ export default class ParticleSystem3D{
             const y = 100 + r * Math.sin(phi) * Math.sin(theta);
             const z = r * Math.cos(phi);
 
-            const radius = 5;
-            // const x = (i - 100 + Math.random() - 0.5) * radius ;
-            // const y = (i - 100 + Math.random() - 0.5) * radius ;
-            // const z = (20 * Math.random() + 10) * radius ;
+            const radius = 10;
             const position = new THREE.Vector3(x, y, z);
             this.spheres.push(this.createSphere(radius, position));
         }
@@ -223,16 +220,16 @@ export default class ParticleSystem3D{
         const material = new THREE.MeshBasicMaterial({ 'vertexColors': true });
         column.mesh = new THREE.Mesh( column.geometry, material ); 
 
-        // column.body = new Array(length).fill().map(() =>{
-        //     const body = new CANNON.Body({
-        //         mass: 0, // 靜態物體
-        //         material: this.groundMaterial,
-        //         collisionFilterGroup: 2, // 所屬組為 1
-        //         collisionFilterMask: 1,  // 只與其他組碰撞，不與同一組的物體碰撞
-        //     })
-        //     this.world.addBody(body);
-        //     return body;
-        // });
+        column.body = new Array(length).fill().map(() =>{
+            const body = new CANNON.Body({
+                mass: 0, // 靜態物體
+                material: this.groundMaterial,
+                collisionFilterGroup: 2, // 所屬組為 1
+                collisionFilterMask: 1,  // 只與其他組碰撞，不與同一組的物體碰撞
+            })
+            this.world.addBody(body);
+            return body;
+        });
         // column.box = new Array(length).fill().map(() =>{
         //     const geometry = new THREE.BoxGeometry(10, 100, 10);
         //     console.log(geometry);
@@ -280,9 +277,9 @@ export default class ParticleSystem3D{
             // column.box[index].geometry = geometry;
             // column.box[index].position.copy(column.body[index].position);
             // column.box[index].quaternion.copy(column.body[index].quaternion);
-
-            // column.body.shape = [];
-            // column.body.addShape(shape);
+            
+            column.body[index].shape = [];
+            if(shape) column.body[index].addShape(shape);
 
             const cubeVertexCount = 36;
             const vertexIndex = index * cubeVertexCount * 3; 
@@ -585,13 +582,14 @@ export default class ParticleSystem3D{
             const z = centerZ + radius * Math.sin(angle) - r * Math.sin(startAngle);
             return [x, z];
         }
+        const addPoint = {};
+        const h = unitHeight / 2; 
+        {
         const [x1, z1] = getXY(r - depth, startAngle);
         const [x2, z2] = getXY(r - depth, endAngle);
         const [x3, z3] = getXY(r, endAngle);
         const [x4, z4] = getXY(r, startAngle);
 
-        const addPoint = {};
-        const h = unitHeight / 2; 
         addPoint[1] = () => { push(x1, z1, y + height - h + 10) }; // 上面左側
         addPoint[2] = () => { push(x2, z2, y + height + h + 10) }; // 上面右側
         addPoint[3] = () => { push(x3, z3, y + height + h) }; // 上面右側外側
@@ -600,7 +598,7 @@ export default class ParticleSystem3D{
         addPoint[6] = () => { push(x4, z4, y) }; // 下面左側外側
         addPoint[7] = () => { push(x3, z3, y) }; // 下面右側外側
         addPoint[8] = () => { push(x2, z2, y) }; // 下面右側
-
+        }
         let idx2 = 0;
         const colorVertices = new Float32Array(36 * 3);
         const pushBRG = (x, y, z) => {
@@ -653,6 +651,7 @@ export default class ParticleSystem3D{
             addColor[point]();
         })
         
+        // 在 CANNON 的凸多面體中，必須將原點包含在內，所以不能使用轉換後的座標：
         // const cannonVertices = [
         //     new CANNON.Vec3(0, 0, 0),
         //     new CANNON.Vec3(x1, y + height - h + 10, z1), // 上面左側
@@ -664,13 +663,33 @@ export default class ParticleSystem3D{
         //     new CANNON.Vec3(x3, y, z3), // 下面右側外側
         //     new CANNON.Vec3(x2, y, z2), // 下面右側
         // ]
+        // const getXZ = (radius, angle) => {
+        //     const x = radius * Math.cos(angle) - (r - depth * 0.5) * Math.cos(startAngle);
+        //     const z = radius * Math.sin(angle) - (r - depth * 0.5) * Math.sin(startAngle);
+        //     return [x, z];
+        // }
+        // const [x1, z1] = getXZ(r - depth, startAngle);
+        // const [x2, z2] = getXZ(r - depth, endAngle);
+        // const [x3, z3] = getXZ(r, endAngle);
+        // const [x4, z4] = getXZ(r, startAngle);
+        // const cannonVertices = [
+        //     new CANNON.Vec3(0, 0, 0),
+        //     new CANNON.Vec3(x1, height - h + 10, z1), // 上面左側
+        //     new CANNON.Vec3(x2, height + h + 10, z2), // 上面右側
+        //     new CANNON.Vec3(x3, height + h, z3), // 上面右側外側
+        //     new CANNON.Vec3(x4, height - h, z4), // 上面左側外側
+        //     new CANNON.Vec3(x1, -1, z1), // 下面左側
+        //     new CANNON.Vec3(x4, -1, z4), // 下面左側外側
+        //     new CANNON.Vec3(x3, -1, z3), // 下面右側外側
+        //     new CANNON.Vec3(x2, -1, z2), // 下面右側
+        // ]
         // const faces = [
-        //     [1,2,3,4],
+        //     [1, 2, 3, 4],
         //     [5, 6, 7, 8],
-        //     [1,4,6,5],
-        //     [2,8,7,3],
+        //     [1, 4, 6, 5],
+        //     [2, 8, 7, 3],
         //     [3, 7, 6, 4],
-        //     [1,5,8,2]
+        //     [1, 5, 8, 2]
         // ];
         // const shape = new CANNON.ConvexPolyhedron(
         //     cannonVertices, 
@@ -679,6 +698,7 @@ export default class ParticleSystem3D{
 
         // 返回圓餅切片－長方體的 36 個頂點坐標、頂點顏色
         return [vertices, colorVertices];
+        // return [vertices, colorVertices, shape];
     }
     
 
