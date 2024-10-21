@@ -1,5 +1,5 @@
 ### 專案簡介
-這是一個以演算法和動畫視覺化為核心的實驗性專案，旨在探索粒子系統、3D 圖形與 WebGL 渲染技術的創新應用。專案中的每個部分均代表不同的技術探索，結合了演算法視覺化、響應式元件設計與動畫管理。專案目前處於早期開發階段，但具備高度可擴展性和探索潛力，特別適合對前端技術、動畫系統與演算法有興趣的開發者。
+這是一個以演算法和動畫視覺化為核心的實驗性專案，旨在探索粒子系統、3D 圖形與 WebGL 渲染技術的創新應用。並在 2024 ithome 鐵人賽整理成系列文，專案中的每個部分均代表不同的技術探索，結合了演算法視覺化、響應式元件設計與動畫管理。專案目前處於開發階段，但具備高度可擴展性和探索潛力，特別適合對前端技術、動畫系統與演算法有興趣的開發者。
 
 gh-pages 線上 Demo: [https://jerry-the-potato.github.io/vite-deploy](https://jerry-the-potato.github.io/vite-deploy)
 
@@ -8,6 +8,10 @@ gh-pages 線上 Demo: [https://jerry-the-potato.github.io/vite-deploy](https://j
 ![https://ithelp.ithome.com.tw/upload/images/20241006/20135197pdqZn30qAR.png](https://ithelp.ithome.com.tw/upload/images/20241006/20135197pdqZn30qAR.png)
 
 ![https://ithelp.ithome.com.tw/upload/images/20241007/201351973DBTkRlOJv.png](https://ithelp.ithome.com.tw/upload/images/20241007/201351973DBTkRlOJv.png)
+
+![https://ithelp.ithome.com.tw/upload/images/20241013/20135197seUO2Qbruw.png](https://ithelp.ithome.com.tw/upload/images/20241013/20135197seUO2Qbruw.png)
+
+![https://ithelp.ithome.com.tw/upload/images/20241017/20135197GluJk9zXLq.png](https://ithelp.ithome.com.tw/upload/images/20241017/20135197GluJk9zXLq.png)
 
 ### 專案目標
 這個專案主要是：
@@ -25,9 +29,10 @@ gh-pages 線上 Demo: [https://jerry-the-potato.github.io/vite-deploy](https://j
 * [Three.js](https://ithelp.ithome.com.tw/articles/10341610)
 * [BuffGemetry](https://ithelp.ithome.com.tw/articles/10341831)
 
+
 完整系列文：
 * 目錄－[讓演算法起舞：前端特效應用的探索之旅](https://ithelp.ithome.com.tw/users/20135197/ironman/7565)
 * 主題1－[B4 在旋轉的沙漏中：掠食者與獵物的動態美學](https://ithelp.ithome.com.tw/articles/10358208)
 * 主題2－[C2 讓排序演算法起舞吧！最小單位：華爾滋](https://ithelp.ithome.com.tw/articles/10361096)
 * 主題3－[D1 Three.js 與音訊處理：3D 音頻視覺化的架構搭建指南](https://ithelp.ithome.com.tw/articles/10364878)
-* 主題4－
+* 主題4－[E3 渲染的奧秘：分形茱莉亞集合的片段著色器藝術](https://ithelp.ithome.com.tw/articles/10367905)
