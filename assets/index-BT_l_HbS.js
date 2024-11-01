@@ -45456,7 +45456,7 @@ function CookieTable() {
     });
     setRows(newRows);
   }, [tableData]);
-  return /* @__PURE__ */ jsxRuntimeExports.jsx("section", { className: "section", id: "cookie", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Table, { columns, rows }) });
+  return /* @__PURE__ */ jsxRuntimeExports.jsx("section", { className: "section", id: "CookieTable", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Table, { columns, rows }) });
 }
 function GetHyperLink({ divRef }) {
   const [hyperlink, setHyperlink] = reactExports.useState();
@@ -45563,4 +45563,4 @@ function App() {
 const domNode = document.getElementById("root");
 const root = createRoot(domNode);
 root.render(/* @__PURE__ */ jsxRuntimeExports.jsx(App, {}));
-//# sourceMappingURL=index-OTBBz6nG.js.map
+//# sourceMappingURL=index-BT_l_HbS.js.map
