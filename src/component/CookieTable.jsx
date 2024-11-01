@@ -65,7 +65,7 @@ function CookieTable(){
         //     });
 
     }, [tableData]);
-    return <section className="section" id="cookie">
+    return <section className="section" id="CookieTable">
             <Table columns={columns} rows={rows}/>
         </section>
 }
